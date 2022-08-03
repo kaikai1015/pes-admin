@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWoDemandVMapper">
+
+    <resultMap type="SyncWieWoDemandVEO" id="SyncWieWoDemandVEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+        <result property="operationName"    column="OPERATION_NAME"    />
+        <result property="materialSeqNumber"    column="MATERIAL_SEQ_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="requiredDate"    column="REQUIRED_DATE"    />
+        <result property="quantityPerProduct"    column="QUANTITY_PER_PRODUCT"    />
+        <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="transactionQuantity"    column="TRANSACTION_QUANTITY"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="basisType"    column="BASIS_TYPE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="workOrderStatusId"    column="WORK_ORDER_STATUS_ID"    />
+    </resultMap>
+
+    <sql id="selectSyncWieWoDemandVVo">
+        SELECT
+        wwom.work_order_id,
+        wwom.organization_id,
+        wwom.work_order_operation_material_id AS WO_OPERATION_MATERIAL_ID,
+        '发料' AS OPERATION_NAME,
+        wwom.material_sequence_number AS MATERIAL_SEQ_NUMBER,
+        wwom.inventory_item_id,
+        wwom.required_date,
+        --wwom.quantity_per_product,
+        (case when pwcd.work_center_code = 1 and wwom.techniques_code in (4,10) then 0 else wwom.quantity_per_product end) as quantity_per_product,
+        --(wwom.required_quantity + wwom.sun_hao_quantity) AS required_quantity,
+        (case when pwcd.work_center_code = 1 and wwom.techniques_code in (4,10) then 0 else (wwom.required_quantity + wwom.sun_hao_quantity) end) as required_quantity,
+        wwom.issued_quantity,
+        wwom.uom_code,
+        0 AS TRANSACTION_QUANTITY,
+        wwom.BASIS_TYPE,
+        wwom.subinventory_code,
+        wwom.last_update_date,
+        wwom.last_update_by as last_updated_by
+        FROM
+        pes_wie_wo_operation_materials_erp wwom,
+        pes_wie_work_orders_b_erp wwob
+        LEFT JOIN pes_work_center_description_all pwcd
+        on (wwob.work_center_id = pwcd.work_center_id
+        and wwob.organization_id = pwcd.organization_id)
+    </sql>
+
+    <select id="selectSyncWieWoDemandVList" parameterType="SyncWieWoDemandVEO" resultMap="SyncWieWoDemandVEOResult">
+        <include refid="selectSyncWieWoDemandVVo"/>
+        <where>
+            AND wwom.pes_work_order_id = wwob.pes_work_order_id
+            AND wwom.material_sequence_number > 0
+            AND wwob.work_order_id > 0
+            AND wwom.work_order_operation_material_id > 0
+            <if test="workOrderId != null "> and wwom.WORK_ORDER_ID = #{workOrderId}</if>
+            <if test="woOperationMaterialId != null "> and wwom.work_order_operation_material_id = #{woOperationMaterialId}</if>
+            <if test="inventoryItemId != null "> and wwom.INVENTORY_ITEM_ID = #{inventoryItemId}</if>
+            <if test="workOrderStatusId != null "> and wwob.WORK_ORDER_STATUS_ID = #{workOrderStatusId}</if>
+            <if test="beginTime != null and beginTime != ''"> and wwom.LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-60,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and wwom.LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+
+    <delete id="deleteSyncWieWoDemandVTempEO">
+        TRUNCATE TABLE sync_wie_wo_demand_v_temp
+    </delete>
+
+    <insert id="batchSyncWieWoDemandVTempEO">
+        insert into sync_wie_wo_demand_v_temp( ORGANIZATION_ID, BASIS_TYPE,WORK_ORDER_ID, WO_OPERATION_MATERIAL_ID, OPERATION_NAME, MATERIAL_SEQ_NUMBER, INVENTORY_ITEM_ID, REQUIRED_DATE, QUANTITY_PER_PRODUCT, REQUIRED_QUANTITY, ISSUED_QUANTITY,UOM_CODE,TRANSACTION_QUANTITY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT},#{item.basisType,jdbcType=VARCHAR}, #{item.workOrderId,jdbcType=BIGINT}, #{item.woOperationMaterialId,jdbcType=BIGINT}, #{item.operationName,jdbcType=VARCHAR}, #{item.materialSeqNumber,jdbcType=INTEGER}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.requiredDate,jdbcType=TIMESTAMP}, cast(#{item.quantityPerProduct,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.requiredQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.issuedQuantity,jdbcType=DECIMAL} as decimal(15,5)),#{item.uomCode,jdbcType=VARCHAR}, cast(#{item.transactionQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="deleteSyncWieWoDemandVEO">
+        TRUNCATE TABLE sync_wie_wo_demand_v;
+        INSERT INTO sync_wie_wo_demand_v (
+        ORGANIZATION_ID,
+        WORK_ORDER_ID,
+        WO_OPERATION_MATERIAL_ID,
+        OPERATION_NAME,
+        MATERIAL_SEQ_NUMBER,
+        INVENTORY_ITEM_ID,
+        REQUIRED_DATE,
+        QUANTITY_PER_PRODUCT,
+        REQUIRED_QUANTITY,
+        ISSUED_QUANTITY,
+        UOM_CODE,
+        BASIS_TYPE,
+        TRANSACTION_QUANTITY
+        ) SELECT
+        ORGANIZATION_ID,
+        WORK_ORDER_ID,
+        WO_OPERATION_MATERIAL_ID,
+        OPERATION_NAME,
+        MATERIAL_SEQ_NUMBER,
+        INVENTORY_ITEM_ID,
+        REQUIRED_DATE,
+        QUANTITY_PER_PRODUCT,
+        REQUIRED_QUANTITY,
+        ISSUED_QUANTITY,
+        UOM_CODE,
+        BASIS_TYPE,
+        TRANSACTION_QUANTITY
+        FROM
+        sync_wie_wo_demand_v_temp
+    </delete>
+
+    <!--<insert id="batchSyncWieWoDemandVEO">-->
+    <!--INSERT INTO sync_wie_wo_demand_v (-->
+    <!--ORGANIZATION_ID,-->
+    <!--WORK_ORDER_ID,-->
+    <!--WO_OPERATION_MATERIAL_ID,-->
+    <!--OPERATION_NAME,-->
+    <!--MATERIAL_SEQ_NUMBER,-->
+    <!--INVENTORY_ITEM_ID,-->
+    <!--REQUIRED_DATE,-->
+    <!--QUANTITY_PER_PRODUCT,-->
+    <!--REQUIRED_QUANTITY,-->
+    <!--ISSUED_QUANTITY,-->
+    <!--UOM_CODE,-->
+    <!--TRANSACTION_QUANTITY-->
+    <!--) SELECT-->
+    <!--ORGANIZATION_ID,-->
+    <!--WORK_ORDER_ID,-->
+    <!--WO_OPERATION_MATERIAL_ID,-->
+    <!--OPERATION_NAME,-->
+    <!--MATERIAL_SEQ_NUMBER,-->
+    <!--INVENTORY_ITEM_ID,-->
+    <!--REQUIRED_DATE,-->
+    <!--QUANTITY_PER_PRODUCT,-->
+    <!--REQUIRED_QUANTITY,-->
+    <!--ISSUED_QUANTITY,-->
+    <!--UOM_CODE,-->
+    <!--TRANSACTION_QUANTITY-->
+    <!--FROM-->
+    <!--sync_wie_wo_demand_v_temp-->
+    <!--</insert>-->
+
+</mapper>

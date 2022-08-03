@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.supplier.mapper.PesItemQuantityPriceListMapper">
+
+    <resultMap type="PesItemQuantityPriceList" id="PesItemQuantityPriceListResult">
+                    <result property="itemPriceId"    column="item_price_id"    />
+                    <result property="priceList"    column="price_list"    />
+                    <result property="quantity"    column="quantity"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="quantityPriceId"    column="quantity_price_id"    />
+        <result property="sourcingItemId"    column="sourcing_item_id"    />
+            </resultMap>
+
+    <sql id="selectPesItemQuantityPriceListVo">
+        select item_price_id, price_list, quantity, create_by, create_date, last_update_date, last_update_by, quantity_price_id from pes_item_quantity_price_list
+    </sql>
+
+    <select id="selectPesItemQuantityPriceListList" parameterType="PesItemQuantityPriceList" resultMap="PesItemQuantityPriceListResult">
+        <include refid="selectPesItemQuantityPriceListVo"/>
+        <where>
+            item_price_id in (select item_price_id from pes_item_supplier_price_list where sourcing_item_id = #{sourcingItemId})
+        </where>
+        order by item_price_id
+    </select>
+
+    <insert id="insertPesItemQuantityPriceList" parameterType="PesItemQuantityPriceList">
+        insert into pes_item_quantity_price_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="itemPriceId != null">item_price_id,</if>
+            <if test="priceList != null">price_list,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="itemPriceId != null">#{itemPriceId},</if>
+            <if test="priceList != null">#{priceList},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <delete id="deletePesItemQuantityPriceListByIds" parameterType="Long">
+        delete from pes_item_quantity_price_list where quantity_price_id = #{quantityPriceId}
+    </delete>
+
+    <select id="checkItemQuantityListUnique" parameterType="PesItemQuantityPriceList" resultType="int">
+        select count(1) from pes_item_quantity_price_list where item_price_id = #{itemPriceId} and price_list = #{priceList} and quantity = #{quantity}
+    </select>
+
+    <select id="checkItemQuantityListOAUnique" parameterType="Long" resultType="int">
+        select count(1) from pes_item_supplier_price_list where item_price_id = #{itemPriceId} and approval_status &gt; 0
+    </select>
+
+    <select id="checkItemQuantityListDelete" parameterType="Long" resultType="int">
+        SELECT
+            COUNT (1)
+        FROM
+            pes_item_supplier_price_list list,
+            pes_item_quantity_price_list qlist
+        WHERE
+            list.item_price_id = qlist.item_price_id
+        AND qlist.quantity_price_id = #{quantityPriceId}
+        AND list.approval_status &gt; 0
+    </select>
+
+</mapper>

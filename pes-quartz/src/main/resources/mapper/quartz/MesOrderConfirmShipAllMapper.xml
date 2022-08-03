@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesOrderConfirmShipAllMapper">
+
+    <resultMap type="MesOrderConfirmShipAllEO" id="MesOrderConfirmShipAllEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="waybillNumber"    column="waybill_number"    />
+        <result property="sealNumber"    column="seal_number"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="shippedQuantity"    column="shipped_quantity"    />
+        <result property="unitUode"    column="unit_uode"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="salesOrderNumber"    column="sales_order_number"    />
+        <result property="salesOrderLineNumber"    column="sales_order_line_number"    />
+        <result property="confirmId"    column="confirm_id"    />
+        <result property="requestId"    column="request_id"    />
+        <result property="lotControlCode"    column="LOT_CONTROL_CODE"    />
+        <result property="deliveryDetailId"    column="delivery_detail_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="requestStatus"    column="request_status"    />
+        <result property="shimentName"    column="shiment_name"    />
+    </resultMap>
+
+    <sql id="selectMesOrderConfirmShipAllVo">
+        SELECT
+            ocs.organization_id,
+            (select org.ORGANIZATION_CODE from sync_inv_org_parameters org where ocs.organization_id = org.ORGANIZATION_ID) as organization_code,
+            ocs.waybill_number,
+            ocs.seal_number,
+            ocs.inventory_item_id,
+            ocs.item_number,
+            esb.LOT_CONTROL_CODE,
+            ocs.shipped_quantity,
+            ocs.unit_uode,
+            ocs.subinventory_code,
+            ocs.remark,
+            ocs.last_update_date,
+            ocs.erp_flag,
+            ocs.erp_flag_date,
+            ocs.sales_order_number,
+            ocs.sales_order_line_number,
+            (SELECT
+                    wdd.DELIVERY_DETAIL_ID
+                FROM
+                    sync_wsh_delivery_details wdd
+                WHERE
+                    wdd.sales_order_line_number = ocs.sales_order_line_number
+                AND wdd.sales_order_number = ocs.sales_order_number) AS delivery_detail_id,
+            ocs.confirm_id,
+            ocs.request_id,
+            ocs.shiment_name,
+            ocs.request_status
+        FROM
+            mes_order_confirm_ship_all ocs
+        LEFT JOIN sync_egp_system_items_b esb ON (
+            esb.ORGANIZATION_ID = ocs.ORGANIZATION_ID
+            AND esb.INVENTORY_ITEM_ID = ocs.INVENTORY_ITEM_ID
+        )
+    </sql>
+
+    <select id="getOrderConfirmShipAllList" parameterType="MesOrderConfirmShipAllEO" resultMap="MesOrderConfirmShipAllEOResult">
+        <include refid="selectMesOrderConfirmShipAllVo"/>
+        <where>
+            and (ocs.ERP_FLAG = 0 or ocs.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and ocs.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and ocs.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesOrderConfirmShipAllEO">
+        update mes_order_confirm_ship_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="requestId != null and requestId != ''"> request_id = #{requestId},</if>
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="requestStatus != null and requestStatus != ''">request_status = #{requestStatus},</if>
+            <if test="shimentName != null and shimentName != ''">shiment_name = #{shimentName},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where confirm_id = #{confirmId}
+    </update>
+
+</mapper>

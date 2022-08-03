@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesUpdateReceiptRoutingAllMapper">
+
+    <resultMap type="MesUpdateReceiptRoutingAllEO" id="MesUpdateReceiptRoutingAllEOResult">
+        <result property="soldToLegalEntityId"    column="sold_to_legal_entity_id"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="lineNumber"    column="line_number"    />
+        <result property="scheduleNumber"    column="schedule_number"    />
+        <result property="shipToLocationCode"    column="ship_to_location_code"    />
+        <result property="shipToOrganizationId"    column="ship_to_organization_id"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="receiptRoutingId"    column="receipt_routing_id"    />
+        <result property="itemNumber"    column="item_number"    />
+    </resultMap>
+
+    <sql id="selectMesUpdateReceiptRoutingAllVo">
+        select DISTINCT sold_to_legal_entity_id, order_number from mes_update_receipt_routing_all
+    </sql>
+
+    <select id="getUpdateReceiptRoutingList" parameterType="MesUpdateReceiptRoutingAllEO" resultMap="MesUpdateReceiptRoutingAllEOResult">
+        <include refid="selectMesUpdateReceiptRoutingAllVo"/>
+        <where>
+            and (ERP_FLAG = 0 or ERP_FLAG = 2)
+            <if test="startUpdateDate != null and startUpdateDate != ''"> and LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>
+            <if test="endUpdateDate != null and endUpdateDate != ''"> and LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>
+        </where>
+    </select>
+
+    <select id="getLinesList" parameterType="MesUpdateReceiptRoutingAllEO" resultMap="MesUpdateReceiptRoutingAllEOResult">
+        SELECT
+            sold_to_legal_entity_id,
+            order_number,
+            line_number,
+            schedule_number,
+            ship_to_location_code,
+            ship_to_organization_id,
+            last_update_date,
+            erp_flag,
+            erp_flag_date,
+            receipt_routing_id,
+            item_number
+        FROM
+            mes_update_receipt_routing_all
+        where order_number = #{orderNumber}
+--         and LAST_UPDATE_DATE &gt;= #{startUpdateDate}
+--         and LAST_UPDATE_DATE &lt; #{endUpdateDate}
+        and (ERP_FLAG = 0 or ERP_FLAG = 2)
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesUpdateReceiptRoutingAllEO">
+        update mes_update_receipt_routing_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where order_number = #{orderNumber}
+        and LAST_UPDATE_DATE &gt;= #{startUpdateDate}
+        and LAST_UPDATE_DATE &lt; #{endUpdateDate}
+    </update>
+
+</mapper>

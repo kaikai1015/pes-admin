@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorksHeadersAllMapper">
+
+    <resultMap type="PesWieWorksHeadersAll" id="PesWieWorksHeadersAllResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="workDefinitionCode"    column="work_definition_code"    />
+                    <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+                    <result property="plannedStartDate"    column="planned_start_date"    />
+                    <result property="lineNums"    column="line_nums"    />
+                    <result property="erpWork"    column="erp_work"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="wieWorkId"    column="wie_work_id"    />
+                    <result property="organizationCode"    column="organization_code"    />
+                    <result property="remark"    column="remark"    />
+        <result property="documentNumbers"    column="document_numbers"    />
+        <result property="custPoNumbers"    column="cust_po_numbers"    />
+        <result property="documentLineNums"    column="DOCUMENT_LINE_NUMS"    />
+        <result property="splitQuantity"    column="split_quantity"    />
+        <result property="erpWorkNumberId"    column="erp_work_number_id"    />
+        <result property="erpWorkStatus"    column="erp_work_status"    />
+        <result property="customerName"    column="customer_name"    />
+            </resultMap>
+
+    <sql id="selectPesWieWorksHeadersAllVo">
+        SELECT
+            list.organization_id,
+            list.inventory_item_id,
+            list.item_number,
+            list.item_description,
+            list.work_definition_code,
+            list.planned_start_quantity,
+            list.planned_start_date,
+            list.line_nums,
+            list.document_number as document_numbers,
+            list.cust_po_number as cust_po_numbers,
+            list.document_line_num as document_line_nums,
+            list.erp_work,
+            list.wie_work_id,
+            list.remark,
+            list.split_quantity,
+            list.erp_work_status,
+            list.erp_work_number_id,
+            list.last_update_by,
+            list.last_update_date
+        FROM
+            pes_wie_works_headers_all list
+    </sql>
+
+    <select id="selectPesWieWorksHeadersAllList" parameterType="PesWieWorksHeadersAll" resultMap="PesWieWorksHeadersAllResult">
+        <include refid="selectPesWieWorksHeadersAllVo"/>
+        <where>
+            and list.split_flag = 0
+            <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.item_number like (#{itemNumber} + '%')</if>
+            <if test="lineNums != null  and lineNums != ''"> and list.line_nums like ('%' + #{lineNums} + '%')</if>
+            <if test="documentNumbers != null  and documentNumbers != ''"> and (list.document_number like ('%' + #{documentNumbers} + '%') or list.cust_po_number like ('%' + #{documentNumbers} + '%'))</if>
+            <if test="erpWork != null  and erpWork != ''"> and list.erp_work like (#{erpWork} + '%')</if>
+            <if test="erpWorkNumberId != null"> and list.erp_work_number_id &gt; #{erpWorkNumberId}</if>
+            <if test="erpWorkStatus != null "> and list.erp_work_status = #{erpWorkStatus}</if>
+            <if test="beginTime != null and beginTime != ''"> and list.last_update_date &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and list.last_update_date &lt;= #{endTime}</if>
+        </where>
+        order by list.wie_work_id desc
+    </select>
+
+    <select id="selectPesWieWorksHeadersAllById" parameterType="Long" resultMap="PesWieWorksHeadersAllResult">
+        <include refid="selectPesWieWorksHeadersAllVo"/>
+        where list.wie_work_id = #{wieWorkId}
+    </select>
+
+    <select id="selectOrgnazationCode" parameterType="Long" resultMap="PesWieWorksHeadersAllResult">
+        select ORGANIZATION_CODE from sync_inv_org_parameters where ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <insert id="insertPesWieWorksHeadersAll" parameterType="PesWieWorksHeadersAll">
+        insert into pes_wie_works_headers_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="workDefinitionCode != null">work_definition_code,</if>
+            <if test="plannedStartQuantity != null">planned_start_quantity,</if>
+            <if test="plannedStartDate != null">planned_start_date,</if>
+            <if test="lineNums != null">line_nums,</if>
+            <if test="documentNumbers != null">document_number,</if>
+            <if test="documentLineNums != null">document_line_num,</if>
+            <if test="custPoNumbers != null">cust_po_number,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="workDefinitionCode != null">#{workDefinitionCode},</if>
+            <if test="plannedStartQuantity != null">#{plannedStartQuantity},</if>
+            <if test="plannedStartDate != null">#{plannedStartDate},</if>
+            <if test="lineNums != null">#{lineNums},</if>
+            <if test="documentNumbers != null">#{documentNumbers},</if>
+            <if test="documentLineNums != null">#{documentLineNums},</if>
+            <if test="custPoNumbers != null">#{custPoNumbers},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesWieWorksHeadersAll" parameterType="PesWieWorksHeadersAll">
+        update pes_wie_works_headers_all
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workDefinitionCode != null">work_definition_code = #{workDefinitionCode},</if>
+            <if test="plannedStartQuantity != null">planned_start_quantity = #{plannedStartQuantity},</if>
+            <if test="splitQuantity != null">split_quantity = #{splitQuantity},</if>
+            <if test="plannedStartDate != null">planned_start_date = #{plannedStartDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            last_update_date = getdate(),
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+        </trim>
+        where wie_work_id = #{wieWorkId}
+    </update>
+
+    <select id="getErpWorksLines" parameterType="Long" resultMap="PesWieWorksHeadersAllResult">
+        SELECT
+            list.organization_id,
+            list.inventory_item_id,
+            list.item_number,
+            list.item_description,
+            wwdn.work_definition_code,
+            list.plan_wie_quantity as planned_start_quantity,
+            list.plan_start_date as planned_start_date,
+            list.line_num as line_nums,
+            list.DOCUMENT_NUMBER as document_numbers,
+            list.DOCUMENT_LINE_NUM as DOCUMENT_LINE_NUMS,
+            list.CUST_PO_NUMBER as cust_po_numbers
+        FROM
+            pes_work_plan_line_list list
+        LEFT JOIN (SELECT
+                wwds.ORGANIZATION_ID,
+                wwds.INVENTORY_ITEM_ID,
+                wwds.WORK_DEFINITION_NAME_ID
+                FROM
+                sync_wis_work_definitions wwds,
+                sync_wis_work_definitions_id wwdid
+                WHERE
+                wwds.WORK_DEFINITION_ID = wwdid.WORK_DEFINITION_ID
+                AND wwds.STATUS_CODE = 'ACTIVE'
+                AND wwds.PRODUCTION_PRIORITY = 1) wwd ON (
+            list.organization_id = wwd.ORGANIZATION_ID
+            AND list.inventory_item_id = wwd.INVENTORY_ITEM_ID)
+        LEFT JOIN sync_wis_work_definition_names_b wwdn ON (
+            wwdn.WORK_DEFINITION_NAME_ID = wwd.WORK_DEFINITION_NAME_ID
+            AND GETDATE() BETWEEN wwdn.EFFECTIVE_FROM_DATE AND isnull(wwdn.EFFECTIVE_TO_DATE,GETDATE()))
+        WHERE 1=1
+        and list.line_num in
+        <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+            #{lineNum}
+        </foreach>
+    </select>
+
+    <delete id="updateWorkFlag" parameterType="String">
+        update pes_work_plan_line_list set work_flag = '1',last_update_date = getdate() where line_num = #{lineNum}
+    </delete>
+
+    <select id="getErpSumWorksLines" parameterType="Long" resultMap="PesWieWorksHeadersAllResult">
+        SELECT
+        list.organization_id,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        wwdn.work_definition_code,
+        sum(list.plan_wie_quantity) as planned_start_quantity,
+        min(list.plan_start_date) as planned_start_date,
+        line_nums = stuff((SELECT '/' + CAST(lists.line_num as varchar)
+                            FROM pes_work_plan_line_list lists
+                            WHERE lists.organization_id = list.organization_id
+                              and lists.inventory_item_id = list.inventory_item_id
+                              and lists.line_num in
+                                <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+                                    #{lineNum}
+                                </foreach>
+                              FOR XML path('')), 1, 1, ''),
+        document_numbers = stuff((SELECT '/' + CAST(lists.document_number as varchar)
+                            FROM pes_work_plan_line_list lists
+                            WHERE lists.organization_id = list.organization_id
+                            and lists.inventory_item_id = list.inventory_item_id
+                            and lists.line_num in
+                            <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+                                #{lineNum}
+                            </foreach>
+                            FOR XML path('')), 1, 1, ''),
+        document_line_nums = stuff((SELECT '/' + CAST(lists.document_line_num as varchar)
+                            FROM pes_work_plan_line_list lists
+                            WHERE lists.organization_id = list.organization_id
+                            and lists.inventory_item_id = list.inventory_item_id
+                            and lists.line_num in
+                            <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+                                #{lineNum}
+                            </foreach>
+                            FOR XML path('')), 1, 1, ''),
+        cust_po_numbers = stuff((SELECT '/' + CAST(lists.CUST_PO_NUMBER as varchar)
+                            FROM pes_work_plan_line_list lists
+                            WHERE lists.organization_id = list.organization_id
+                            and lists.inventory_item_id = list.inventory_item_id
+                            and lists.line_num in
+                            <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+                                #{lineNum}
+                            </foreach>
+                            FOR XML path('')), 1, 1, '')
+        FROM
+        pes_work_plan_line_list list
+        LEFT JOIN (SELECT
+        wwds.ORGANIZATION_ID,
+        wwds.INVENTORY_ITEM_ID,
+        wwds.WORK_DEFINITION_NAME_ID
+        FROM
+        sync_wis_work_definitions wwds,
+        sync_wis_work_definitions_id wwdid
+        WHERE
+        wwds.WORK_DEFINITION_ID = wwdid.WORK_DEFINITION_ID
+        AND wwds.STATUS_CODE = 'ACTIVE'
+        AND wwds.PRODUCTION_PRIORITY = 1) wwd ON (
+        list.organization_id = wwd.ORGANIZATION_ID
+        AND list.inventory_item_id = wwd.INVENTORY_ITEM_ID)
+        LEFT JOIN sync_wis_work_definition_names_b wwdn ON (
+        wwdn.WORK_DEFINITION_NAME_ID = wwd.WORK_DEFINITION_NAME_ID
+        AND GETDATE() BETWEEN wwdn.EFFECTIVE_FROM_DATE AND isnull(wwdn.EFFECTIVE_TO_DATE,GETDATE()))
+        WHERE
+        list.line_num in
+        <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+            #{lineNum}
+        </foreach>
+        GROUP BY
+        list.organization_id,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        wwdn.work_definition_code
+    </select>
+
+    <delete id="updateSumWorkFlag" parameterType="Long">
+        update pes_work_plan_line_list set work_flag = '1',last_update_date = getdate() where line_num in
+        <foreach collection="array" item="lineNum" open="(" separator="," close=")">
+            #{lineNum}
+        </foreach>
+    </delete>
+
+    <delete id="updateErpWork" parameterType="PesWieWorksHeadersAll">
+        update pes_wie_works_headers_all
+        <trim prefix="SET" suffixOverrides=",">
+            last_update_date = getdate(),
+            last_update_by = #{lastUpdateBy},
+            <if test="erpWork != null">erp_work = #{erpWork},</if>
+            <if test="erpWorkNumberId != null">erp_work_number_id = #{erpWorkNumberId},</if>
+            <if test="erpWorkStatus != null">erp_work_status = #{erpWorkStatus},</if>
+            <if test="errorInfor != null">error_infor = #{errorInfor},</if>
+        </trim>
+        where wie_work_id = #{wieWorkId}
+    </delete>
+
+    <delete id="updateSplitQuantity" parameterType="Long">
+        update pes_wie_works_headers_all set split_flag = '1',last_update_date = getdate() where wie_work_id = #{wieWorkId}
+    </delete>
+
+    <select id="selectPesWieWorksHeadersAllByIds" parameterType="Long" resultMap="PesWieWorksHeadersAllResult">
+        <include refid="selectPesWieWorksHeadersAllVo"/>
+        where list.erp_work_number_id &gt; 0
+        and list.wie_work_id in
+        <foreach collection="array" item="wieWorkId" open="(" separator="," close=")">
+            #{wieWorkId}
+        </foreach>
+    </select>
+
+    <delete id="deleteErpWorks" parameterType="Long">
+        update pes_wie_works_headers_all set erp_work = '0',last_update_date = getdate() where wie_work_id in
+        <foreach collection="array" item="wieWorkId" open="(" separator="," close=")">
+            #{wieWorkId}
+        </foreach>
+    </delete>
+
+    <select id="selectItemDescriptions" parameterType="pesWieWorksHeadersAll" resultMap="PesWieWorksHeadersAllResult">
+        SELECT
+        list.INVENTORY_ITEM_ID,
+        list.ITEM_DESCRIPTION,
+        wwdn.work_definition_code
+        FROM
+        sync_items_num_des_list list
+        LEFT JOIN (SELECT
+                wwds.ORGANIZATION_ID,
+                wwds.INVENTORY_ITEM_ID,
+                wwds.WORK_DEFINITION_NAME_ID
+                FROM
+                sync_wis_work_definitions wwds,
+                sync_wis_work_definitions_id wwdid
+                WHERE
+                wwds.WORK_DEFINITION_ID = wwdid.WORK_DEFINITION_ID
+                AND wwds.STATUS_CODE = 'ACTIVE'
+                AND wwds.PRODUCTION_PRIORITY = 1) wwd ON (
+        list.organization_id = wwd.ORGANIZATION_ID
+        AND list.inventory_item_id = wwd.INVENTORY_ITEM_ID)
+        LEFT JOIN sync_wis_work_definition_names_b wwdn ON (
+        wwdn.WORK_DEFINITION_NAME_ID = wwd.WORK_DEFINITION_NAME_ID
+        AND GETDATE() BETWEEN wwdn.EFFECTIVE_FROM_DATE AND isnull(wwdn.EFFECTIVE_TO_DATE,GETDATE()))
+        WHERE
+        list.ORGANIZATION_ID = #{organizationId}
+        AND list.ITEM_NUMBER = #{itemNumber}
+    </select>
+
+
+    <select id="selectCustomerName" parameterType="PesWieWorksHeadersAll" resultMap="PesWieWorksHeadersAllResult">
+        SELECT
+        CUSTOMER_NAME
+        FROM
+        sync_orders_demand_list
+        WHERE
+        plan_lot_num = left(#{lineNums},10)
+        AND DOCUMENT_NUMBER = #{documentNumbers}
+        AND DOCUMENT_LINE_NUM = #{documentLineNums}
+    </select>
+
+
+    <select id="selectLinesData" parameterType="String" resultMap="PesWieWorksHeadersAllResult">
+        SELECT
+            list.organization_id,
+            list.inventory_item_id,
+            list.item_number,
+            list.item_description,
+            wwdn.work_definition_code,
+            list.plan_wie_quantity AS planned_start_quantity,
+            list.plan_start_date as planned_start_date,
+            list.line_num as line_nums,
+            list.DOCUMENT_NUMBER as document_numbers,
+            list.DOCUMENT_LINE_NUM as document_line_nums,
+            list.CUST_PO_NUMBER as cust_po_numbers
+        FROM
+            pes_wie_orders_line_list list
+        LEFT JOIN (SELECT
+                        wwds.ORGANIZATION_ID,
+                        wwds.INVENTORY_ITEM_ID,
+                        wwds.WORK_DEFINITION_NAME_ID
+                        FROM
+                        sync_wis_work_definitions wwds,
+                        sync_wis_work_definitions_id wwdid
+                        WHERE
+                        wwds.WORK_DEFINITION_ID = wwdid.WORK_DEFINITION_ID
+                        AND wwds.STATUS_CODE = 'ACTIVE'
+                        AND wwds.PRODUCTION_PRIORITY = 1) wwd ON (
+                    list.organization_id = wwd.ORGANIZATION_ID
+                    AND list.inventory_item_id = wwd.INVENTORY_ITEM_ID)
+                LEFT JOIN sync_wis_work_definition_names_b wwdn ON (
+                    wwdn.WORK_DEFINITION_NAME_ID = wwd.WORK_DEFINITION_NAME_ID
+                    AND GETDATE() BETWEEN wwdn.EFFECTIVE_FROM_DATE AND isnull(wwdn.EFFECTIVE_TO_DATE,GETDATE()))
+        WHERE
+            list.line_num = #{lineNums}
+        AND list.plan_wie_quantity = 0
+    </select>
+
+</mapper>

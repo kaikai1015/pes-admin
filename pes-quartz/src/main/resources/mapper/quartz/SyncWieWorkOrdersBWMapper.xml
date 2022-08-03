@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWorkOrdersBWMapper">
+
+    <resultMap type="SyncWieWorkOrdersBWEO" id="SyncWieWorkOrdersBWEOResult">
+        <result property="organizationCode"    column="ORGANIZATION_CODE"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="description"    column="DESCRIPTION"    />
+    </resultMap>
+
+    <delete id="deleteSyncWieWorkOrdersBWTempEO">
+        TRUNCATE TABLE sync_wie_work_orders_b_w_temp
+    </delete>
+
+    <insert id="batchSyncWieWorkOrdersBWTempEO">
+        insert into sync_wie_work_orders_b_w_temp( ORGANIZATION_CODE, WORK_ORDER_ID, ORGANIZATION_ID, WORK_ORDER_NUMBER, INVENTORY_ITEM_ID, PLANNED_START_QUANTITY, COMPLETED_QUANTITY, ITEM_NUMBER, DESCRIPTION) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationCode,jdbcType=VARCHAR}, #{item.workOrderId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.inventoryItemId,jdbcType=BIGINT}, cast(#{item.plannedStartQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.completedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.itemNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <delete id="batchSyncWieWorkOrdersBWEO">
+        TRUNCATE TABLE sync_wie_work_orders_b_w;
+        INSERT INTO sync_wie_work_orders_b_w (
+        ORGANIZATION_CODE,
+        WORK_ORDER_ID,
+        ORGANIZATION_ID,
+        WORK_ORDER_NUMBER,
+        INVENTORY_ITEM_ID,
+        PLANNED_START_QUANTITY,
+        COMPLETED_QUANTITY,
+        ITEM_NUMBER,
+        DESCRIPTION
+        ) SELECT
+        ORGANIZATION_CODE,
+        WORK_ORDER_ID,
+        ORGANIZATION_ID,
+        WORK_ORDER_NUMBER,
+        INVENTORY_ITEM_ID,
+        PLANNED_START_QUANTITY,
+        COMPLETED_QUANTITY,
+        ITEM_NUMBER,
+        DESCRIPTION
+        FROM
+        sync_wie_work_orders_b_w_temp
+    </delete>
+
+</mapper>

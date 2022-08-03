@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncInvTrnxEffMapper">
+
+    <resultMap type="SyncInvTrnxEffEO" id="SyncInvTrnxEffEOResult">
+        <result property="flexValue"    column="flex_value"    />
+        <result property="description"    column="description"    />
+        <result property="type"    column="type"    />
+    </resultMap>
+
+    <sql id="selectSyncInvTrnxEffVo">
+        select flex_value, description, type from sync_inv_material_txns_eff
+    </sql>
+
+    <select id="selectSyncInvTrnxEffList" parameterType="SyncInvTrnxEffEO" resultMap="SyncInvTrnxEffEOResult">
+        <include refid="selectSyncInvTrnxEffVo"/>
+    </select>
+
+    <delete id="deleteSyncInvTrnxEffLis">
+        TRUNCATE TABLE sync_inv_material_txns_eff
+    </delete>
+
+    <insert id="batchSyncInvTrnxEffLis">
+        insert into sync_inv_material_txns_eff( flex_value, description, type) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.flexValue,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR},#{item.type,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

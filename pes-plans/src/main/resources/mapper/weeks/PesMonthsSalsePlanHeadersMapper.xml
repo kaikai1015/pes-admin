@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.PesMonthsSalsePlanHeadersMapper">
+
+    <resultMap type="PesMonthsSalsePlanHeaders" id="PesMonthsSalsePlanHeadersResult">
+                    <result property="id"    column="id"    />
+                    <result property="buId"    column="bu_id"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="months"    column="months"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="prodLineFlag"    column="prod_line_flag"    />
+        <result property="months"    column="months"    />
+        <result property="years"    column="years"    />
+        <result property="flag"    column="flag"    />
+            </resultMap>
+
+    <sql id="selectPesMonthsSalsePlanHeadersVo">
+        SELECT
+            id,
+            bu_id,
+            lot_num,
+            years,
+            months,
+            create_by,
+            create_date,
+            prod_line_flag,
+            flag
+        FROM
+            pes_months_salse_plan_headers
+    </sql>
+
+    <select id="selectPesMonthsSalsePlanHeadersList" parameterType="PesMonthsSalsePlanHeaders" resultMap="PesMonthsSalsePlanHeadersResult">
+        <include refid="selectPesMonthsSalsePlanHeadersVo"/>
+        <where>
+            <if test="lotNum != null "> and lot_num = #{lotNum}</if>
+            <if test="prodLineFlag != null  and prodLineFlag != ''"> and prod_line_flag = #{prodLineFlag}</if>
+        </where>
+        ORDER BY ID DESC
+    </select>
+
+    <select id="selectPesMonthsSalsePlanHeadersById" parameterType="Long" resultMap="PesMonthsSalsePlanHeadersResult">
+        <include refid="selectPesMonthsSalsePlanHeadersVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="checkAddAllowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_months_salse_plan_headers
+        WHERE
+        1 = 1
+        and bu_id = #{buId}
+        AND lot_num = #{lotNum}
+        AND prod_line_flag = #{prodLineFlag}
+    </select>
+
+    <insert id="insertPesMonthsSalsePlanHeaders" parameterType="PesMonthsSalsePlanHeaders">
+        insert into pes_months_salse_plan_headers
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="buId != null">bu_id,</if>
+            <if test="lotNum != null">lot_num,</if>
+            <if test="years != null">years,</if>
+            <if test="months != null">months,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            <if test="createBy != null">last_update_by,</if>
+           last_update_date,
+            <if test="prodLineFlag != null and prodLineFlag != ''">prod_line_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="buId != null">#{buId},</if>
+            <if test="lotNum != null">#{lotNum},</if>
+            <if test="years != null">#{years},</if>
+            <if test="months != null">#{months},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="prodLineFlag != null and prodLineFlag != ''">#{prodLineFlag},</if>
+        </trim>
+    </insert>
+
+    <delete id="deletePesMonthsSalsePlanHeadersByIds" parameterType="Long">
+        delete from pes_months_salse_plan_headers where id = #{id}
+    </delete>
+
+    <select id="checkDeleteAllowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_months_salse_plan_headers
+        WHERE
+        1 = 1
+        and id = #{id}
+        AND flag = '1'
+    </select>
+
+</mapper>

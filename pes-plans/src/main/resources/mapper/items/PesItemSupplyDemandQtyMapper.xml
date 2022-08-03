@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesItemSupplyDemandQtyMapper">
+
+    <resultMap type="PesItemSupplyDemandQty" id="PesItemSupplyDemandQtyResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="wieS"    column="WIE_S"    />
+        <result property="wieD"    column="WIE_D"    />
+        <result property="prS"    column="PR_S"    />
+        <result property="poS"    column="PO_S"    />
+        <result property="dooD"    column="DOO_D"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="deliveryingQuantity"    column="deliverying_quantity"    />
+        <result property="checkedUnconfirmedQuantity"    column="checked_unconfirmed_quantity"    />
+        <result property="receiptConfirmedQuantity"    column="receipt_confirmed_quantity"    />
+        <result property="unrcvQuantity"    column="unrcv_quantity"    />
+        <result property="rcvQuantity"    column="rcv_quantity"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="augYears"    column="aug_years"    />
+        <result property="segYears"    column="seg_years"    />
+        <result property="zeroYears"    column="zero_years"    />
+        <result property="janYears"    column="jan_years"    />
+        <result property="febYears"    column="feb_years"    />
+        <result property="febYears"    column="feb_years"    />
+        <result property="fixedLeadTime"    column="FIXED_LEAD_TIME"    />
+        <result property="minimumOrderQuantity"    column="MINIMUM_ORDER_QUANTITY"    />
+    </resultMap>
+
+    <sql id="selectPesItemSupplyDemandQtyVo">
+        SELECT
+            item.ORGANIZATION_ID,
+            item.INVENTORY_ITEM_ID,
+            item.ITEM_NUMBER,
+            item.ITEM_DESCRIPTION,
+            isnull(ioq.quantity,0) as quantity,
+            isnull(isd.WIE_S,0) as WIE_S,
+            isnull(isd.WIE_D,0) as WIE_D,
+            isnull(isd.PR_S,0) as PR_S,
+            isnull(isd.PO_S,0) as PO_S,
+            isnull(isd.DOO_D,0) as DOO_D,
+            isnull(list.deliverying_quantity,0) as deliverying_quantity,
+            isnull(list.checked_unconfirmed_quantity,0) as checked_unconfirmed_quantity,
+            isnull(list.receipt_confirmed_quantity,0) as receipt_confirmed_quantity,
+            isnull(list.unrcv_quantity,0) as unrcv_quantity,
+            isnull(list.rcv_quantity,0) as rcv_quantity,
+            item.FIXED_LEAD_TIME,
+            item.MINIMUM_ORDER_QUANTITY
+        FROM
+            sync_items_num_des_list item
+            LEFT JOIN pes_item_supply_demand_quantity isd
+            on (isd.ORGANIZATION_ID = item.ORGANIZATION_ID
+            AND isd.INVENTORY_ITEM_ID = item.INVENTORY_ITEM_ID)
+            left join sync_inv_onhand_quantity_new ioq
+            on (item.ORGANIZATION_ID = ioq.ORGANIZATION_ID
+            AND item.INVENTORY_ITEM_ID = ioq.INVENTORY_ITEM_ID)
+            LEFT JOIN mes_item_quantity_status_list list
+            ON (item.ORGANIZATION_ID = list.ORGANIZATION_ID
+            AND item.INVENTORY_ITEM_ID = list.INVENTORY_ITEM_ID)
+    </sql>
+
+    <select id="selectPesItemSupplyDemandQtyList" parameterType="PesItemSupplyDemandQty" resultMap="PesItemSupplyDemandQtyResult">
+        <include refid="selectPesItemSupplyDemandQtyVo"/>
+        <where>
+            and isnull(ioq.quantity,0) + isnull(isd.WIE_S,0) + abs(isnull(isd.WIE_D,0)) + isnull(isd.PR_S,0) + isnull(isd.PO_S,0) + abs(isnull(isd.DOO_D,0)) + isnull(list.deliverying_quantity,0) + isnull(list.checked_unconfirmed_quantity,0) + isnull(list.receipt_confirmed_quantity,0) + isnull(list.unrcv_quantity,0) + isnull(list.rcv_quantity,0) > 0
+            <if test="organizationId != null "> and item.ORGANIZATION_ID = #{organizationId}</if>
+            <if test="itemNumber != null "> and item.ITEM_NUMBER like ('%' + #{itemNumber} + '%')</if>
+        </where>
+    </select>
+</mapper>

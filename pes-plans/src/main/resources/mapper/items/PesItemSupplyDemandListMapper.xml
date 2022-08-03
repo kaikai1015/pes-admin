@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesItemSupplyDemandListMapper">
+
+    <resultMap type="PesItemSupplyDemandList" id="PesItemSupplyDemandListResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="description"    column="DESCRIPTION"    />
+        <result property="type"    column="TYPE"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="date"    column="DATE"    />
+        <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+        <result property="onhandQuantity"    column="ONHAND_QUANTITY"    />
+        <result property="uom"    column="UOM"    />
+    </resultMap>
+
+    <sql id="selectPesItemSupplyDemandVo">
+        SELECT
+            inl.ORGANIZATION_ID,
+            inl.INVENTORY_ITEM_ID,
+            inl.ITEM_NUMBER,
+            inl.ITEM_DESCRIPTION as DESCRIPTION
+        FROM
+            pes_item_supply_demand_header_list list,
+            sync_items_num_des_list inl
+        WHERE
+            list.INVENTORY_ITEM_ID = inl.INVENTORY_ITEM_ID
+        AND list.ORGANIZATION_ID = inl.ORGANIZATION_ID
+    </sql>
+
+    <!--<sql id="selectPesItemSupplyDemandListVo">-->
+        <!--SELECT-->
+            <!--TYPE,-->
+            <!--QUANTITY,-->
+            <!--DATE,-->
+            <!--DOCUMENT_NUMBER,-->
+            <!--UOM,-->
+            <!--sum(QUANTITY) OVER(partition by ORGANIZATION_ID,INVENTORY_ITEM_ID order by DATE,TYPE,DOCUMENT_NUMBER) as ONHAND_QUANTITY-->
+        <!--FROM-->
+            <!--pes_item_supply_demand_list-->
+            <!--where 1=1-->
+    <!--</sql>-->
+
+    <select id="selectPesItemSupplyDemandListById" parameterType="PesItemSupplyDemandList" resultMap="PesItemSupplyDemandListResult">
+        <include refid="selectPesItemSupplyDemandVo"/>
+        and inl.ORGANIZATION_ID = #{organizationId}
+        and inl.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+    <select id="selectPesItemSupplyDemandListList" parameterType="PesItemSupplyDemandList" resultMap="PesItemSupplyDemandListResult">
+        <include refid="selectPesItemSupplyDemandVo"/>
+            <if test="itemNumber != null  and itemNumber != ''"> and inl.ITEM_NUMBER = #{itemNumber}</if>
+    </select>
+
+    <select id="selectPesItemSupplyDemandList" parameterType="PesItemSupplyDemandList" resultMap="PesItemSupplyDemandListResult">
+        SELECT
+            allInfor.TYPE,
+            allInfor.QUANTITY,
+            (CASE WHEN allInfor.DATE = '1900-01-01' then GETDATE() else allInfor.DATE end) as DATE,
+            allInfor.DOCUMENT_NUMBER,
+            allInfor.UOM,
+            sum(allInfor.QUANTITY) OVER(partition by allInfor.ORGANIZATION_ID,allInfor.INVENTORY_ITEM_ID order by allInfor.DATE,allInfor.TYPE,allInfor.DOCUMENT_NUMBER) as ONHAND_QUANTITY
+        FROM
+        (
+            SELECT
+                'ON_HAND' AS TYPE,
+                sum(QUANTITY) as QUANTITY,
+                '1900-01-01' AS DATE,
+                NULL AS DOCUMENT_NUMBER,
+                NULL AS UOM,
+                ORGANIZATION_ID,
+                INVENTORY_ITEM_ID
+            FROM
+                sync_inv_onhand_quantity_new
+            WHERE
+                ORGANIZATION_ID = #{organizationId}
+            AND INVENTORY_ITEM_ID = #{inventoryItemId}
+            group by ORGANIZATION_ID,
+                      INVENTORY_ITEM_ID
+            UNION ALL
+            SELECT
+                TYPE,
+                QUANTITY,
+                DATE,
+                DOCUMENT_NUMBER,
+                UOM,
+                ORGANIZATION_ID,
+                INVENTORY_ITEM_ID
+            FROM
+                pes_item_supply_demand_list
+            where 1=1
+                and ORGANIZATION_ID = #{organizationId}
+                AND INVENTORY_ITEM_ID = #{inventoryItemId}
+        ) allInfor
+    </select>
+
+</mapper>

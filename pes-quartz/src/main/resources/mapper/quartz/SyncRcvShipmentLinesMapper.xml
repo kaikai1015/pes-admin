@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncRcvShipmentLinesMapper">
+
+    <resultMap type="SyncRcvShipmentLinesEO" id="SyncRcvShipmentLinesEOResult">
+        <result property="shipmentLineId"    column="SHIPMENT_LINE_ID"    />
+        <result property="shipmentHeaderId"    column="SHIPMENT_HEADER_ID"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="lineNum"    column="LINE_NUM"    />
+        <result property="categoryId"    column="CATEGORY_ID"    />
+        <result property="quantityShipped"    column="QUANTITY_SHIPPED"    />
+        <result property="quantityReceived"    column="QUANTITY_RECEIVED"    />
+        <result property="quantityDelivered"    column="QUANTITY_DELIVERED"    />
+        <result property="quantityReturned"    column="QUANTITY_RETURNED"    />
+        <result property="quantityAccepted"    column="QUANTITY_ACCEPTED"    />
+        <result property="quantityRejected"    column="QUANTITY_REJECTED"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="itemId"    column="ITEM_ID"    />
+        <result property="shipmentLineStatusCode"    column="SHIPMENT_LINE_STATUS_CODE"    />
+        <result property="sourceDocumentCode"    column="SOURCE_DOCUMENT_CODE"    />
+        <result property="poHeaderId"    column="PO_HEADER_ID"    />
+        <result property="poLineId"    column="PO_LINE_ID"    />
+        <result property="poLineLocationId"    column="PO_LINE_LOCATION_ID"    />
+        <result property="poDistributionId"    column="PO_DISTRIBUTION_ID"    />
+        <result property="routingHeaderId"    column="ROUTING_HEADER_ID"    />
+        <result property="packingSlip"    column="PACKING_SLIP"    />
+        <result property="fromOrganizationId"    column="FROM_ORGANIZATION_ID"    />
+        <result property="deliverToPersonId"    column="DELIVER_TO_PERSON_ID"    />
+        <result property="employeeId"    column="EMPLOYEE_ID"    />
+        <result property="destinationTypeCode"    column="DESTINATION_TYPE_CODE"    />
+        <result property="toOrganizationId"    column="TO_ORGANIZATION_ID"    />
+        <result property="toSubinventory"    column="TO_SUBINVENTORY"    />
+        <result property="locatorId"    column="LOCATOR_ID"    />
+        <result property="deliverToLocationId"    column="DELIVER_TO_LOCATION_ID"    />
+        <result property="shipmentUnitPrice"    column="SHIPMENT_UNIT_PRICE"    />
+        <result property="transferCost"    column="TRANSFER_COST"    />
+        <result property="transportationCost"    column="TRANSPORTATION_COST"    />
+        <result property="comments"    column="COMMENTS"    />
+        <result property="attribute1"    column="ATTRIBUTE1"    />
+        <result property="attribute2"    column="ATTRIBUTE2"    />
+        <result property="attribute3"    column="ATTRIBUTE3"    />
+        <result property="attribute4"    column="ATTRIBUTE4"    />
+        <result property="attribute5"    column="ATTRIBUTE5"    />
+        <result property="primaryUomCode"    column="PRIMARY_UOM_CODE"    />
+        <result property="shipToLocationId"    column="SHIP_TO_LOCATION_ID"    />
+        <result property="receiptAdviceLineNumber"    column="RECEIPT_ADVICE_LINE_NUMBER"    />
+        <result property="raDocumentLineNumber"    column="RA_DOCUMENT_LINE_NUMBER"    />
+        <result property="raDooHeaderNumber"    column="RA_DOO_HEADER_NUMBER"    />
+        <result property="raDooLineNumber"    column="RA_DOO_LINE_NUMBER"    />
+        <result property="raDooFulfillmentLineNumber"    column="RA_DOO_FULFILLMENT_LINE_NUMBER"    />
+        <result property="raDocScheduleNumber"    column="RA_DOC_SCHEDULE_NUMBER"    />
+        <result property="raDocLineCreationDate"    column="RA_DOC_LINE_CREATION_DATE"    />
+        <result property="raDocLineLastUpdateDate"    column="RA_DOC_LINE_LAST_UPDATE_DATE"    />
+        <result property="raExpectedReceiptDate"    column="RA_EXPECTED_RECEIPT_DATE"    />
+        <result property="raDaysEarlyReceiptAllowed"    column="RA_DAYS_EARLY_RECEIPT_ALLOWED"    />
+        <result property="raDaysLateReceiptAllowed"    column="RA_DAYS_LATE_RECEIPT_ALLOWED"    />
+        <result property="raReceiptDaysExceptionCode"    column="RA_RECEIPT_DAYS_EXCEPTION_CODE"    />
+        <result property="raEnforceShipToLocCode"    column="RA_ENFORCE_SHIP_TO_LOC_CODE"    />
+        <result property="raAllowSubstituteReceipt"    column="RA_ALLOW_SUBSTITUTE_RECEIPT"    />
+        <result property="raQtyRcvTolerance"    column="RA_QTY_RCV_TOLERANCE"    />
+        <result property="raQtyRcvExceptionCode"    column="RA_QTY_RCV_EXCEPTION_CODE"    />
+        <result property="raNoteToReceiver"    column="RA_NOTE_TO_RECEIVER"    />
+        <result property="receiptAdviceHeaderId"    column="RECEIPT_ADVICE_HEADER_ID"    />
+        <result property="receiptAdviceLineId"    column="RECEIPT_ADVICE_LINE_ID"    />
+        <result property="raOrigDooHeaderNumber"    column="RA_ORIG_DOO_HEADER_NUMBER"    />
+        <result property="raOrigDooLineNumber"    column="RA_ORIG_DOO_LINE_NUMBER"    />
+        <result property="raOrigOcHeaderNumber"    column="RA_ORIG_OC_HEADER_NUMBER"    />
+        <result property="raOrigOcLineNumber"    column="RA_ORIG_OC_LINE_NUMBER"    />
+        <result property="raOrigDooFulfilLineNum"    column="RA_ORIG_DOO_FULFIL_LINE_NUM"    />
+        <result property="customerId"    column="CUSTOMER_ID"    />
+        <result property="customerSiteId"    column="CUSTOMER_SITE_ID"    />
+        <result property="raQuantityExpected"    column="RA_QUANTITY_EXPECTED"    />
+        <result property="raSecondaryQuantityExpected"    column="RA_SECONDARY_QUANTITY_EXPECTED"    />
+        <result property="raUnitPrice"    column="RA_UNIT_PRICE"    />
+        <result property="spQuantity"    column="SP_QUANTITY"    />
+        <result property="spUomCode"    column="SP_UOM_CODE"    />
+        <result property="spGroupId"    column="SP_GROUP_ID"    />
+        <result property="raLastActionCode"    column="RA_LAST_ACTION_CODE"    />
+        <result property="raMessageNumber"    column="RA_MESSAGE_NUMBER"    />
+        <result property="interfaceTransactionId"    column="INTERFACE_TRANSACTION_ID"    />
+        <result property="transferOrderHeaderId"    column="TRANSFER_ORDER_HEADER_ID"    />
+        <result property="transferOrderLineId"    column="TRANSFER_ORDER_LINE_ID"    />
+        <result property="consignedFlag"    column="CONSIGNED_FLAG"    />
+        <result property="firstPtyRegId"    column="FIRST_PTY_REG_ID"    />
+        <result property="thirdPtyRegId"    column="THIRD_PTY_REG_ID"    />
+        <result property="defaultTaxationCountry"    column="DEFAULT_TAXATION_COUNTRY"    />
+        <result property="documentFiscalClassification"    column="DOCUMENT_FISCAL_CLASSIFICATION"    />
+        <result property="trxBusinessCategory"    column="TRX_BUSINESS_CATEGORY"    />
+        <result property="taxInvoiceNumber"    column="TAX_INVOICE_NUMBER"    />
+        <result property="taxInvoiceDate"    column="TAX_INVOICE_DATE"    />
+        <result property="shipFromLocationId"    column="SHIP_FROM_LOCATION_ID"    />
+        <result property="userDefinedFiscClass"    column="USER_DEFINED_FISC_CLASS"    />
+        <result property="taxClassificationCode"    column="TAX_CLASSIFICATION_CODE"    />
+        <result property="productType"    column="PRODUCT_TYPE"    />
+    </resultMap>
+
+    <delete id="deleteSyncRcvShipmentLinesEO">
+        delete from sync_rcv_shipment_lines where SHIPMENT_LINE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.shipmentLineId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncRcvShipmentLinesEO">
+        insert into sync_rcv_shipment_lines( SHIPMENT_LINE_ID, LAST_UPDATE_DATE, LAST_UPDATED_BY, CREATION_DATE, CREATED_BY, SHIPMENT_HEADER_ID, LINE_NUM, CATEGORY_ID, QUANTITY_SHIPPED, QUANTITY_RECEIVED, QUANTITY_DELIVERED, QUANTITY_RETURNED, QUANTITY_ACCEPTED, QUANTITY_REJECTED, UOM_CODE, ITEM_DESCRIPTION, ITEM_ID, SHIPMENT_LINE_STATUS_CODE, SOURCE_DOCUMENT_CODE, PO_HEADER_ID, PO_LINE_ID, PO_LINE_LOCATION_ID, PO_DISTRIBUTION_ID, ROUTING_HEADER_ID, PACKING_SLIP, FROM_ORGANIZATION_ID, DELIVER_TO_PERSON_ID, EMPLOYEE_ID, DESTINATION_TYPE_CODE, TO_ORGANIZATION_ID, TO_SUBINVENTORY, LOCATOR_ID, DELIVER_TO_LOCATION_ID, SHIPMENT_UNIT_PRICE, TRANSFER_COST, TRANSPORTATION_COST, COMMENTS, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, PRIMARY_UOM_CODE, SHIP_TO_LOCATION_ID, RECEIPT_ADVICE_LINE_NUMBER, RA_DOCUMENT_LINE_NUMBER, RA_DOO_HEADER_NUMBER, RA_DOO_LINE_NUMBER, RA_DOO_FULFILLMENT_LINE_NUMBER, RA_DOC_SCHEDULE_NUMBER, RA_DOC_LINE_CREATION_DATE, RA_DOC_LINE_LAST_UPDATE_DATE, RA_EXPECTED_RECEIPT_DATE, RA_DAYS_EARLY_RECEIPT_ALLOWED, RA_DAYS_LATE_RECEIPT_ALLOWED, RA_RECEIPT_DAYS_EXCEPTION_CODE, RA_ENFORCE_SHIP_TO_LOC_CODE, RA_ALLOW_SUBSTITUTE_RECEIPT, RA_QTY_RCV_TOLERANCE, RA_QTY_RCV_EXCEPTION_CODE, RA_NOTE_TO_RECEIVER, RECEIPT_ADVICE_HEADER_ID, RECEIPT_ADVICE_LINE_ID, RA_ORIG_DOO_HEADER_NUMBER, RA_ORIG_DOO_LINE_NUMBER, RA_ORIG_OC_HEADER_NUMBER, RA_ORIG_OC_LINE_NUMBER, RA_ORIG_DOO_FULFIL_LINE_NUM, CUSTOMER_ID, CUSTOMER_SITE_ID, RA_QUANTITY_EXPECTED, RA_SECONDARY_QUANTITY_EXPECTED, RA_UNIT_PRICE, SP_QUANTITY, SP_UOM_CODE, SP_GROUP_ID, RA_LAST_ACTION_CODE, RA_MESSAGE_NUMBER, INTERFACE_TRANSACTION_ID, TRANSFER_ORDER_HEADER_ID, TRANSFER_ORDER_LINE_ID, CONSIGNED_FLAG, FIRST_PTY_REG_ID, THIRD_PTY_REG_ID, DEFAULT_TAXATION_COUNTRY, DOCUMENT_FISCAL_CLASSIFICATION, TRX_BUSINESS_CATEGORY, TAX_INVOICE_NUMBER, TAX_INVOICE_DATE, SHIP_FROM_LOCATION_ID, USER_DEFINED_FISC_CLASS, TAX_CLASSIFICATION_CODE, PRODUCT_TYPE) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.shipmentLineId,jdbcType=BIGINT}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.shipmentHeaderId,jdbcType=BIGINT}, #{item.lineNum,jdbcType=BIGINT}, #{item.categoryId,jdbcType=BIGINT}, cast(#{item.quantityShipped,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityReceived,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityDelivered,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityReturned,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityAccepted,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityRejected,jdbcType=DECIMAL} as decimal(15,5)), #{item.uomCode,jdbcType=VARCHAR}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.itemId,jdbcType=BIGINT}, #{item.shipmentLineStatusCode,jdbcType=VARCHAR}, #{item.sourceDocumentCode,jdbcType=VARCHAR}, #{item.poHeaderId,jdbcType=BIGINT}, #{item.poLineId,jdbcType=BIGINT}, #{item.poLineLocationId,jdbcType=BIGINT}, #{item.poDistributionId,jdbcType=BIGINT}, #{item.routingHeaderId,jdbcType=BIGINT}, #{item.packingSlip,jdbcType=VARCHAR}, #{item.fromOrganizationId,jdbcType=BIGINT}, #{item.deliverToPersonId,jdbcType=BIGINT}, #{item.employeeId,jdbcType=BIGINT}, #{item.destinationTypeCode,jdbcType=VARCHAR}, #{item.toOrganizationId,jdbcType=BIGINT}, #{item.toSubinventory,jdbcType=VARCHAR}, #{item.locatorId,jdbcType=BIGINT}, #{item.deliverToLocationId,jdbcType=BIGINT}, cast(#{item.shipmentUnitPrice,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.transferCost,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.transportationCost,jdbcType=DECIMAL} as decimal(15,5)), #{item.comments,jdbcType=VARCHAR}, #{item.attribute1,jdbcType=VARCHAR}, #{item.attribute2,jdbcType=VARCHAR}, #{item.attribute3,jdbcType=VARCHAR}, #{item.attribute4,jdbcType=VARCHAR}, #{item.attribute5,jdbcType=VARCHAR}, #{item.primaryUomCode,jdbcType=VARCHAR}, #{item.shipToLocationId,jdbcType=BIGINT}, #{item.receiptAdviceLineNumber,jdbcType=VARCHAR}, #{item.raDocumentLineNumber,jdbcType=VARCHAR}, #{item.raDooHeaderNumber,jdbcType=VARCHAR}, #{item.raDooLineNumber,jdbcType=VARCHAR}, #{item.raDooFulfillmentLineNumber,jdbcType=VARCHAR}, #{item.raDocScheduleNumber,jdbcType=VARCHAR}, #{item.raDocLineCreationDate,jdbcType=TIMESTAMP}, #{item.raDocLineLastUpdateDate,jdbcType=TIMESTAMP}, #{item.raExpectedReceiptDate,jdbcType=TIMESTAMP}, cast(#{item.raDaysEarlyReceiptAllowed,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.raDaysLateReceiptAllowed,jdbcType=DECIMAL} as decimal(15,5)), #{item.raReceiptDaysExceptionCode,jdbcType=VARCHAR}, #{item.raEnforceShipToLocCode,jdbcType=VARCHAR}, #{item.raAllowSubstituteReceipt,jdbcType=VARCHAR}, cast(#{item.raQtyRcvTolerance,jdbcType=DECIMAL} as decimal(15,5)), #{item.raQtyRcvExceptionCode,jdbcType=VARCHAR}, #{item.raNoteToReceiver,jdbcType=VARCHAR}, #{item.receiptAdviceHeaderId,jdbcType=BIGINT}, #{item.receiptAdviceLineId,jdbcType=BIGINT}, #{item.raOrigDooHeaderNumber,jdbcType=VARCHAR}, #{item.raOrigDooLineNumber,jdbcType=VARCHAR}, #{item.raOrigOcHeaderNumber,jdbcType=VARCHAR}, #{item.raOrigOcLineNumber,jdbcType=VARCHAR}, #{item.raOrigDooFulfilLineNum,jdbcType=VARCHAR}, #{item.customerId,jdbcType=BIGINT}, #{item.customerSiteId,jdbcType=BIGINT}, cast(#{item.raQuantityExpected,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.raSecondaryQuantityExpected,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.raUnitPrice,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.spQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.spUomCode,jdbcType=VARCHAR}, #{item.spGroupId,jdbcType=BIGINT}, #{item.raLastActionCode,jdbcType=VARCHAR}, cast(#{item.raMessageNumber,jdbcType=DECIMAL} as decimal(15,5)), #{item.interfaceTransactionId,jdbcType=BIGINT}, #{item.transferOrderHeaderId,jdbcType=BIGINT}, #{item.transferOrderLineId,jdbcType=BIGINT}, #{item.consignedFlag,jdbcType=VARCHAR}, #{item.firstPtyRegId,jdbcType=BIGINT}, #{item.thirdPtyRegId,jdbcType=BIGINT}, #{item.defaultTaxationCountry,jdbcType=VARCHAR}, #{item.documentFiscalClassification,jdbcType=VARCHAR}, #{item.trxBusinessCategory,jdbcType=VARCHAR}, #{item.taxInvoiceNumber,jdbcType=VARCHAR}, #{item.taxInvoiceDate,jdbcType=TIMESTAMP}, #{item.shipFromLocationId,jdbcType=BIGINT}, #{item.userDefinedFiscClass,jdbcType=VARCHAR}, #{item.taxClassificationCode,jdbcType=VARCHAR}, #{item.productType,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

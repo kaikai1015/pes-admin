@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.CuxWorkOrdersQtDetailsQlHistoryMapper">
+
+    <resultMap type="CuxWorkOrdersQtDetailsQlHistoryEO" id="CuxWorkOrdersQtDetailsQlHistoryEOResult">
+        <result property="qtId"    column="qt_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="plannedStartDate"    column="planned_start_date"    />
+        <result property="pItemNumber"    column="p_item_number"    />
+        <result property="pDescription"    column="p_description"    />
+        <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+        <result property="completedQuantity"    column="completed_quantity"    />
+        <result property="materialSeqNumber"    column="material_seq_number"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="description"    column="description"    />
+        <result property="requiredQuantity"    column="required_quantity"    />
+        <result property="sumRequiredQuantity"    column="sum_required_quantity"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="remainQuantity"    column="remain_quantity"    />
+        <result property="receiveQuantity"    column="receive_quantity"    />
+        <result property="inboundQuantity"    column="inbound_quantity"    />
+        <result property="revRemainQuantity"    column="rev_remain_quantity"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="prodLine"    column="prod_line"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="orderNum"    column="order_num"    />
+        <result property="lotNum"    column="lot_num"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+    </resultMap>
+
+    <select id="getCuxWorkOrdersQtDetailsQlHistoryList" parameterType="String" resultMap="CuxWorkOrdersQtDetailsQlHistoryEOResult">
+        SELECT
+            organization_code,
+            work_order_number,
+            planned_start_date,
+            p_item_number,
+            p_description,
+            planned_start_quantity,
+            completed_quantity,
+            material_seq_number,
+            item_number,
+            description,
+            required_quantity,
+            sum_required_quantity,
+            quantity,
+            remain_quantity,
+            receive_quantity,
+            inbound_quantity,
+            rev_remain_quantity,
+            buyer_name,
+            prod_line,
+            customer_name,
+            order_num,
+            lot_num,
+            create_by,
+            last_update_by
+        FROM
+            cux_work_orders_qt_details_ql
+        where lot_num &lt;= #{lotNum}
+    </select>
+
+    <insert id="batchCuxWorkOrdersQtDetailsQlHistoryEO">
+        insert into cux_work_orders_qt_details_ql_history(organization_code, work_order_number, planned_start_date, p_item_number,p_description,planned_start_quantity, completed_quantity,material_seq_number, item_number,description,required_quantity, sum_required_quantity, quantity, remain_quantity, receive_quantity, inbound_quantity, rev_remain_quantity, buyer_name, prod_line,customer_name,order_num,lot_num,create_by,last_update_by) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.organizationCode,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.plannedStartDate,jdbcType=TIMESTAMP}, #{item.pItemNumber,jdbcType=VARCHAR},#{item.pDescription,jdbcType=VARCHAR},#{item.plannedStartQuantity,jdbcType=DECIMAL}, #{item.completedQuantity,jdbcType=DECIMAL}, #{item.materialSeqNumber,jdbcType=BIGINT}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.requiredQuantity,jdbcType=DECIMAL},#{item.sumRequiredQuantity,jdbcType=DECIMAL},#{item.quantity,jdbcType=DECIMAL},#{item.remainQuantity,jdbcType=DECIMAL},#{item.receiveQuantity,jdbcType=DECIMAL},#{item.inboundQuantity,jdbcType=DECIMAL},#{item.revRemainQuantity,jdbcType=DECIMAL}, #{item.buyerName,jdbcType=VARCHAR}, #{item.prodLine,jdbcType=VARCHAR}, #{item.customerName,jdbcType=VARCHAR}, #{item.orderNum,jdbcType=VARCHAR},#{item.lotNum,jdbcType=VARCHAR},#{item.createBy,jdbcType=VARCHAR},#{item.lastUpdateBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <delete id="delCuxWorkOrdersQtDetailsQlHistoryList" parameterType="String">
+        delete from cux_work_orders_qt_details_ql where lot_num &lt;= #{lotNum}
+    </delete>
+
+</mapper>

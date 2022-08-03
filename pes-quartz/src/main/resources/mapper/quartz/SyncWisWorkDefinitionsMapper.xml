@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWisWorkDefinitionsMapper">
+
+    <resultMap type="SyncWisWorkDefinitionsEO" id="SyncWisWorkDefinitionsEOResult">
+    </resultMap>
+
+    <delete id="deleteSyncWisWorkDefinitionsEO">
+        delete from sync_wis_work_definitions where WORK_DEFINITION_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.workDefinitionId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncWisWorkDefinitionsEO">
+        insert into sync_wis_work_definitions( WORK_DEFINITION_ID, WORK_DEFINITION_TYPE, WORK_METHOD_ID, ORGANIZATION_ID, INVENTORY_ITEM_ID, TRANSFORM_FROM_ITEM_ID, WORK_DEFINITION_NAME_ID, WD_MNT_NAME_ID, STATUS_CODE, INACTIVE_DATE, WORK_DEFINITION_HEADER_NAME, PRODUCTION_PRIORITY, COSTING_PRIORITY, SERIAL_TRACKING_FLAG, BILL_SEQUENCE_ID, QUANTITY, UOM_CODE, SYSTEM_GENERATED_FLAG, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workDefinitionId,jdbcType=BIGINT}, #{item.workDefinitionType,jdbcType=VARCHAR}, #{item.workMethodId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.transformFromItemId,jdbcType=BIGINT}, #{item.workDefinitionNameId,jdbcType=BIGINT}, #{item.wdMntNameId,jdbcType=BIGINT}, #{item.statusCode,jdbcType=VARCHAR}, #{item.inactiveDate,jdbcType=TIMESTAMP}, #{item.workDefinitionHeaderName,jdbcType=VARCHAR}, cast(#{item.productionPriority,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.costingPriority,jdbcType=DECIMAL} as decimal(15,5)), #{item.serialTrackingFlag,jdbcType=VARCHAR}, #{item.billSequenceId,jdbcType=BIGINT}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.uomCode,jdbcType=VARCHAR}, #{item.systemGeneratedFlag,jdbcType=VARCHAR}, #{item.createdBy,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

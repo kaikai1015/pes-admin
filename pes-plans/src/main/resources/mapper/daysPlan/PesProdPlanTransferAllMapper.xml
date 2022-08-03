@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdPlanTransferAllMapper">
+
+    <resultMap type="PesProdPlanTransferAll" id="PesProdPlanTransferAllResult">
+                    <result property="beiLiaoId"    column="bei_liao_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="requiredQuantity"    column="required_quantity"    />
+                    <result property="beiLiaoQuantity"    column="bei_liao_quantity"    />
+                    <result property="diaoChuQuantity"    column="diao_chu_quantity"    />
+                    <result property="diaoChuSubinventory"    column="diao_chu_subinventory"    />
+                    <result property="diaoRuQuantity"    column="diao_ru_quantity"    />
+                    <result property="diaoRuSubinventory"    column="diao_ru_subinventory"    />
+                    <result property="transferFlag"    column="transfer_flag"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="planTransferId"    column="plan_transfer_id"    />
+                    <result property="maxSubinventoryCode"    column="max_subinventory_code"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="suoHaoQuantity"    column="suo_hao_quantity"    />
+                    <result property="transferedFlag"    column="transfered_flag"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="turnoverSubinventory"    column="turnover_subinventory"    />
+                    <result property="type"    column="type"    />
+                    <result property="sourceId"    column="source_id"    />
+                    <result property="sourceType"    column="source_type"    />
+                    <result property="sourceCategory"    column="source_category"    />
+                    <result property="sourceCode"    column="source_code"    />
+                    <result property="sourceName"    column="source_name"    />
+                    <result property="sourceReferenceId"    column="source_reference_id"    />
+            </resultMap>
+
+    <sql id="selectPesProdPlanTransferAllVo">
+        SELECT
+            *
+        FROM
+            pes_prod_plan_transfer_all_v pptav
+    </sql>
+
+    <select id="selectPesProdPlanTransferAllList" parameterType="PesProdPlanTransferAll" resultMap="PesProdPlanTransferAllResult">
+        <include refid="selectPesProdPlanTransferAllVo"/>
+        <where>
+
+            <if test="planTransferId != null "> and pptav.plan_transfer_id = #{planTransferId}</if>
+            <if test="organizationId != null "> and pptav.organization_id = #{organizationId}</if>
+            <if test="lotNum != null"> and pptav.lot_num = #{lotNum}</if>
+            <if test="sourceId != null"> and pptav.source_id = #{sourceId}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and pptav.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and pptav.item_number like (#{itemNumber} + '%')</if>
+            <if test="diaoChuSubinventory != null  and diaoChuSubinventory != ''"> and pptav.diao_chu_subinventory like (#{diaoChuSubinventory} + '%')</if>
+            <if test="transferFlag != null  and transferFlag != ''"> and pptav.transfer_flag = #{transferFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectPesProdPlanTransferAllById" parameterType="Long" resultMap="PesProdPlanTransferAllResult">
+        SELECT
+            ppbla.bei_liao_id,
+            ppbla.organization_id,
+            ppbla.inventory_item_id,
+            ppbla.required_quantity,
+            ppbla.bei_liao_quantity,
+            ppdla.work_order_number,
+            ppdla.work_order_id,
+            (select sdd.dict_label from sys_dict_data sdd where sdd.dict_value = ppdla.xian_bie_flag and sdd.dict_type = 'prod_xian_bian_cang') as diao_ru_subinventory,
+            (select sdd.dict_label from sys_dict_data sdd where sdd.dict_value = '1' and sdd.dict_type = 'prod_turnover_cang') as turnover_subinventory
+        FROM
+--             pes_prod_plan_bei_liao_all ppbla,
+
+        <if test="sourceType == 'ISSUE' "> pes_prod_plan_bei_liao_all_order ppbla,pes_prod_line_days_line_all ppdla</if>
+        <if test="sourceType == 'OUTSIDE' "> pes_prod_plan_bei_liao_all_ww ppbla,pes_prod_line_days_line_all_ww ppdla</if>
+
+        WHERE
+            1 = 1
+        AND ppbla.id = #{id}
+        AND ppbla.bei_liao_quantity &gt; 0
+        AND ppbla.line_id = ppdla.line_id
+        ORDER BY
+            ppbla.organization_id,
+            ppbla.inventory_item_id
+    </select>
+
+    <select id="selectPesProdOnhandQuantitys" parameterType="PesProdPlanTransferAll" resultMap="PesProdPlanTransferAllResult">
+        SELECT
+        qtys.organization_id,
+        qtys.inventory_item_id,
+        qtys.subinventory_code as diao_chu_subinventory,
+        max(qtys.subinventory_code) over (partition by qtys.organization_id,qtys.inventory_item_id order by qtys.organization_id,qtys.inventory_item_id) as max_subinventory_code,
+        (case when qtys.sum_onhand_quantity &lt;= #{beiLiaoQuantity} then qtys.quantity else #{beiLiaoQuantity} - qtys.sum_onhand_quantity + qtys.quantity end) as diao_chu_quantity
+        FROM
+        (select
+        qty.organization_id,
+        qty.inventory_item_id,
+        qty.subinventory_code,
+        qty.quantity,
+        qty.sum_onhand_quantity,
+        qty.qty_flag,
+        MIN(qty.qty_flag) OVER (Partition by qty.organization_id,qty.inventory_item_id) as min_flag
+        FROM
+        (SELECT
+        organization_id,
+        inventory_item_id,
+        subinventory_code,
+        (case when subinventory_code = #{maxSubcode} then quantity - #{maxQuantity} else quantity end) as quantity,
+        SUM ((case when subinventory_code = #{maxSubcode} then quantity - #{maxQuantity} else quantity end)) OVER (partition BY organization_id,inventory_item_id ORDER BY subinventory_code asc) AS sum_onhand_quantity,
+        (case when SUM ((case when subinventory_code = #{maxSubcode} then quantity - #{maxQuantity} else quantity end))
+        OVER (partition BY organization_id,inventory_item_id ORDER BY subinventory_code asc) - #{beiLiaoQuantity} &lt; 0 then null else
+        SUM ((case when subinventory_code = #{maxSubcode} then quantity - #{maxQuantity} else quantity end)) OVER (partition BY organization_id,inventory_item_id ORDER BY subinventory_code asc) - #{beiLiaoQuantity} end) qty_flag
+        FROM
+        sync_inv_onhand_quantity_new_code
+        WHERE
+        organization_id = #{organizationId}
+        AND inventory_item_id = #{inventoryItemId}
+        and subinventory_code &gt;= #{maxSubcode}
+        ) qty) qtys
+        where isnull(qtys.qty_flag,0) &lt;= isnull(qtys.min_flag,0)
+    </select>
+
+    <!--<insert id="insertPesProdPlanTransferAll">-->
+        <!--insert into pes_prod_plan_transfer_all( bei_liao_id, organization_id, inventory_item_id, required_quantity, bei_liao_quantity, diao_chu_quantity,diao_chu_subinventory, diao_ru_quantity, diao_ru_subinventory, create_by, last_update_by) values-->
+        <!--<foreach item="item" index="index" collection="list" separator=",">-->
+            <!--( #{item.beiLiaoId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.requiredQuantity,jdbcType=DECIMAL}, #{item.beiLiaoQuantity,jdbcType=DECIMAL}, #{item.diaoChuQuantity,jdbcType=DECIMAL}, #{item.diaoChuSubinventory,jdbcType=VARCHAR}, #{item.diaoRuQuantity,jdbcType=DECIMAL}, #{item.diaoRuSubinventory,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR})-->
+        <!--</foreach>-->
+    <!--</insert>-->
+
+    <insert id="insertPesProdPlanTransferAll" parameterType="PesProdPlanTransferAll"   useGeneratedKeys="true" keyProperty="planTransferId" keyColumn="plan_transfer_id">
+        insert into pes_prod_plan_transfer_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="beiLiaoId != null">bei_liao_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="requiredQuantity != null">required_quantity,</if>
+            <if test="beiLiaoQuantity != null">bei_liao_quantity,</if>
+            <if test="diaoChuQuantity != null">diao_chu_quantity,</if>
+            <if test="diaoChuSubinventory != null">diao_chu_subinventory,</if>
+            <if test="diaoRuQuantity != null">diao_ru_quantity,</if>
+            <if test="diaoRuSubinventory != null">diao_ru_subinventory,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createBy != null">last_update_by,</if>
+            <if test="sourceType != null">source_type,</if>
+            <if test="sourceId != null">source_id,</if>
+            <if test="type != null">type,</if>
+            <if test="turnoverSubinventory != null">turnover_subinventory,</if>
+            <if test="sourceCategory != null">source_category,</if>
+            <if test="sourceCode != null">source_code,</if>
+            <if test="sourceName != null">source_name,</if>
+            <if test="sourceReferenceId != null">source_reference_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="beiLiaoId != null">#{beiLiaoId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="requiredQuantity != null">#{requiredQuantity},</if>
+            <if test="beiLiaoQuantity != null">#{beiLiaoQuantity},</if>
+            <if test="diaoChuQuantity != null">#{diaoChuQuantity},</if>
+            <if test="diaoChuSubinventory != null">#{diaoChuSubinventory},</if>
+            <if test="diaoRuQuantity != null">#{diaoRuQuantity},</if>
+            <if test="diaoRuSubinventory != null">#{diaoRuSubinventory},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="sourceType != null">#{sourceType},</if>
+            <if test="sourceId != null">#{sourceId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="turnoverSubinventory != null">#{turnoverSubinventory},</if>
+            <if test="sourceCategory != null">#{sourceCategory},</if>
+            <if test="sourceCode != null">#{sourceCode},</if>
+            <if test="sourceName != null">#{sourceName},</if>
+            <if test="sourceReferenceId != null">#{sourceReferenceId},</if>
+        </trim>
+    </insert>
+
+    <delete id="deletePesProdPlanTransferAllByIds" parameterType="String">
+        delete from pes_prod_plan_transfer_all where plan_transfer_id in
+        <foreach item="planTransferId" collection="array" open="(" separator="," close=")">
+            #{planTransferId}
+        </foreach>
+    </delete>
+
+    <delete id="updateTransferFlag" parameterType="Long">
+        UPDATE pes_prod_line_days_header_all set transfer_flag = '1' where id = #{id}
+    </delete>
+    <update id="updatePesProdPlanTransferAll" parameterType="PesProdPlanTransferAll">
+        update pes_prod_plan_transfer_all
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="beiLiaoId != null">bei_liao_id = #{beiLiaoId},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+            <if test="requiredQuantity != null">required_quantity = #{requiredQuantity},</if>
+            <if test="beiLiaoQuantity != null">bei_liao_quantity = #{beiLiaoQuantity},</if>
+            <if test="diaoChuQuantity != null">diao_chu_quantity = #{diaoChuQuantity},</if>
+            <if test="diaoChuSubinventory != null">diao_chu_subinventory = #{diaoChuSubinventory},</if>
+            <if test="diaoRuQuantity != null">diao_ru_quantity = #{diaoRuQuantity},</if>
+            <if test="diaoRuSubinventory != null">diao_ru_subinventory = #{diaoRuSubinventory},</if>
+            <if test="transferFlag != null">transfer_flag = #{transferFlag},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+            <if test="sourceId != null">source_id = #{sourceId},</if>
+            <if test="turnoverSubinventory != null">turnover_subinventory = #{turnoverSubinventory},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="sourceCategory != null">source_category = #{sourceCategory},</if>
+            <if test="sourceType != null">source_type = #{sourceType},</if>
+            <if test="sourceCode != null">source_code = #{sourceCode},</if>
+            <if test="sourceName != null">source_name = #{sourceName},</if>
+            <if test="sourceReferenceId != null">source_reference_id = #{sourceReferenceId},</if>
+        </trim>
+        where plan_transfer_id = #{planTransferId}
+    </update>
+</mapper>

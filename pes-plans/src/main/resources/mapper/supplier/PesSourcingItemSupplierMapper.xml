@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.supplier.mapper.PesSourcingItemSupplierMapper">
+
+    <resultMap type="PesSourcingItemSupplier" id="PesSourcingItemSupplierResult">
+        <result property="sourcingItemId"    column="sourcing_item_id"    />
+                    <result property="supplierId"    column="supplier_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="effectiveStartDate"    column="effective_start_date"    />
+                    <result property="effectiveEndDate"    column="effective_end_date"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="supplierNumber"    column="supplier_number"    />
+            </resultMap>
+
+    <sql id="selectPesSourcingItemSupplierVo">
+        select sourcing_item_id,supplier_id, item_number, organization_id, inventory_item_id, item_description, effective_start_date, effective_end_date, create_date, create_by, last_update_date, last_update_by from pes_sourcing_item_supplier
+    </sql>
+
+    <select id="selectPesSourcingItemSupplierList" parameterType="PesSourcingItemSupplier" resultMap="PesSourcingItemSupplierResult">
+        <include refid="selectPesSourcingItemSupplierVo"/>
+        <where>
+            and GETDATE() BETWEEN effective_start_date and effective_end_date
+            <if test="supplierId != null "> and supplier_id = #{supplierId}</if>
+        </where>
+    </select>
+
+    <insert id="insertPesSourcingItemSupplier" parameterType="PesSourcingItemSupplier">
+        insert into pes_sourcing_item_supplier
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="itemNumber != null and itemNumber != ''">item_number,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="itemNumber != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_description,</if>
+            <if test="effectiveStartDate != null">effective_start_date,</if>
+            <if test="effectiveEndDate != null">effective_end_date,</if>
+            create_date,
+            <if test="lastUpdateBy != null">create_by,</if>
+            last_update_date,
+            <if test="lastUpdateBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="itemNumber != null and itemNumber != ''">#{itemNumber},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            (select INVENTORY_ITEM_ID from sync_items_num_des_list where ITEM_NUMBER = #{itemNumber} and ORGANIZATION_ID = #{organizationId}),
+            (select ITEM_DESCRIPTION from sync_items_num_des_list where ITEM_NUMBER = #{itemNumber} and ORGANIZATION_ID = #{organizationId}),
+            <if test="effectiveStartDate != null">#{effectiveStartDate},</if>
+            <if test="effectiveEndDate != null">#{effectiveEndDate},</if>
+            GETDATE(),
+            <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+            GETDATE(),
+            <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesSourcingItemSupplier" parameterType="PesSourcingItemSupplier">
+        update pes_sourcing_item_supplier
+        set effective_start_date = #{effectiveStartDate},
+            effective_end_date = #{effectiveEndDate},
+            last_update_date = GETDATE(),
+            last_update_by = #{lastUpdateBy}
+        where supplier_id = #{supplierId}
+        and inventory_item_id = #{inventoryItemId}
+        and organization_id = #{organizationId}
+    </update>
+
+    <select id="checkItemSupplierUnique" parameterType="PesSourcingItemSupplier" resultType="int">
+        select count(1) from pes_sourcing_item_supplier where item_number = #{itemNumber} and organization_id = #{organizationId} and supplier_id = #{supplierId} and GETDATE() BETWEEN effective_start_date and effective_end_date
+    </select>
+
+    <select id="selectPesSourcingItemSupplierById" parameterType="PesSourcingItemSupplier" resultMap="PesSourcingItemSupplierResult">
+        SELECT
+        sis.item_number,
+        sis.item_description,
+        sis.effective_start_date,
+        sis.effective_end_date,
+        shl.supplier_number,
+        shl.supplier_name
+        FROM
+        pes_sourcing_item_supplier sis,
+        pes_supplier_header_list shl
+        WHERE
+        sis.supplier_id = shl.supplier_id
+        and sourcing_item_id = #{sourcingItemId}
+    </select>
+
+</mapper>

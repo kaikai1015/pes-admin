@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPoHeadersAllMapper">
+
+    <resultMap type="SyncPoHeadersAllEO" id="SyncPoHeadersAllEOResult">
+        <result property="prcBuId"    column="prc_bu_id"    />
+        <result property="poHeaderId"    column="po_header_id"    />
+        <result property="segment1"    column="segment1"    />
+        <result property="typeLookupCode"    column="type_lookup_code"    />
+        <result property="documentStatus"    column="document_status"    />
+        <result property="vendorId"    column="vendor_id"    />
+        <result property="agentId"    column="agent_id"    />
+        <result property="comments"    column="comments"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="soldtoLeId"    column="soldto_le_id"    />
+        <result property="creationDate"    column="creation_date"    />
+    </resultMap>
+
+    <sql id="selectSyncPoHeadersAllVo">
+        select prc_bu_id, po_header_id, soldto_le_id,segment1, type_lookup_code, document_status, vendor_id, agent_id, comments,creation_date, last_update_date from sync_po_headers_all
+    </sql>
+
+    <select id="selectSyncPoHeadersAllList" parameterType="SyncPoHeadersAllEO" resultMap="SyncPoHeadersAllEOResult">
+        <include refid="selectSyncPoHeadersAllVo"/>
+        <where>
+            and document_status &lt;&gt; 'INCOMPLETE'
+            <if test="poHeaderId != null "> and po_header_id = #{poHeaderId}</if>
+            <if test="segment1 != null  and segment1 != ''"> and segment1 = #{segment1}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-20,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+
+    <delete id="deleteSyncPoHeadersAllEO">
+        delete from sync_po_headers_all where po_header_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.poHeaderId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPoHeadersAllEO">
+        insert into sync_po_headers_all( prc_bu_id, po_header_id, soldto_le_id,segment1, type_lookup_code, document_status, vendor_id, agent_id, comments,creation_date,last_update_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.prcBuId,jdbcType=BIGINT}, #{item.poHeaderId,jdbcType=BIGINT},#{item.soldtoLeId,jdbcType=BIGINT}, #{item.segment1,jdbcType=VARCHAR}, #{item.typeLookupCode,jdbcType=VARCHAR}, #{item.documentStatus,jdbcType=VARCHAR}, #{item.vendorId,jdbcType=BIGINT}, #{item.agentId,jdbcType=BIGINT}, #{item.comments,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.lastUpdateDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

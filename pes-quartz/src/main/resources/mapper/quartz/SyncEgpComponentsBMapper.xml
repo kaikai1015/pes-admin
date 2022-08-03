@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncEgpComponentsBMapper">
+
+    <resultMap type="SyncEgpComponentsBEO" id="SyncEgpComponentsBEOResult"></resultMap>
+
+    <delete id="deleteSyncEgpComponentsBEO">
+        delete from sync_egp_components_b where COMPONENT_SEQUENCE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.componentSequenceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncEgpComponentsBEO">
+        insert into sync_egp_components_b( OPERATION_SEQ_NUM, PRIMARY_UOM_CODE, CHANGE_ID, ITEM_NUM, COMPONENT_QUANTITY, COMPONENT_YIELD_FACTOR, COMPONENT_REMARKS, EFFECTIVITY_DATE, DISABLE_DATE, IMPLEMENTATION_DATE, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, PLANNING_FACTOR, ACD_TYPE, OLD_COMPONENT_SEQUENCE_ID, COMPONENT_SEQUENCE_ID, BILL_SEQUENCE_ID, REQUEST_ID, WIP_SUPPLY_TYPE, PICK_COMPONENTS, BOM_ITEM_TYPE, PLAN_LEVEL, VENDOR_ID, UNIT_PRICE, PK1_VALUE, PK2_VALUE, BASIS_TYPE, COMMON_COMPONENT_SEQUENCE_ID, last_update_date, creation_date, created_by, last_updated_by, last_update_login, OBJECT_VERSION_NUMBER) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.operationSeqNum,jdbcType=DECIMAL}, #{item.primaryUomCode,jdbcType=VARCHAR}, #{item.changeId,jdbcType=BIGINT}, #{item.itemNum,jdbcType=DECIMAL}, #{item.componentQuantity,jdbcType=DECIMAL}, #{item.componentYieldFactor,jdbcType=DECIMAL}, #{item.componentRemarks,jdbcType=VARCHAR}, #{item.effectivityDate,jdbcType=TIMESTAMP}, #{item.disableDate,jdbcType=TIMESTAMP}, #{item.implementationDate,jdbcType=TIMESTAMP}, #{item.attributeCategory,jdbcType=VARCHAR}, #{item.attribute1,jdbcType=VARCHAR}, #{item.attribute2,jdbcType=VARCHAR}, #{item.attribute3,jdbcType=VARCHAR}, #{item.attribute4,jdbcType=VARCHAR}, #{item.attribute5,jdbcType=VARCHAR}, #{item.attribute6,jdbcType=VARCHAR}, #{item.attribute7,jdbcType=VARCHAR}, #{item.attribute8,jdbcType=VARCHAR}, #{item.attribute9,jdbcType=VARCHAR}, #{item.attribute10,jdbcType=VARCHAR}, #{item.planningFactor,jdbcType=DECIMAL}, #{item.acdType,jdbcType=DECIMAL}, #{item.oldComponentSequenceId,jdbcType=BIGINT}, #{item.componentSequenceId,jdbcType=BIGINT}, #{item.billSequenceId,jdbcType=BIGINT}, #{item.requestId,jdbcType=BIGINT}, #{item.wipSupplyType,jdbcType=DECIMAL}, #{item.pickComponents,jdbcType=DECIMAL}, #{item.bomItemType,jdbcType=DECIMAL}, #{item.planLevel,jdbcType=DECIMAL}, #{item.vendorId,jdbcType=BIGINT}, #{item.unitPrice,jdbcType=DECIMAL}, #{item.pk1Value,jdbcType=VARCHAR}, #{item.pk2Value,jdbcType=VARCHAR}, #{item.basisType,jdbcType=DECIMAL}, #{item.commonComponentSequenceId,jdbcType=BIGINT}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateLogin,jdbcType=VARCHAR}, #{item.objectVersionNumber,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+</mapper>

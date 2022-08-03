@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPozSuppliersMapper">
+
+    <resultMap type="SyncPozSuppliersEO" id="SyncPozSuppliersEOResult">
+        <result property="vendorId"    column="VENDOR_ID"    />
+        <result property="segment1"    column="SEGMENT1"    />
+        <result property="partyId"    column="PARTY_ID"    />
+        <result property="enabledFlag"    column="ENABLED_FLAG"    />
+        <result property="summaryFlag"    column="SUMMARY_FLAG"    />
+        <result property="vendorTypeLookupCode"    column="VENDOR_TYPE_LOOKUP_CODE"    />
+        <result property="startDateActive"    column="START_DATE_ACTIVE"    />
+        <result property="endDateActive"    column="END_DATE_ACTIVE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="partyName"    column="PARTY_NAME"    />
+    </resultMap>
+
+    <sql id="selectSyncPozSuppliersVo">
+        select VENDOR_ID, SEGMENT1, PARTY_ID, ENABLED_FLAG, SUMMARY_FLAG, VENDOR_TYPE_LOOKUP_CODE, START_DATE_ACTIVE, END_DATE_ACTIVE, LAST_UPDATE_DATE, LAST_UPDATED_BY from sync_poz_suppliers
+    </sql>
+
+    <select id="selectSyncPozSuppliersList" parameterType="SyncPozSuppliersEO" resultMap="SyncPozSuppliersEOResult">
+        SELECT
+        ps.VENDOR_ID,
+        ps.PARTY_ID,
+        ps.SEGMENT1,
+        hz.PARTY_NAME,
+        ps.ENABLED_FLAG,
+        ps.SUMMARY_FLAG,
+        ps.VENDOR_TYPE_LOOKUP_CODE,
+        ps.START_DATE_ACTIVE,
+        ps.END_DATE_ACTIVE,
+        ps.LAST_UPDATE_DATE,
+        ps.LAST_UPDATED_BY
+        FROM
+        sync_poz_suppliers ps,
+        sync_hz_parties hz
+        <where>
+        hz.PARTY_ID = ps.PARTY_ID
+            <if test="vendorId != null "> and ps.VENDOR_ID = #{vendorId}</if>
+            <if test="segment1 != null  and segment1 != ''"> and ps.SEGMENT1 = #{segment1}</if>
+            <if test="partyId != null "> and ps.PARTY_ID = #{partyId}</if>
+            <if test="beginTime != null and beginTime != ''"> and ps.LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-20,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and ps.LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncPozSuppliersEO">
+        delete from sync_poz_suppliers where VENDOR_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.vendorId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPozSuppliersEO">
+        insert into sync_poz_suppliers( VENDOR_ID, SEGMENT1, PARTY_ID, ENABLED_FLAG, SUMMARY_FLAG, VENDOR_TYPE_LOOKUP_CODE, START_DATE_ACTIVE, END_DATE_ACTIVE, LAST_UPDATE_DATE, LAST_UPDATED_BY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.vendorId,jdbcType=BIGINT}, #{item.segment1,jdbcType=VARCHAR}, #{item.partyId,jdbcType=BIGINT}, #{item.enabledFlag,jdbcType=VARCHAR}, #{item.summaryFlag,jdbcType=VARCHAR}, #{item.vendorTypeLookupCode,jdbcType=VARCHAR}, #{item.startDateActive,jdbcType=TIMESTAMP}, #{item.endDateActive,jdbcType=TIMESTAMP}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

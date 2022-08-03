@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.SyncInvOnhandQuantityNewPriceMapper">
+
+    <resultMap type="SyncInvOnhandQuantityNewPriceEO" id="SyncInvOnhandQuantityNewPriceEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="sumUnitCost"    column="sum_unit_cost"    />
+        <result property="snapshotDate"    column="snapshot_date"    />
+        <result property="productCatalog"    column="Product_Catalog"    />
+        <result property="itemCatalog"    column="Item_Catalog"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="dateDiffDays"    column="date_diff_days"    />
+        <result property="monthDiffDays"    column="month_diff_days"    />
+        <result property="sumUnitCostAmount"    column="sum_unit_cost_amount"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+    </resultMap>
+
+    <sql id="selectSyncInvOnhandQuantityNewVo">
+        SELECT
+            list.ORGANIZATION_ID,
+            list.ITEM_NUMBER,
+            list.description as ITEM_DESCRIPTION,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+            and eic.inventory_item_id = list.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+            and eic.inventory_item_id = list.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog,
+	    cto.quantity_onhand as quantity,
+	    cto.subinventory_code,
+	    cto.cost_date as snapshot_date,
+	    datediff(day,cto.cost_date,GETDATE()) as date_diff_days,
+	    datediff(DAY,cto.cost_date,GETDATE())/30 as month_diff_days,
+	    isnull(price.sum_unit_cost,0) as sum_unit_cost,
+	    isnull(price.sum_unit_cost,0) * cto.quantity_onhand as sum_unit_cost_amount
+
+        FROM
+	    sync_cst_transactions_onhand_v cto,
+	    sync_egp_system_items_b_w list
+	    left join sync_cst_costed_vu_costs_v_unit_price price
+	    on (list.INVENTORY_ITEM_ID = price.INVENTORY_ITEM_ID
+	    and list.organization_id = price.organization_id)
+    </sql>
+
+    <select id="selectSyncInvOnhandQuantityNewList" parameterType="SyncInvOnhandQuantityNewPriceEO" resultMap="SyncInvOnhandQuantityNewPriceEOResult">
+        <include refid="selectSyncInvOnhandQuantityNewVo"/>
+        <where>
+            and cto.inventory_item_id = list.INVENTORY_ITEM_ID
+            AND cto.organization_id = list.organization_id
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="subinventoryCode != null  and subinventoryCode != ''"> and cto.subinventory_code like (#{subinventoryCode} + '%')</if>
+            <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+            <if test="beginTime != null and beginTime != ''"> and cto.cost_date &lt; #{beginTime}</if>
+        </where>
+    </select>
+
+</mapper>

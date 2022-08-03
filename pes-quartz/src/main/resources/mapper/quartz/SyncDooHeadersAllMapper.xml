@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncDooHeadersAllMapper">
+
+    <resultMap type="SyncDooHeadersAllEO" id="SyncDooHeadersAllEOResult">
+        <result property="headerId"    column="HEADER_ID"    />
+        <result property="preCreditCheckedFlag"    column="PRE_CREDIT_CHECKED_FLAG"    />
+        <result property="orderNumber"    column="ORDER_NUMBER"    />
+        <result property="ownerId"    column="OWNER_ID"    />
+        <result property="sourceOrderSystem"    column="SOURCE_ORDER_SYSTEM"    />
+        <result property="sourceOrderNumber"    column="SOURCE_ORDER_NUMBER"    />
+        <result property="sourceOrderId"    column="SOURCE_ORDER_ID"    />
+        <result property="sourceDocumentTypeCode"    column="SOURCE_DOCUMENT_TYPE_CODE"    />
+        <result property="sourceRevisionNumber"    column="SOURCE_REVISION_NUMBER"    />
+        <result property="origSysDocumentRef"    column="ORIG_SYS_DOCUMENT_REF"    />
+        <result property="sourceOrgId"    column="SOURCE_ORG_ID"    />
+        <result property="orgId"    column="ORG_ID"    />
+        <result property="legalEntityId"    column="LEGAL_ENTITY_ID"    />
+        <result property="soldToCustomerId"    column="SOLD_TO_CUSTOMER_ID"    />
+        <result property="soldToContactId"    column="SOLD_TO_CONTACT_ID"    />
+        <result property="orderedDate"    column="ORDERED_DATE"    />
+        <result property="customerPoNumber"    column="CUSTOMER_PO_NUMBER"    />
+        <result property="orderTypeCode"    column="ORDER_TYPE_CODE"    />
+        <result property="transactionalCurrencyCode"    column="TRANSACTIONAL_CURRENCY_CODE"    />
+        <result property="conversionRate"    column="CONVERSION_RATE"    />
+        <result property="conversionTypeCode"    column="CONVERSION_TYPE_CODE"    />
+        <result property="conversionDate"    column="CONVERSION_DATE"    />
+        <result property="statusCode"    column="STATUS_CODE"    />
+        <result property="partialShipAllowedFlag"    column="PARTIAL_SHIP_ALLOWED_FLAG"    />
+        <result property="openFlag"    column="OPEN_FLAG"    />
+        <result property="onHold"    column="ON_HOLD"    />
+        <result property="canceledFlag"    column="CANCELED_FLAG"    />
+        <result property="changeVersionNumber"    column="CHANGE_VERSION_NUMBER"    />
+        <result property="isEditable"    column="IS_EDITABLE"    />
+        <result property="cancelReasonCode"    column="CANCEL_REASON_CODE"    />
+        <result property="soldToPartyId"    column="SOLD_TO_PARTY_ID"    />
+        <result property="soldToPartyContactId"    column="SOLD_TO_PARTY_CONTACT_ID"    />
+        <result property="requestCancelDate"    column="REQUEST_CANCEL_DATE"    />
+        <result property="comments"    column="COMMENTS"    />
+        <result property="allowCurrencyOverrideFlag"    column="ALLOW_CURRENCY_OVERRIDE_FLAG"    />
+        <result property="appliedCurrencyCode"    column="APPLIED_CURRENCY_CODE"    />
+        <result property="pricedOn"    column="PRICED_ON"    />
+        <result property="pricingSegmentCode"    column="PRICING_SEGMENT_CODE"    />
+        <result property="pricingSegmentExplanation"    column="PRICING_SEGMENT_EXPLANATION"    />
+        <result property="pricingStrategyExplanation"    column="PRICING_STRATEGY_EXPLANATION"    />
+        <result property="segmentExplanationMsgName"    column="SEGMENT_EXPLANATION_MSG_NAME"    />
+        <result property="strategyExplanationMsgName"    column="STRATEGY_EXPLANATION_MSG_NAME"    />
+        <result property="pricingStrategyId"    column="PRICING_STRATEGY_ID"    />
+        <result property="freezeTaxFlag"    column="FREEZE_TAX_FLAG"    />
+        <result property="shipsetFlag"    column="SHIPSET_FLAG"    />
+        <result property="fulfillOrgId"    column="FULFILL_ORG_ID"    />
+        <result property="supplierId"    column="SUPPLIER_ID"    />
+        <result property="supplierSiteId"    column="SUPPLIER_SITE_ID"    />
+        <result property="demandClassCode"    column="DEMAND_CLASS_CODE"    />
+        <result property="substituteAllowedFlag"    column="SUBSTITUTE_ALLOWED_FLAG"    />
+        <result property="freightTermsCode"    column="FREIGHT_TERMS_CODE"    />
+        <result property="fobPointCode"    column="FOB_POINT_CODE"    />
+        <result property="packingInstructions"    column="PACKING_INSTRUCTIONS"    />
+        <result property="shippingInstructions"    column="SHIPPING_INSTRUCTIONS"    />
+        <result property="shipmentPriorityCode"    column="SHIPMENT_PRIORITY_CODE"    />
+        <result property="requestShipDate"    column="REQUEST_SHIP_DATE"    />
+        <result property="latestAcceptableShipDate"    column="LATEST_ACCEPTABLE_SHIP_DATE"    />
+        <result property="earliestAcceptableShipDate"    column="EARLIEST_ACCEPTABLE_SHIP_DATE"    />
+        <result property="carrierId"    column="CARRIER_ID"    />
+        <result property="shipModeOfTransport"    column="SHIP_MODE_OF_TRANSPORT"    />
+        <result property="shipClassOfService"    column="SHIP_CLASS_OF_SERVICE"    />
+        <result property="requestArrivalDate"    column="REQUEST_ARRIVAL_DATE"    />
+        <result property="latestAcceptArrivalDate"    column="LATEST_ACCEPT_ARRIVAL_DATE"    />
+        <result property="earliestAcceptArrivalDate"    column="EARLIEST_ACCEPT_ARRIVAL_DATE"    />
+        <result property="submittedFlag"    column="SUBMITTED_FLAG"    />
+        <result property="referenceHeaderId"    column="REFERENCE_HEADER_ID"    />
+        <result property="freezePriceFlag"    column="FREEZE_PRICE_FLAG"    />
+        <result property="freezeShippingChargeFlag"    column="FREEZE_SHIPPING_CHARGE_FLAG"    />
+        <result property="paymentTermId"    column="PAYMENT_TERM_ID"    />
+        <result property="soldToPartyContactPointId"    column="SOLD_TO_PARTY_CONTACT_POINT_ID"    />
+        <result property="modifiedFlag"    column="MODIFIED_FLAG"    />
+        <result property="revisionSourceOrderSystem"    column="REVISION_SOURCE_ORDER_SYSTEM"    />
+        <result property="approvalSequenceNumber"    column="APPROVAL_SEQUENCE_NUMBER"    />
+        <result property="tradeComplianceResultCode"    column="TRADE_COMPLIANCE_RESULT_CODE"    />
+        <result property="createdInRelease"    column="CREATED_IN_RELEASE"    />
+        <result property="submittedDate"    column="SUBMITTED_DATE"    />
+        <result property="submittedBy"    column="SUBMITTED_BY"    />
+        <result property="salesChannelCode"    column="SALES_CHANNEL_CODE"    />
+        <result property="salespersonId"    column="SALESPERSON_ID"    />
+        <result property="batchId"    column="BATCH_ID"    />
+        <result property="creationMode"    column="CREATION_MODE"    />
+        <result property="mdoFlag"    column="MDO_FLAG"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateLogin"    column="LAST_UPDATE_LOGIN"    />
+        <result property="objectVersionNumber"    column="OBJECT_VERSION_NUMBER"    />
+    </resultMap>
+
+    <sql id="selectSyncDooHeadersAllVo">
+        select HEADER_ID, PRE_CREDIT_CHECKED_FLAG, ORDER_NUMBER, OWNER_ID, SOURCE_ORDER_SYSTEM, SOURCE_ORDER_NUMBER, SOURCE_ORDER_ID, SOURCE_DOCUMENT_TYPE_CODE, SOURCE_REVISION_NUMBER, ORIG_SYS_DOCUMENT_REF, SOURCE_ORG_ID, ORG_ID, LEGAL_ENTITY_ID, SOLD_TO_CUSTOMER_ID, SOLD_TO_CONTACT_ID, ORDERED_DATE, CUSTOMER_PO_NUMBER, ORDER_TYPE_CODE, TRANSACTIONAL_CURRENCY_CODE, CONVERSION_RATE, CONVERSION_TYPE_CODE, CONVERSION_DATE, STATUS_CODE, PARTIAL_SHIP_ALLOWED_FLAG, OPEN_FLAG, ON_HOLD, CANCELED_FLAG, CHANGE_VERSION_NUMBER, IS_EDITABLE, CANCEL_REASON_CODE, SOLD_TO_PARTY_ID, SOLD_TO_PARTY_CONTACT_ID, REQUEST_CANCEL_DATE, COMMENTS, ALLOW_CURRENCY_OVERRIDE_FLAG, APPLIED_CURRENCY_CODE, PRICED_ON, PRICING_SEGMENT_CODE, PRICING_SEGMENT_EXPLANATION, PRICING_STRATEGY_EXPLANATION, SEGMENT_EXPLANATION_MSG_NAME, STRATEGY_EXPLANATION_MSG_NAME, PRICING_STRATEGY_ID, FREEZE_TAX_FLAG, SHIPSET_FLAG, FULFILL_ORG_ID, SUPPLIER_ID, SUPPLIER_SITE_ID, DEMAND_CLASS_CODE, SUBSTITUTE_ALLOWED_FLAG, FREIGHT_TERMS_CODE, FOB_POINT_CODE, PACKING_INSTRUCTIONS, SHIPPING_INSTRUCTIONS, SHIPMENT_PRIORITY_CODE, REQUEST_SHIP_DATE, LATEST_ACCEPTABLE_SHIP_DATE, EARLIEST_ACCEPTABLE_SHIP_DATE, CARRIER_ID, SHIP_MODE_OF_TRANSPORT, SHIP_CLASS_OF_SERVICE, REQUEST_ARRIVAL_DATE, LATEST_ACCEPT_ARRIVAL_DATE, EARLIEST_ACCEPT_ARRIVAL_DATE, SUBMITTED_FLAG, REFERENCE_HEADER_ID, FREEZE_PRICE_FLAG, FREEZE_SHIPPING_CHARGE_FLAG, PAYMENT_TERM_ID, SOLD_TO_PARTY_CONTACT_POINT_ID, MODIFIED_FLAG, REVISION_SOURCE_ORDER_SYSTEM, APPROVAL_SEQUENCE_NUMBER, TRADE_COMPLIANCE_RESULT_CODE, CREATED_IN_RELEASE, SUBMITTED_DATE, SUBMITTED_BY, SALES_CHANNEL_CODE, SALESPERSON_ID, BATCH_ID, CREATION_MODE, MDO_FLAG, LAST_UPDATE_DATE, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_LOGIN, OBJECT_VERSION_NUMBER from sync_doo_headers_all
+    </sql>
+
+
+    <select id="selectSyncDooHeadersAllList" parameterType="SyncDooHeadersAllEO" resultMap="SyncDooHeadersAllEOResult">
+        <include refid="selectSyncDooHeadersAllVo"/>
+        <where>
+            <if test="headerId != null "> and HEADER_ID = #{headerId}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and ORDER_NUMBER = #{orderNumber}</if>
+            <if test="orderTypeCode != null  and orderTypeCode != ''"> and ORDER_TYPE_CODE = #{orderTypeCode}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncDooHeadersAllEO">
+        delete from sync_doo_headers_all where HEADER_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.headerId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncDooHeadersAllEO">
+        insert into sync_doo_headers_all( HEADER_ID, PRE_CREDIT_CHECKED_FLAG, ORDER_NUMBER, OWNER_ID, SOURCE_ORDER_SYSTEM, SOURCE_ORDER_NUMBER, SOURCE_ORDER_ID, SOURCE_DOCUMENT_TYPE_CODE, SOURCE_REVISION_NUMBER, ORIG_SYS_DOCUMENT_REF, SOURCE_ORG_ID, ORG_ID, LEGAL_ENTITY_ID, SOLD_TO_CUSTOMER_ID, SOLD_TO_CONTACT_ID, ORDERED_DATE, CUSTOMER_PO_NUMBER, ORDER_TYPE_CODE, TRANSACTIONAL_CURRENCY_CODE, CONVERSION_RATE, CONVERSION_TYPE_CODE, CONVERSION_DATE, STATUS_CODE, PARTIAL_SHIP_ALLOWED_FLAG, OPEN_FLAG, ON_HOLD, CANCELED_FLAG, CHANGE_VERSION_NUMBER, IS_EDITABLE, CANCEL_REASON_CODE, SOLD_TO_PARTY_ID, SOLD_TO_PARTY_CONTACT_ID, REQUEST_CANCEL_DATE, COMMENTS, ALLOW_CURRENCY_OVERRIDE_FLAG, APPLIED_CURRENCY_CODE, PRICED_ON, PRICING_SEGMENT_CODE, PRICING_SEGMENT_EXPLANATION, PRICING_STRATEGY_EXPLANATION, SEGMENT_EXPLANATION_MSG_NAME, STRATEGY_EXPLANATION_MSG_NAME, PRICING_STRATEGY_ID, FREEZE_TAX_FLAG, SHIPSET_FLAG, FULFILL_ORG_ID, SUPPLIER_ID, SUPPLIER_SITE_ID, DEMAND_CLASS_CODE, SUBSTITUTE_ALLOWED_FLAG, FREIGHT_TERMS_CODE, FOB_POINT_CODE, PACKING_INSTRUCTIONS, SHIPPING_INSTRUCTIONS, SHIPMENT_PRIORITY_CODE, REQUEST_SHIP_DATE, LATEST_ACCEPTABLE_SHIP_DATE, EARLIEST_ACCEPTABLE_SHIP_DATE, CARRIER_ID, SHIP_MODE_OF_TRANSPORT, SHIP_CLASS_OF_SERVICE, REQUEST_ARRIVAL_DATE, LATEST_ACCEPT_ARRIVAL_DATE, EARLIEST_ACCEPT_ARRIVAL_DATE, SUBMITTED_FLAG, REFERENCE_HEADER_ID, FREEZE_PRICE_FLAG, FREEZE_SHIPPING_CHARGE_FLAG, PAYMENT_TERM_ID, SOLD_TO_PARTY_CONTACT_POINT_ID, MODIFIED_FLAG, REVISION_SOURCE_ORDER_SYSTEM, APPROVAL_SEQUENCE_NUMBER, TRADE_COMPLIANCE_RESULT_CODE, CREATED_IN_RELEASE, SUBMITTED_DATE, SUBMITTED_BY, SALES_CHANNEL_CODE, SALESPERSON_ID, BATCH_ID, CREATION_MODE, MDO_FLAG, LAST_UPDATE_DATE, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_LOGIN, OBJECT_VERSION_NUMBER) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.headerId,jdbcType=BIGINT}, #{item.preCreditCheckedFlag,jdbcType=VARCHAR}, #{item.orderNumber,jdbcType=VARCHAR}, #{item.ownerId,jdbcType=BIGINT}, #{item.sourceOrderSystem,jdbcType=VARCHAR}, #{item.sourceOrderNumber,jdbcType=VARCHAR}, #{item.sourceOrderId,jdbcType=VARCHAR}, #{item.sourceDocumentTypeCode,jdbcType=VARCHAR}, #{item.sourceRevisionNumber,jdbcType=BIGINT}, #{item.origSysDocumentRef,jdbcType=VARCHAR}, #{item.sourceOrgId,jdbcType=BIGINT}, #{item.orgId,jdbcType=BIGINT}, #{item.legalEntityId,jdbcType=BIGINT}, #{item.soldToCustomerId,jdbcType=BIGINT}, #{item.soldToContactId,jdbcType=BIGINT}, #{item.orderedDate,jdbcType=TIMESTAMP}, #{item.customerPoNumber,jdbcType=VARCHAR}, #{item.orderTypeCode,jdbcType=VARCHAR}, #{item.transactionalCurrencyCode,jdbcType=VARCHAR}, cast(#{item.conversionRate,jdbcType=DECIMAL} as decimal(15,5)), #{item.conversionTypeCode,jdbcType=VARCHAR}, #{item.conversionDate,jdbcType=TIMESTAMP}, #{item.statusCode,jdbcType=VARCHAR}, #{item.partialShipAllowedFlag,jdbcType=VARCHAR}, #{item.openFlag,jdbcType=VARCHAR}, #{item.onHold,jdbcType=VARCHAR}, #{item.canceledFlag,jdbcType=VARCHAR}, #{item.changeVersionNumber,jdbcType=BIGINT}, #{item.isEditable,jdbcType=VARCHAR}, #{item.cancelReasonCode,jdbcType=VARCHAR}, #{item.soldToPartyId,jdbcType=BIGINT}, #{item.soldToPartyContactId,jdbcType=BIGINT}, #{item.requestCancelDate,jdbcType=TIMESTAMP}, #{item.comments,jdbcType=VARCHAR}, #{item.allowCurrencyOverrideFlag,jdbcType=VARCHAR}, #{item.appliedCurrencyCode,jdbcType=VARCHAR}, #{item.pricedOn,jdbcType=TIMESTAMP}, #{item.pricingSegmentCode,jdbcType=VARCHAR}, #{item.pricingSegmentExplanation,jdbcType=VARCHAR}, #{item.pricingStrategyExplanation,jdbcType=VARCHAR}, #{item.segmentExplanationMsgName,jdbcType=VARCHAR}, #{item.strategyExplanationMsgName,jdbcType=VARCHAR}, #{item.pricingStrategyId,jdbcType=BIGINT}, #{item.freezeTaxFlag,jdbcType=VARCHAR}, #{item.shipsetFlag,jdbcType=VARCHAR}, #{item.fulfillOrgId,jdbcType=BIGINT}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierSiteId,jdbcType=BIGINT}, #{item.demandClassCode,jdbcType=VARCHAR}, #{item.substituteAllowedFlag,jdbcType=VARCHAR}, #{item.freightTermsCode,jdbcType=VARCHAR}, #{item.fobPointCode,jdbcType=VARCHAR}, #{item.packingInstructions,jdbcType=VARCHAR}, #{item.shippingInstructions,jdbcType=VARCHAR}, #{item.shipmentPriorityCode,jdbcType=VARCHAR}, #{item.requestShipDate,jdbcType=TIMESTAMP}, #{item.latestAcceptableShipDate,jdbcType=TIMESTAMP}, #{item.earliestAcceptableShipDate,jdbcType=TIMESTAMP}, #{item.carrierId,jdbcType=BIGINT}, #{item.shipModeOfTransport,jdbcType=VARCHAR}, #{item.shipClassOfService,jdbcType=VARCHAR}, #{item.requestArrivalDate,jdbcType=TIMESTAMP}, #{item.latestAcceptArrivalDate,jdbcType=TIMESTAMP}, #{item.earliestAcceptArrivalDate,jdbcType=TIMESTAMP}, #{item.submittedFlag,jdbcType=VARCHAR}, #{item.referenceHeaderId,jdbcType=BIGINT}, #{item.freezePriceFlag,jdbcType=VARCHAR}, #{item.freezeShippingChargeFlag,jdbcType=VARCHAR}, #{item.paymentTermId,jdbcType=BIGINT}, #{item.soldToPartyContactPointId,jdbcType=BIGINT}, #{item.modifiedFlag,jdbcType=VARCHAR}, #{item.revisionSourceOrderSystem,jdbcType=VARCHAR}, #{item.approvalSequenceNumber,jdbcType=BIGINT}, #{item.tradeComplianceResultCode,jdbcType=VARCHAR}, #{item.createdInRelease,jdbcType=VARCHAR}, #{item.submittedDate,jdbcType=TIMESTAMP}, #{item.submittedBy,jdbcType=VARCHAR}, #{item.salesChannelCode,jdbcType=VARCHAR}, #{item.salespersonId,jdbcType=BIGINT}, #{item.batchId,jdbcType=BIGINT}, #{item.creationMode,jdbcType=VARCHAR}, #{item.mdoFlag,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateLogin,jdbcType=VARCHAR}, #{item.objectVersionNumber,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+</mapper>

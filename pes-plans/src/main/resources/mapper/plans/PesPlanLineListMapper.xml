@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.plans.mapper.PesPlanLineListMapper">
+
+    <resultMap type="PesPlanLineList" id="PesPlanLineListResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="organizationCode"    column="organization_code"    />
+                    <result property="prodLine"    column="prod_line"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planLotLineNum"    column="plan_lot_line_num"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="planItemNumber"    column="plan_item_number"    />
+                    <result property="planItemDescription"    column="plan_item_description"    />
+                    <result property="planItemType"    column="plan_item_type"    />
+                    <result property="planItemQuantity"    column="plan_item_quantity"    />
+                    <result property="planTreeCode"    column="plan_tree_code"    />
+                    <result property="planDate"    column="plan_date"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="id"    column="id"    />
+                    <result property="mrpFlag"    column="mrp_flag"    />
+        <result property="planForcastType"    column="plan_forcast_type"    />
+        <result property="planForcastPrice"    column="plan_forcast_price"    />
+        <result property="planForcastAmount"    column="plan_forcast_amount"    />
+        <result property="planForcastDeliveryDate"    column="plan_forcast_delivery_date"    />
+            </resultMap>
+
+    <sql id="selectPesPlanLineListVo">
+        SELECT
+            organization_id,
+            organization_code,
+            prod_line,
+            plan_lot_num,
+            plan_lot_line_num,
+            inventory_item_id,
+            plan_item_number,
+            plan_item_description,
+            plan_item_type,
+            plan_item_quantity,
+            plan_tree_code,
+            plan_date,
+            create_date,
+            create_by,
+            last_update_date,
+            last_update_by,
+            id,
+            mrp_flag,
+            plan_forcast_type,
+            isnull(plan_forcast_price,0) as plan_forcast_price,
+            isnull(plan_forcast_amount,0) as plan_forcast_amount,
+            plan_forcast_delivery_date
+        FROM
+            pes_plan_line_list
+    </sql>
+
+    <select id="selectPesPlanLineListList" parameterType="PesPlanLineList" resultMap="PesPlanLineListResult">
+        <include refid="selectPesPlanLineListVo"/>
+        <where>
+               <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>                                                                                                                                                                                                                      </where>
+    </select>
+
+    <select id="getPlanHeader" parameterType="Long" resultMap="PesPlanLineListResult">
+        SELECT
+          phl.organization_id,
+          phl.organization_code,
+          phl.prod_line,
+          phl.plan_lot_num
+        FROM
+          pes_plan_header_list phl
+        WHERE phl.plan_lot_num = #{planLotNum}
+    </select>
+
+    <select id="selectCount" parameterType="PesPlanLineList" resultMap="PesPlanLineListResult">
+        <include refid="selectPesPlanLineListVo"/>
+        <where>
+            <if test="planLotNum != null  and planLotNum != ''"> and plan_lot_num = #{planLotNum}</if>
+            <if test="organizationCode != null  and organizationCode != ''"> and organization_code = #{organizationCode}</if>
+            <if test="planItemNumber != null  and planItemNumber != ''"> and plan_item_number = #{planItemNumber}</if>
+        </where>
+    </select>
+
+    <select id="getOrgItemId" parameterType="PesPlanLineList" resultMap="PesPlanLineListResult">
+        SELECT
+            inventory_item_id,
+            ITEM_DESCRIPTION as plan_item_description,
+            ITEM_TYPE as plan_item_type
+        FROM
+            sync_items_num_des_list
+        WHERE
+            item_number = #{planItemNumber}
+            and organization_id = #{organizationId}
+    </select>
+
+    <insert id="insertPlines">
+        insert into pes_plan_line_list(organization_id, organization_code, prod_line, plan_lot_num, plan_lot_line_num, inventory_item_id, plan_item_number, plan_item_description, plan_item_type, plan_item_quantity, plan_tree_code, plan_date, create_by, last_update_by,plan_forcast_type,plan_forcast_price,plan_forcast_amount,plan_forcast_delivery_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.organizationId,jdbcType=BIGINT}, #{item.organizationCode,jdbcType=VARCHAR}, #{item.prodLine,jdbcType=VARCHAR}, #{item.planLotNum,jdbcType=BIGINT}, #{item.planLotLineNum,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.planItemNumber,jdbcType=VARCHAR}, #{item.planItemDescription,jdbcType=VARCHAR}, #{item.planItemType,jdbcType=VARCHAR}, #{item.planItemQuantity,jdbcType=DECIMAL}, #{item.planTreeCode,jdbcType=VARCHAR}, #{item.planDate,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR}, #{item.planForcastType,jdbcType=VARCHAR}, #{item.planForcastPrice,jdbcType=DECIMAL}, #{item.planForcastAmount,jdbcType=DECIMAL}, #{item.planForcastDeliveryDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

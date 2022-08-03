@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.plans.mapper.CuxPoLeadTimeListMapper">
+
+    <resultMap type="CuxPoLeadTimeList" id="CuxPoLeadTimeListResult">
+                    <result property="id"    column="id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="organizationCode"    column="organization_code"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="prodType"    column="prod_type"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="buyer"    column="buyer"    />
+                    <result property="prDate"    column="pr_date"    />
+                    <result property="poDate"    column="po_date"    />
+                    <result property="supplierDate"    column="supplier_date"    />
+                    <result property="logistDate"    column="logist_date"    />
+                    <result property="rcvDate"    column="rcv_date"    />
+                    <result property="stockMethod"    column="stock_method"    />
+                    <result property="expProdDate"    column="exp_prod_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="totalDays"    column="total_days"    />
+                    <result property="safetyStock"    column="safety_stock"    />
+        <result property="buHuoDian"    column="bu_huo_dian"    />
+        <result property="deliveryType"    column="delivery_type"    />
+        <result property="makeBuyerFlag"    column="make_buyer_flag"    />
+            </resultMap>
+
+    <sql id="selectCuxPoLeadTimeListVo">
+        select organization_id, organization_code, inventory_item_id, item_number, item_description, prod_type, item_type, uom, buyer, pr_date, po_date, supplier_date, logist_date, rcv_date, stock_method, exp_prod_date, safety_stock,bu_huo_dian,delivery_type from cux_po_lead_time_list
+    </sql>
+
+    <select id="selectCuxPoLeadTimeListList" parameterType="CuxPoLeadTimeList" resultMap="CuxPoLeadTimeListResult">
+        <include refid="selectCuxPoLeadTimeListVo"/>
+        <where>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+            <if test="organizationId != null  and organizationId != ''"> and organization_id = #{organizationId}</if>
+        </where>
+
+    </select>
+
+    <select id="selectCuxPoLeadTimeListAll" parameterType="CuxPoLeadTimeList" resultMap="CuxPoLeadTimeListResult">
+        SELECT
+          organization_id,
+          inventory_item_id,
+          (pr_date + po_date + supplier_date + logist_date + rcv_date + exp_prod_date) AS total_days
+        FROM
+          cux_po_lead_time_list
+    </select>
+
+    <select id="getItemDescriptions" parameterType="CuxPoLeadTimeList" resultMap="CuxPoLeadTimeListResult">
+        SELECT
+        list.ITEM_NUMBER,
+        list.ITEM_DESCRIPTION,
+        list.PRIMARY_UOM_CODE AS uom,
+        list.INVENTORY_ITEM_ID,
+        (
+        SELECT
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        ecb.CATEGORY_ID = eic.CATEGORY_ID
+        AND eic.CATEGORY_SET_ID = 300000001799553
+        AND eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+        AND eic.INVENTORY_ITEM_ID = list.INVENTORY_ITEM_ID
+        ) AS prod_type,
+        (
+        SELECT
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        ecb.CATEGORY_ID = eic.CATEGORY_ID
+        AND eic.CATEGORY_SET_ID = 300000001799581
+        AND eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+        AND eic.INVENTORY_ITEM_ID = list.INVENTORY_ITEM_ID
+        ) AS item_type,
+        (CASE WHEN list.PLANNING_MAKE_BUY_CODE = 1 THEN 'MPS' ELSE 'MRP' END) AS make_buyer_flag
+        FROM
+        sync_items_num_des_list list
+        WHERE
+        list.ITEM_NUMBER = #{itemNumber}
+        and list.ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <insert id="insertCuxPoLeadTimeList" parameterType="CuxPoLeadTimeList">
+        insert into cux_po_lead_time_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="prodType != null">prod_type,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="uom != null">uom,</if>
+            <if test="buyer != null">buyer,</if>
+            <if test="prDate != null">pr_date,</if>
+            <if test="poDate != null">po_date,</if>
+            <if test="supplierDate != null">supplier_date,</if>
+            <if test="logistDate != null">logist_date,</if>
+            <if test="rcvDate != null">rcv_date,</if>
+            <if test="stockMethod != null">stock_method,</if>
+            <if test="expProdDate != null">exp_prod_date,</if>
+            <if test="lastUpdateBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="lastUpdateBy != null">last_update_by,</if>
+            <if test="safetyStock != null">safety_stock,</if>
+            <if test="buHuoDian != null">bu_huo_dian,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="prodType != null">#{prodType},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="uom != null">#{uom},</if>
+            <if test="buyer != null">#{buyer},</if>
+            <if test="prDate != null">#{prDate},</if>
+            <if test="poDate != null">#{poDate},</if>
+            <if test="supplierDate != null">#{supplierDate},</if>
+            <if test="logistDate != null">#{logistDate},</if>
+            <if test="rcvDate != null">#{rcvDate},</if>
+            <if test="stockMethod != null">#{stockMethod},</if>
+            <if test="expProdDate != null">#{expProdDate},</if>
+            <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+            getdate(),
+            getdate(),
+            <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+            <if test="safetyStock != null">#{safetyStock},</if>
+            <if test="buHuoDian != null">#{buHuoDian},</if>
+        </trim>
+    </insert>
+
+</mapper>

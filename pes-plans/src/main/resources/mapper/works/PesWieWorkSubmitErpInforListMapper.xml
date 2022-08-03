@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkSubmitErpInforListMapper">
+
+    <resultMap type="PesWieWorkSubmitErpInforList" id="PesWieWorkSubmitErpInforListResult">
+                    <result property="pesId"    column="pes_id"    />
+                    <result property="erpId"    column="erp_id"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="type"    column="type"    />
+                    <result property="submitErpId"    column="submit_erp_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="countNumber"    column="count_number"    />
+                    <result property="erpFlag"    column="erp_flag"    />
+        <result property="pesWorkOrderId"    column="pes_work_order_id"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+        <result property="quantityPerProduct"    column="quantity_per_product"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="wieWorkDate"    column="wie_work_date"    />
+        <result property="erpType"    column="erp_type"    />
+            </resultMap>
+
+    <sql id="selectPesWieWorkSubmitErpInforListVo">
+        SELECT
+            pes_id,
+            erp_id,
+            create_by,
+            create_date,
+            remark,
+            type,
+            wie_work_date,
+            work_order_status_id,
+            quantity_per_product,
+            quantity,
+            submit_erp_id,
+            item_number,
+            item_description,
+            count_number,
+            erp_flag,
+            erp_type
+        FROM
+            pes_wie_work_submit_erp_infor_list
+    </sql>
+
+    <select id="selectPesWieWorkSubmitErpInforListList" parameterType="PesWieWorkSubmitErpInforList" resultMap="PesWieWorkSubmitErpInforListResult">
+        <include refid="selectPesWieWorkSubmitErpInforListVo"/>
+        <where>
+            <if test="pesWorkOrderId != null "> and pes_work_order_id = #{pesWorkOrderId}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+            <if test="erpFlag != null  and erpFlag != ''"> and erp_flag = #{erpFlag}</if>
+            <if test="erpType != null "> and erp_type = #{erpType}</if>
+        </where>
+        order by type,count_number,submit_erp_id
+    </select>
+
+    <delete id="deleteSelectPesWieWorkSubmitErpInforListList">
+        DELETE FROM pes_wie_work_submit_erp_infor_list where erp_flag = 2
+    </delete>
+
+
+</mapper>

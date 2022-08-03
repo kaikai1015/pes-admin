@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxInvOnhandMaterialSumQuantitySubinventoryListMapper">
+
+    <resultMap type="CuxInvOnhandMaterialSumQuantitySubinventoryList" id="CuxInvOnhandMaterialSumQuantitySubinventoryListResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="transactionYear"    column="transaction_year"    />
+                    <result property="subinventoryCode"    column="subinventory_code"    />
+                    <result property="oneQuantity"    column="one_quantity"    />
+                    <result property="twoQuantity"    column="two_quantity"    />
+                    <result property="threeQuantity"    column="three_quantity"    />
+                    <result property="fourQuantity"    column="four_quantity"    />
+                    <result property="fiveQuantity"    column="five_quantity"    />
+                    <result property="sixQuantity"    column="six_quantity"    />
+                    <result property="sevenQuantity"    column="seven_quantity"    />
+                    <result property="eightQuantity"    column="eight_quantity"    />
+                    <result property="nineQuantity"    column="nine_quantity"    />
+                    <result property="tenQuantity"    column="ten_quantity"    />
+                    <result property="elevenQuantity"    column="eleven_quantity"    />
+                    <result property="twelveQuantity"    column="twelve_quantity"    />
+                    <result property="thirteenQuantity"    column="thirteen_quantity"    />
+                    <result property="fourteenQuantity"    column="fourteen_quantity"    />
+                    <result property="fifteenQuantity"    column="fifteen_quantity"    />
+                    <result property="sixteenQuantity"    column="sixteen_quantity"    />
+                    <result property="seventeenQuantity"    column="seventeen_quantity"    />
+                    <result property="eighteenQuantity"    column="eighteen_quantity"    />
+                    <result property="nineteenQuantity"    column="nineteen_quantity"    />
+                    <result property="twentyQuantity"    column="twenty_quantity"    />
+                    <result property="twentyOneQuantity"    column="twenty_one_quantity"    />
+                    <result property="twentyTwoQuantity"    column="twenty_two_quantity"    />
+                    <result property="twentyThreeQuantity"    column="twenty_three_quantity"    />
+                    <result property="twentyFourQuantity"    column="twenty_four_quantity"    />
+                    <result property="twentyFiveQuantity"    column="twenty_five_quantity"    />
+                    <result property="twentySixQuantity"    column="twenty_six_quantity"    />
+                    <result property="twentySevenQuantity"    column="twenty_seven_quantity"    />
+                    <result property="twentyEightQuantity"    column="twenty_eight_quantity"    />
+                    <result property="twentyNineQuantity"    column="twenty_nine_quantity"    />
+                    <result property="thirtyQuantity"    column="thirty_quantity"    />
+                    <result property="thirtyOneQuantity"    column="thirty_one_quantity"    />
+                    <result property="thirtyTwoQuantity"    column="thirty_two_quantity"    />
+                    <result property="thirtyThreeQuantity"    column="thirty_three_quantity"    />
+                    <result property="thirtyFourQuantity"    column="thirty_four_quantity"    />
+                    <result property="thirtyFiveQuantity"    column="thirty_five_quantity"    />
+                    <result property="thirtySixQuantity"    column="thirty_six_quantity"    />
+                    <result property="thirtySevenQuantity"    column="thirty_seven_quantity"    />
+                    <result property="thirtyEightQuantity"    column="thirty_eight_quantity"    />
+                    <result property="thirtyNineQuantity"    column="thirty_nine_quantity"    />
+                    <result property="fortyQuantity"    column="forty_quantity"    />
+                    <result property="fortyOneQuantity"    column="forty_one_quantity"    />
+                    <result property="fortyTwoQuantity"    column="forty_two_quantity"    />
+                    <result property="fortyThreeQuantity"    column="forty_three_quantity"    />
+                    <result property="fortyFourQuantity"    column="forty_four_quantity"    />
+                    <result property="fortyFiveQuantity"    column="forty_five_quantity"    />
+                    <result property="fortySixQuantity"    column="forty_six_quantity"    />
+                    <result property="fortySevenQuantity"    column="forty_seven_quantity"    />
+                    <result property="fortyEightQuantity"    column="forty_eight_quantity"    />
+                    <result property="fortyNineQuantity"    column="forty_nine_quantity"    />
+                    <result property="fiftyQuantity"    column="fifty_quantity"    />
+                    <result property="fiftyOneQuantity"    column="fifty_one_quantity"    />
+                    <result property="fiftyTwoQuantity"    column="fifty_two_quantity"    />
+                    <result property="fiftyThreeQuantity"    column="fifty_three_quantity"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+            </resultMap>
+
+    <sql id="selectCuxInvOnhandMaterialSumQuantitySubinventoryListVo">
+        SELECT
+            list.organization_id,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            invlist.transaction_year,
+            invlist.subinventory_code,
+            invlist.one_quantity,
+            invlist.two_quantity,
+            invlist.three_quantity,
+            invlist.four_quantity,
+            invlist.five_quantity,
+            invlist.six_quantity,
+            invlist.seven_quantity,
+            invlist.eight_quantity,
+            invlist.nine_quantity,
+            invlist.ten_quantity,
+            invlist.eleven_quantity,
+            invlist.twelve_quantity,
+            invlist.thirteen_quantity,
+            invlist.fourteen_quantity,
+            invlist.fifteen_quantity,
+            invlist.sixteen_quantity,
+            invlist.seventeen_quantity,
+            invlist.eighteen_quantity,
+            invlist.nineteen_quantity,
+            invlist.twenty_quantity,
+            invlist.twenty_one_quantity,
+            invlist.twenty_two_quantity,
+            invlist.twenty_three_quantity,
+            invlist.twenty_four_quantity,
+            invlist.twenty_five_quantity,
+            invlist.twenty_six_quantity,
+            invlist.twenty_seven_quantity,
+            invlist.twenty_eight_quantity,
+            invlist.twenty_nine_quantity,
+            invlist.thirty_quantity,
+            invlist.thirty_one_quantity,
+            invlist.thirty_two_quantity,
+            invlist.thirty_three_quantity,
+            invlist.thirty_four_quantity,
+            invlist.thirty_five_quantity,
+            invlist.thirty_six_quantity,
+            invlist.thirty_seven_quantity,
+            invlist.thirty_eight_quantity,
+            invlist.thirty_nine_quantity,
+            invlist.forty_quantity,
+            invlist.forty_one_quantity,
+            invlist.forty_two_quantity,
+            invlist.forty_three_quantity,
+            invlist.forty_four_quantity,
+            invlist.forty_five_quantity,
+            invlist.forty_six_quantity,
+            invlist.forty_seven_quantity,
+            invlist.forty_eight_quantity,
+            invlist.forty_nine_quantity,
+            invlist.fifty_quantity,
+            invlist.fifty_one_quantity,
+            invlist.fifty_two_quantity,
+            invlist.fifty_three_quantity
+        FROM
+            cux_inv_onhand_material_sum_quantity_subinventory_list invlist,
+            sync_items_num_des_list list
+    </sql>
+
+    <select id="selectCuxInvOnhandMaterialSumQuantitySubinventoryListList" parameterType="CuxInvOnhandMaterialSumQuantitySubinventoryList" resultMap="CuxInvOnhandMaterialSumQuantitySubinventoryListResult">
+        <include refid="selectCuxInvOnhandMaterialSumQuantitySubinventoryListVo"/>
+        <where>
+            and list.INVENTORY_ITEM_ID = invlist.inventory_item_id
+            AND list.ORGANIZATION_ID = invlist.ORGANIZATION_ID
+            --AND invlist.one_quantity + invlist.two_quantity + invlist.three_quantity + invlist.four_quantity + invlist.five_quantity + invlist.six_quantity + invlist.seven_quantity + invlist.eight_quantity + invlist.nine_quantity + invlist.ten_quantity + invlist.eleven_quantity + invlist.twelve_quantity + invlist.thirteen_quantity + invlist.fourteen_quantity + invlist.fifteen_quantity + invlist.sixteen_quantity + invlist.seventeen_quantity + invlist.eighteen_quantity + invlist.nineteen_quantity + invlist.twenty_quantity + invlist.twenty_one_quantity + invlist.twenty_two_quantity + invlist.twenty_three_quantity + invlist.twenty_four_quantity + invlist.twenty_five_quantity + invlist.twenty_six_quantity + invlist.twenty_seven_quantity + invlist.twenty_eight_quantity + invlist.twenty_nine_quantity + invlist.thirty_quantity + invlist.thirty_one_quantity + invlist.thirty_two_quantity + invlist.thirty_three_quantity + invlist.thirty_four_quantity + invlist.thirty_five_quantity + invlist.thirty_six_quantity + invlist.thirty_seven_quantity + invlist.thirty_eight_quantity + invlist.thirty_nine_quantity + invlist.forty_quantity + invlist.forty_one_quantity + invlist.forty_two_quantity + invlist.forty_three_quantity + invlist.forty_four_quantity + invlist.forty_five_quantity + invlist.forty_six_quantity + invlist.forty_seven_quantity + invlist.forty_eight_quantity + invlist.forty_nine_quantity + invlist.fifty_quantity + invlist.fifty_one_quantity + invlist.fifty_two_quantity + invlist.fifty_three_quantity > 0
+            <if test="organizationId != null "> and invlist.organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="transactionYear != null "> and invlist.transaction_year = #{transactionYear}</if>
+            <if test="subinventoryCode != null  and subinventoryCode != ''"> and invlist.subinventory_code like (#{subinventoryCode} + '%')</if>
+        </where>
+    </select>
+
+
+</mapper>

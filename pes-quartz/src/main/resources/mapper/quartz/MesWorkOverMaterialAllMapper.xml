@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesWorkOverMaterialAllMapper">
+
+    <resultMap type="MesWorkOverMaterialAll" id="MesWorkOverMaterialAllResult">
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="operationSequence"    column="operation_sequence"    />
+                    <result property="transactionType"    column="transaction_type"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="transactionQuantity"    column="transaction_quantity"    />
+                    <result property="transactionDate"    column="transaction_date"    />
+                    <result property="subinventoryCode"    column="subinventory_code"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="erpFlagDate"    column="erp_flag_date"    />
+                    <result property="erpFlag"    column="erp_flag"    />
+                    <result property="materialId"    column="material_id"    />
+        <result property="errorInfor"    column="error_infor"    />
+            </resultMap>
+
+    <sql id="selectMesWorkOverMaterialAllVo">
+        SELECT
+            work_order_id,
+            work_order_number,
+            operation_sequence,
+            transaction_type,
+            item_number,
+            inventory_item_id,
+            organization_id,
+            transaction_quantity,
+            transaction_date,
+            subinventory_code,
+            remark,
+            erp_flag_date,
+            erp_flag,
+            material_id,
+            error_infor
+        FROM
+            mes_work_material_all
+    </sql>
+
+    <select id="selectMesWorkOverMaterialAllList" parameterType="MesWorkOverMaterialAll" resultMap="MesWorkOverMaterialAllResult">
+        <include refid="selectMesWorkOverMaterialAllVo"/>
+        <where>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number = #{workOrderNumber}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+            <if test="erpFlag != null  and erpFlag != ''"> and erp_flag = #{erpFlag}</if>
+        </where>
+        order by material_id desc
+    </select>
+
+    <select id="selectMesWorkOverMaterialAllById" parameterType="Long" resultMap="MesWorkOverMaterialAllResult">
+        <include refid="selectMesWorkOverMaterialAllVo"/>
+        where material_id = #{materialId}
+    </select>
+
+</mapper>

@@ -1,0 +1,591 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdProcessingMapper">
+
+    <resultMap type="PesProdProcessing" id="PesProdProcessingResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="issuedQuantity"    column="issued_quantity"    />
+                    <result property="suoHaoQuantity"    column="suo_hao_quantity"    />
+                    <result property="transferedQuantity"    column="transfered_quantity"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+                    <result property="receiveQuantity"    column="receive_quantity"    />
+                    <result property="beiLiaoQuantity"    column="bei_liao_quantity"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="untransferQuantity"    column="UNTRANSFER_QUANTITY"    />
+                    <result property="overReceiveQuantity"    column="over_receive_quantity"    />
+                    <result property="overIssueQuantity"    column="over_issue_quantity"    />
+                    <result property="backLiaoQuantity"    column="back_liao_quantity"    />
+                    <result property="supplementQuantity"    column="supplement_quantity"    />
+                    <result property="planLotsId"    column="plan_lots_id"    />
+                    <result property="workOrderLineId"    column="work_order_line_id"    />
+                    <result property="planId"    column="plan_id"    />
+
+                    <result property="lotNumDate"    column="lot_num_date"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="planName"    column="plan_name"    />
+                    <result property="prodLineFlag"    column="prod_line_flag"    />
+                    <result property="lineId"    column="line_id"    />
+                    <result property="partyName"    column="party_name"    />
+                    <result property="orderNumber"    column="order_number"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="xianBieFlag"    column="xian_bie_flag"    />
+                    <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+                    <result property="requiredQuantity"    column="required_quantity"    />
+                    <result property="requiredDate"    column="required_date"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="workPlanQuantity"    column="work_plan_quantity"    />
+                    <result property="plannedCompletionDate"    column="planned_completion_date"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="customerPoNumber"    column="customer_po_number"    />
+                    <result property="isWwFlag"    column="is_ww_flag"    />
+                    <result property="subinventoryCode"    column="subinventoryCode"    />
+        <result property="sumRequiredQuantity"    column="SUM_REQUIRED_QUANTITY"    />
+        <result property="remainQuantity"    column="remain_quantity"    />
+        <result property="overRemainQuantity"    column="over_remain_quantity"    />
+        <result property="daiKouQuantity"    column="dai_kou_quantity"    />
+        <result property="invOnhandQuantity"    column="inv_onhand_quantity"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+        <result property="prodLineValue"    column="prod_line_value"    />
+            </resultMap>
+
+    <sql id="selectPesProdProcessingVo">
+        select organization_id, work_order_id, inventory_item_id, issued_quantity, suo_hao_quantity, transfered_quantity, onhand_quantity, receive_quantity, bei_liao_quantity, create_by, create_date, last_update_by, last_update_date, UNTRANSFER_QUANTITY, over_receive_quantity, over_issue_quantity, back_liao_quantity, supplement_quantity, plan_lots_id, work_order_line_id, plan_id from pes_prod_processing
+        ,is_ww_flag
+    </sql>
+
+    <sql id="selectPesProdProcessingListVo">
+        SELECT
+            ppldha.lot_num,
+            ppldha.lot_num_date,
+            ppldla.create_by,
+            wwob.plan_name,
+            (case when ppldha.is_ww_flag = 'N' then (select sdt.dict_label from sys_dict_data sdt where sdt.dict_type = 'xian_bie_flag' and sdt.dict_value = ppldla.xian_bie_flag) else (select sdt.dict_label from sys_dict_data sdt where sdt.dict_type = 'weiwei_supplier' and sdt.dict_value = ppldha.prod_line_flag) end) as prod_line_value,
+            ppldla.line_id,
+            wwob.customer_name as party_name,
+            wwob.order_number,
+            wwob.p_item_number,
+            wwob.p_item_description,
+            wwob.work_order_number,
+            wwob.work_order_status_id,
+            wwob.planned_start_quantity as work_plan_quantity,
+            wwob.planned_completion_date,
+            wwom.item_number,
+            wwom.item_description,
+            wwom.techniques_code as item_work_name_flag,
+            isnull(wwom.sun_hao_quantity,0) as suo_hao_quantity,
+            wwom.required_quantity,
+            wwom.transfered_quantity,
+            (wwom.required_quantity + wwom.sun_hao_quantity - wwom.transfered_quantity) as untransfer_quantity,
+            isnull((select ioqcode.quantity from sync_inv_onhand_quantity_new_code ioqcode where ioqcode.organization_id = wwom.organization_id and ioqcode.inventory_item_id = wwom.inventory_item_id and ioqcode.subinventory_code = wwom.subinventory_code),0) as onhand_quantity,
+            wwom.issued_quantity,
+            (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) as dai_kou_quantity,
+            --(case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then sum((wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity)) over(PARTITION BY ppldha.is_ww_flag,wwom.organization_id,wwom.inventory_item_id ORDER BY ppldla.line_id) else 0 end) as sum_required_quantity,
+            (case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then sum((case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) else 0 end)) over(PARTITION BY ppldha.is_ww_flag,wwom.organization_id,wwom.inventory_item_id ORDER BY ppldla.line_id) else 0 end) as sum_required_quantity,
+            (case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then isnull(iopn.quantity,0) - sum((case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) else 0 end)) over(PARTITION BY ppldha.is_ww_flag,wwom.organization_id,wwom.inventory_item_id ORDER BY ppldla.line_id) else 0 end) as remain_quantity,
+            (case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then (case when (isnull(iopn.quantity,0) - sum((case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) else 0 end)) over(PARTITION BY ppldha.is_ww_flag,wwom.organization_id,wwom.inventory_item_id ORDER BY ppldla.line_id) + (wwom.required_quantity - wwom.issued_quantity))  &lt;  0 then (-1)*(wwom.required_quantity - wwom.issued_quantity) else (isnull(iopn.quantity,0) - sum((case when wwob.work_order_status_id >= 10002 and (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) > 0 then (wwom.required_quantity + wwom.sun_hao_quantity - wwom.issued_quantity) else 0 end)) over(PARTITION BY ppldha.is_ww_flag,wwom.organization_id,wwom.inventory_item_id ORDER BY ppldla.line_id)) end) else 0 end) as over_remain_quantity,
+            isnull(iopn.quantity,0) as inv_onhand_quantity,
+            ppldla.work_order_id,
+            ppldla.organization_id,
+            ppldha.days_prod_flag
+    </sql>
+
+    <!--<select id="selectPesProdProcessingList" parameterType="PesProdProcessing" resultMap="PesProdProcessingResult">-->
+<!--&lt;!&ndash;        <include refid="selectPesProdProcessingVo"/>&ndash;&gt;-->
+        <!--select *,(inv_onhand_quantity - SUM_REQUIRED_QUANTITY) as REMAIN_QUANTITY,(case when ((inv_onhand_quantity - SUM_REQUIRED_QUANTITY) + (required_quantity - issued_quantity)) &lt; 0 then (-1)*(required_quantity - issued_quantity) else (inv_onhand_quantity - SUM_REQUIRED_QUANTITY) end) as over_remain_quantity from pes_prod_processing_v-->
+        <!--<where>-->
+            <!--<if test="prodLineFlag != null "> and prod_line_flag = #{prodLineFlag}</if>-->
+            <!--<if test="inventoryItemId != null "> and inventory_item_id = #{inventoryItemId}</if>-->
+            <!--<if test="isWwFlag != null "> and is_ww_flag = #{isWwFlag}</if>-->
+            <!--<if test="issuedQuantity != null "> and issued_quantity = #{issuedQuantity}</if>-->
+            <!--<if test="suoHaoQuantity != null "> and suo_hao_quantity = #{suoHaoQuantity}</if>-->
+            <!--<if test="transferedQuantity != null "> and transfered_quantity = #{transferedQuantity}</if>-->
+            <!--<if test="onhandQuantity != null "> and onhand_quantity = #{onhandQuantity}</if>-->
+            <!--<if test="receiveQuantity != null "> and receive_quantity = #{receiveQuantity}</if>-->
+            <!--<if test="beiLiaoQuantity != null "> and bei_liao_quantity = #{beiLiaoQuantity}</if>-->
+            <!--<if test="createDate != null "> and create_date = #{createDate}</if>-->
+            <!--<if test="lastUpdateBy != null  and lastUpdateBy != ''"> and last_update_by = #{lastUpdateBy}</if>-->
+            <!--<if test="lastUpdateDate != null "> and last_update_date = #{lastUpdateDate}</if>-->
+            <!--<if test="untransferQuantity != null "> and UNTRANSFER_QUANTITY = #{untransferQuantity}</if>-->
+            <!--<if test="overReceiveQuantity != null "> and over_receive_quantity = #{overReceiveQuantity}</if>-->
+            <!--<if test="overIssueQuantity != null "> and over_issue_quantity = #{overIssueQuantity}</if>-->
+            <!--<if test="backLiaoQuantity != null "> and back_liao_quantity = #{backLiaoQuantity}</if>-->
+            <!--<if test="supplementQuantity != null "> and supplement_quantity = #{supplementQuantity}</if>-->
+            <!--<if test="planLotsId != null  and planLotsId != ''"> and plan_lots_id = #{planLotsId}</if>-->
+            <!--<if test="planId != null "> and plan_id = #{planId}</if>-->
+            <!--<if test="xianBieFlag != null and xianBieFlag != ''"> and xian_bie_flag = #{xianBieFlag}</if>-->
+            <!--<if test="lotNum != null "> and lot_num = #{lotNum}</if>-->
+            <!--<if test="orderNumber != null  and orderNumber != ''"> and order_number like (#{orderNumber} + '%')</if>-->
+            <!--<if test="customerPoNumber != null  and customerPoNumber != ''"> and customer_po_number like (#{customerPoNumber} + '%')</if>-->
+            <!--<if test="itemNumber != null  and itemNumber != ''"> and ITEM_NUMBER like (#{itemNumber} + '%')</if>-->
+            <!--<if test="pItemNumber != null  and pItemNumber != ''"> and p_item_number like (#{pItemNumber} + '%')</if>-->
+            <!--<if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number like (#{workOrderNumber} + '%')</if>-->
+            <!--<if test="partyName != null  and partyName != ''"> and party_name like ('%' + #{partyName} + '%')</if>-->
+            <!--<if test="beginTime != null and beginTime != ''"> and lot_num_date &gt;= #{beginTime}</if>-->
+            <!--<if test="endTime != null and endTime != ''"> and lot_num_date &lt;= #{endTime}</if>-->
+        <!--</where>-->
+    <!--</select>-->
+
+    <select id="selectPesProdProcessingById" parameterType="Long" resultMap="PesProdProcessingResult">
+        <include refid="selectPesProdProcessingVo"/>
+        where organization_id = #{organizationId}
+    </select>
+
+    <insert id="insertPesProdProcessing" parameterType="PesProdProcessing">
+        insert into pes_prod_processing
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+                <if test="workOrderId != null">work_order_id,</if>
+                <if test="inventoryItemId != null">inventory_item_id,</if>
+                <if test="issuedQuantity != null">issued_quantity,</if>
+                <if test="suoHaoQuantity != null">suo_hao_quantity,</if>
+                <if test="transferedQuantity != null">transfered_quantity,</if>
+                <if test="onhandQuantity != null">onhand_quantity,</if>
+                <if test="receiveQuantity != null">receive_quantity,</if>
+                <if test="beiLiaoQuantity != null">bei_liao_quantity,</if>
+                <if test="createBy != null">create_by,</if>
+                <if test="createDate != null">create_date,</if>
+                <if test="lastUpdateBy != null">last_update_by,</if>
+                <if test="lastUpdateDate != null">last_update_date,</if>
+                <if test="untransferQuantity != null">UNTRANSFER_QUANTITY,</if>
+                <if test="overReceiveQuantity != null">over_receive_quantity,</if>
+                <if test="overIssueQuantity != null">over_issue_quantity,</if>
+                <if test="backLiaoQuantity != null">back_liao_quantity,</if>
+                <if test="supplementQuantity != null">supplement_quantity,</if>
+                <if test="planLotsId != null">plan_lots_id,</if>
+                <if test="workOrderLineId != null">work_order_line_id,</if>
+                <if test="planId != null">plan_id,</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="organizationId != null">#{organizationId},</if>
+                <if test="workOrderId != null">#{workOrderId},</if>
+                <if test="inventoryItemId != null">#{inventoryItemId},</if>
+                <if test="issuedQuantity != null">#{issuedQuantity},</if>
+                <if test="suoHaoQuantity != null">#{suoHaoQuantity},</if>
+                <if test="transferedQuantity != null">#{transferedQuantity},</if>
+                <if test="onhandQuantity != null">#{onhandQuantity},</if>
+                <if test="receiveQuantity != null">#{receiveQuantity},</if>
+                <if test="beiLiaoQuantity != null">#{beiLiaoQuantity},</if>
+                <if test="createBy != null">#{createBy},</if>
+                <if test="createDate != null">#{createDate},</if>
+                <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+                <if test="lastUpdateDate != null">#{lastUpdateDate},</if>
+                <if test="untransferQuantity != null">#{untransferQuantity},</if>
+                <if test="overReceiveQuantity != null">#{overReceiveQuantity},</if>
+                <if test="overIssueQuantity != null">#{overIssueQuantity},</if>
+                <if test="backLiaoQuantity != null">#{backLiaoQuantity},</if>
+                <if test="supplementQuantity != null">#{supplementQuantity},</if>
+                <if test="planLotsId != null">#{planLotsId},</if>
+                <if test="workOrderLineId != null">#{workOrderLineId},</if>
+                <if test="planId != null">#{planId},</if>
+            </trim>
+    </insert>
+    <update id="sumQty" >
+        update p
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="type == 'WIP Backflush' and (category == 'WIP Backflush' or  category == 'OUTSIDE WIP Backflush')  ">
+                issued_quantity = issued_quantity - #{qty},
+            </if>
+            <if test="type == 'WIP Backflush' and (category == 'WIP Backflush' or  category == 'OUTSIDE WIP Backflush')  and  subinventoryCode != '3FCKL001' ">
+                onhand_quantity = ( CASE
+                WHEN pv.supplier_type = '0' THEN onhand_quantity + #{qty}
+                ELSE  onhand_quantity
+                END),
+            </if>
+            <if test="type == 'WIP Backflush EXCEED' and (category == 'WIP Backflush' or  category == 'OUTSIDE WIP Backflush')   ">
+                over_issue_quantity = over_issue_quantity - #{qty},
+            </if>
+            <if test="(type == 'ISSUE' and category == 'TRANSFER_IN'  and  subinventoryCode == 'XBC' ) or (type == 'OUTSIDE' and category == 'TRANSFER_IN')   ">
+                transfered_quantity = transfered_quantity + #{qty},onhand_quantity = onhand_quantity + #{qty},
+                UNTRANSFER_QUANTITY = UNTRANSFER_QUANTITY - #{qty},
+            </if>
+            <if test="(type == 'ISSUE_BACK'  and category == 'BACK_OUT'  and  subinventoryCode == 'XBC' ) or (type == 'OUTSIDE_BACK'  and category == 'BACK_OUT' )   ">
+                transfered_quantity = transfered_quantity + #{qty},onhand_quantity = onhand_quantity + #{qty},
+                UNTRANSFER_QUANTITY = UNTRANSFER_QUANTITY - #{qty},back_liao_quantity = back_liao_quantity - #{qty},
+            </if>
+            <if test="(type == 'ISSUE_EXCEED' or type == 'OUTSIDE_EXCEED')  and category == 'EXCEED_OUT'  ">
+                over_receive_quantity = over_receive_quantity - #{qty},
+            </if>
+        </trim>
+        FROM pes_prod_processing p,(select work_order_line_id,supplier_type from pes_prod_processing_v )pv
+        where p.work_order_line_id = #{lineId} and  pv.work_order_line_id = #{lineId}
+
+
+
+    </update>
+    <update id="updatePesProdProcessing" parameterType="PesProdProcessing">
+        update pes_prod_processing
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workOrderId != null">work_order_id = #{workOrderId},</if>
+            <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+            <if test="issuedQuantity != null">issued_quantity = #{issuedQuantity},</if>
+            <if test="suoHaoQuantity != null">suo_hao_quantity = #{suoHaoQuantity},</if>
+            <if test="transferedQuantity != null">transfered_quantity = #{transferedQuantity},</if>
+            <if test="onhandQuantity != null">onhand_quantity = #{onhandQuantity},</if>
+            <if test="receiveQuantity != null">receive_quantity = #{receiveQuantity},</if>
+            <if test="beiLiaoQuantity != null">bei_liao_quantity = #{beiLiaoQuantity},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+            <if test="untransferQuantity != null">UNTRANSFER_QUANTITY = #{untransferQuantity},</if>
+            <if test="overReceiveQuantity != null">over_receive_quantity = #{overReceiveQuantity},</if>
+            <if test="overIssueQuantity != null">over_issue_quantity = #{overIssueQuantity},</if>
+            <if test="backLiaoQuantity != null">back_liao_quantity = #{backLiaoQuantity},</if>
+            <if test="supplementQuantity != null">supplement_quantity = #{supplementQuantity},</if>
+            <if test="planLotsId != null">plan_lots_id = #{planLotsId},</if>
+            <if test="workOrderLineId != null">work_order_line_id = #{workOrderLineId},</if>
+            <if test="planId != null">plan_id = #{planId},</if>
+        </trim>
+        where organization_id = #{organizationId}
+    </update>
+
+    <delete id="deletePesProdProcessingById" parameterType="Long">
+        delete from pes_prod_processing where organization_id = #{organizationId}
+    </delete>
+
+    <delete id="deletePesProdProcessingByIds" parameterType="String">
+        delete from pes_prod_processing where organization_id in
+        <foreach item="organizationId" collection="array" open="(" separator="," close=")">
+            #{organizationId}
+        </foreach>
+    </delete>
+    <update id="updateInit">
+        UPDATE a
+SET a.issued_quantity = b.klQty,
+a.transfered_quantity = b.dbQty- b.tlQty,
+a.back_liao_quantity = b.tlQty,
+a.UNTRANSFER_QUANTITY = a.required_quantity - ( b.dbQty- b.tlQty ),
+a.onhand_quantity = CASE pitca.item_work_name_flag
+	WHEN 4 THEN b.dbQty
+	ELSE  ( b.dbQty- b.tlQty ) - b.klQty
+END
+,
+a.over_receive_quantity = b.clQty
+FROM
+	pes_prod_processing a 	LEFT JOIN pes_item_techniques_code_all pitca ON ( a.organization_id = pitca.organization_id AND a.inventory_item_id = pitca.inventory_item_id ) ,
+	(
+	SELECT
+		inventory_item_id,
+						organization_id,
+						source_line_id,
+						SUM(dbQty) as dbQty,
+						SUM(tlQty) as tlQty,
+						SUM(clQty) as clQty,
+						SUM(klQty) as klQty
+
+	FROM
+		(
+		SELECT
+			imt.inventory_item_id,
+			imt.organization_id,
+			imt.subinventory_code,
+			imt.source_line_id,
+					imt.transaction_source_category,
+							imt.transaction_source_type,
+--imt.transaction_source_reference_id,
+		CASE
+
+				WHEN transaction_source_type = 'ISSUE'
+				AND imt.transaction_type = 'IN' AND imt.subinventory_code = 'XBC' THEN
+					SUM ( imt.transaction_quantity ) ELSE 0
+					END AS dbQty,
+			CASE
+
+					WHEN transaction_source_type = 'ISSUE_BACK'
+					AND imt.transaction_type = 'OUT' AND imt.transaction_source_category ='BACK_OUT' THEN
+						- SUM ( imt.transaction_quantity ) ELSE 0
+						END AS tlQty,
+				CASE
+
+						WHEN transaction_source_type = 'WIP Backflush'
+						AND imt.transaction_type = 'OUT'  THEN
+							- SUM ( imt.transaction_quantity ) ELSE 0
+							END AS klQty,
+					CASE
+
+							WHEN transaction_source_type = 'ISSUE_EXCEED'
+							AND imt.transaction_type = 'IN' THEN
+								 SUM ( imt.transaction_quantity )
+							WHEN transaction_source_type = 'ISSUE_EXCEED' and imt.source_code = 'WMS'
+							AND imt.transaction_type = 'OUT' THEN
+								- SUM ( imt.transaction_quantity )
+							ELSE 0
+								END AS clQty
+						FROM
+							dbo.pes_inv_material_txns AS imt
+
+ 						WHERE
+
+				(	(transaction_source_type = 'ISSUE'  and   imt.subinventory_code = 'XBC' )or	(transaction_source_type = 'ISSUE_BACK' AND imt.transaction_source_category ='BACK_OUT') or (transaction_source_type = 'WIP Backflush' and 	imt.source_code = 'PES' )  or transaction_source_type = 'ISSUE_EXCEED' )
+						GROUP BY
+							imt.inventory_item_id,
+							imt.organization_id,
+							imt.subinventory_code,
+							imt.transaction_type,
+							imt.transaction_source_category,
+							imt.transaction_source_type,
+							imt.source_code,
+
+							imt.source_line_id
+						) a1
+					GROUP BY
+						inventory_item_id,
+						organization_id,
+
+						source_line_id
+
+					) b
+				WHERE
+					b.source_line_id = a.work_order_line_id
+
+					and
+				a.plan_id = #{pId}
+					and
+					a.is_ww_flag = #{isWw}
+					and
+				b.inventory_item_id = a.inventory_item_id
+	            AND b.organization_id = a.organization_id
+    </update>
+    <insert id="insertInit">
+        INSERT INTO pes_prod_processing
+        (
+        organization_id,
+        work_order_id,
+        inventory_item_id,
+        required_quantity,
+        required_date,
+        suo_hao_quantity,
+        bei_liao_quantity,
+        receive_quantity,
+        create_by,
+        create_date,
+        last_update_by,
+        last_update_date,
+        plan_lots_id,
+        line_id,
+        plan_id,
+        work_order_line_id,
+        UNTRANSFER_QUANTITY,
+        is_ww_flag
+        )
+        SELECT
+        blqqs.ORGANIZATION_ID,
+        blqqs.WORK_ORDER_ID,
+        blqqs.INVENTORY_ITEM_ID,
+        blqqs.net_quantity AS required_quantity,
+        GETDATE(),
+        CASE
+        WHEN ( CHARINDEX( 'A1205', item_number ) &gt; 0 OR CHARINDEX( 'A1306', item_number ) &gt; 0 ) THEN
+        30 ELSE 0
+        END suo_hao_quantity,
+        blqqs.bei_liao_quantity,
+        recived_quantity,
+        #{userName},
+        getdate(),
+        #{userName},
+        getdate(),
+        lot_num,
+        blqqs.line_id,
+        blqqs.id,
+        wo_operation_material_id,
+        blqqs.net_quantity,
+        #{isWw}
+        FROM
+        (
+        SELECT
+        blqq.WORK_ORDER_ID,
+        blqq.ORGANIZATION_ID,
+        blqq.INVENTORY_ITEM_ID,
+        blqq.net_quantity,
+        blqq.ISSUED_QUANTITY,
+        blqq.TRANSFER_QUANTITY,
+        blqq.UNTRANSFER_QUANTITY,
+        blqq.onhand_quantity,
+        blqq.recived_quantity,
+        (
+        CASE
+
+        WHEN ( blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY ) &lt; 0 THEN
+        0 ELSE (
+        CASE
+
+        WHEN ( blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY ) &gt;= blqq.UNTRANSFER_QUANTITY THEN
+        blqq.UNTRANSFER_QUANTITY ELSE ( blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY )
+        END
+        )
+        END
+        ) AS bei_liao_quantity,
+        blqq.line_id,
+        blqq.id,
+        item_number,
+        lot_num,
+        wo_operation_material_id
+        FROM
+        (
+        SELECT
+        blq.WORK_ORDER_ID,
+        blq.ORGANIZATION_ID,
+        blq.INVENTORY_ITEM_ID,
+        blq.net_quantity,
+        blq.ISSUED_QUANTITY,
+        blq.TRANSFER_QUANTITY,
+        ( blq.net_quantity - blq.qichu_quantity - blq.TRANSFER_QUANTITY ) AS UNTRANSFER_QUANTITY,
+        blq.onhand_quantity,
+        blq.recived_quantity,
+        SUM ((
+        blq.net_quantity - blq.qichu_quantity - blq.TRANSFER_QUANTITY
+        )) OVER ( partition BY blq.ORGANIZATION_ID, blq.INVENTORY_ITEM_ID ORDER BY blq.line_id ASC ) AS sum_net_quantity,
+        isnull( blq.onhand_quantity, 0 ) + blq.recived_quantity AS avaliable_quantity,
+        blq.line_id,
+        blq.id,
+        item_number,
+        lot_num,
+        wo_operation_material_id
+        FROM
+        (
+        SELECT
+        wwom.WORK_ORDER_ID,
+        wwom.ORGANIZATION_ID,
+        wwom.INVENTORY_ITEM_ID,
+        wwom.ISSUED_QUANTITY,
+        isnull( pmwsa.TRANSFER_QUANTITY, 0 ) AS TRANSFER_QUANTITY,
+        isnull( qichu.transaction_quantity, 0 ) AS qichu_quantity,
+--         ( pldl.work_plan_quantity * wwom.QUANTITY_PER_PRODUCT ) AS net_quantity,
+        wwom.QUANTITY as net_quantity,
+        ioqn.quantity AS onhand_quantity,
+        isnull( iqsl.deliverying_quantity, 0 ) + isnull( iqsl.checked_unconfirmed_quantity, 0 ) + isnull( iqsl.receipt_confirmed_quantity, 0 ) + isnull( iqsl.unrcv_quantity, 0 ) AS recived_quantity,
+        pldl.line_id,
+        pldl.id,
+        pldl.item_number,
+        ppldhl.lot_num,
+        wwom.wo_operation_material_id
+        FROM
+        <if test='isWw == "N"'>
+            pes_prod_line_days_line_all pldl,
+            pes_prod_line_days_header_all ppldhl,
+        </if>
+        <if test='isWw == "Y"'>
+            pes_prod_line_days_line_all_ww pldl,
+            pes_prod_line_days_header_all_ww ppldhl,
+        </if>
+        sync_wie_wo_operation_materials wwom
+        LEFT JOIN (
+        SELECT
+        ionc.inventory_item_id,
+        ionc.organization_id,
+        SUM ( ionc.quantity ) AS quantity
+        FROM
+        sync_inv_onhand_quantity_new_code ionc
+        WHERE
+        ( ionc.subinventory_code &lt;&gt; 'XBC' AND ionc.subinventory_code &lt;&gt; '4BL001' AND ionc.subinventory_code NOT LIKE '3%' )
+        GROUP BY
+        ionc.inventory_item_id,
+        ionc.organization_id
+        ) ioqn ON ( wwom.ORGANIZATION_ID = ioqn.organization_id AND wwom.INVENTORY_ITEM_ID = ioqn.INVENTORY_ITEM_ID )
+        LEFT JOIN mes_item_quantity_status_list iqsl ON ( wwom.ORGANIZATION_ID = iqsl.organization_id AND wwom.INVENTORY_ITEM_ID = iqsl.INVENTORY_ITEM_ID )
+        LEFT JOIN pes_mes_wie_subinventory_transfer_all pmwsa ON ( wwom.work_order_id = pmwsa.work_order_id AND wwom.organization_id = pmwsa.FROM_ORGANIZATION_ID AND wwom.inventory_item_id = pmwsa.inventory_item_id )
+        LEFT JOIN pes_erp_wie_work_material_qichu_all qichu ON ( wwom.work_order_id = qichu.transaction_source_id AND wwom.organization_id = qichu.organization_id AND wwom.inventory_item_id = qichu.inventory_item_id )
+        WHERE
+        1 = 1
+        AND pldl.id = #{pId}
+        AND pldl.work_order_id = wwom.WORK_ORDER_ID
+        AND pldl.organization_id = wwom.organization_id
+        and wwom.MATERIAL_TYPE = 'COMPONENT'
+        AND pldl.id = ppldhl.id
+        AND ppldhl.is_ww_flag = #{isWw}
+        ) blq
+        ) blqq
+        ) blqqs
+    </insert>
+    <select id="isTrueInv" resultMap="PesProdProcessingResult">
+        SELECT pv.inventory_item_id,pv.is_ww_flag,pv.subinventoryCode  FROM pes_prod_processing_v pv
+        WHERE
+         pv.work_order_line_id = #{lineId}
+    </select>
+
+    <select id="selectPesProdProcessingList" parameterType="PesProdProcessing" resultMap="PesProdProcessingResult">
+        <include refid="selectPesProdProcessingListVo"/>
+        FROM
+            pes_prod_line_days_header_all ppldha,
+            pes_prod_line_days_line_all ppldla,
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+            left join sync_inv_onhand_quantity_new iopn
+            on (wwom.organization_id = iopn.organization_id
+            and wwom.inventory_item_id = iopn.inventory_item_id)
+        <where>
+            and ppldha.id = ppldla.id
+            AND ppldla.organization_id = wwob.organization_id
+            AND ppldla.work_order_id = wwob.work_order_id
+            AND wwob.organization_id = wwom.organization_id
+            AND wwob.work_order_id = wwom.work_order_id
+            and wwom.material_sequence_number > 0
+            and ppldha.is_ww_flag = 'N'
+            <if test="lotNum != null "> and ppldha.lot_num = #{lotNum}</if>
+            <if test="beginTime != null and beginTime != ''"> and ppldha.lot_num_date &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and ppldha.lot_num_date &lt;= #{endTime}</if>
+            <if test="xianBieFlag != null and xianBieFlag != ''"> and ppldla.xian_bie_flag = #{xianBieFlag}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and wwob.order_number like (#{orderNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and wwob.customer_name like ('%' + #{partyName} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwom.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wwob.p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="planName != null  and planName != ''"> and (wwob.plan_name = #{planName} or ppldla.create_by = #{planName})</if>
+--             <if test="createBy != null  and createBy != ''"> and ppldla.create_by = #{createBy}</if>
+            <if test="workOrderStatusIdAll != null and workOrderStatusIdAll != ''"> and wwob.work_order_status_id in (
+                <foreach collection="workOrderStatusIdAll.split(',')" item="workOrderStatusId" index="index" separator=",">
+                    #{workOrderStatusId}
+                </foreach>
+                )</if>
+        </where>
+    </select>
+
+    <select id="selectPesProdProcessingListWw" parameterType="PesProdProcessing" resultMap="PesProdProcessingResult">
+        <include refid="selectPesProdProcessingListVo"/>
+        FROM
+            pes_prod_line_days_header_all_ww ppldha,
+            pes_prod_line_days_line_all_ww ppldla,
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+            left join sync_inv_onhand_quantity_new iopn
+            on (wwom.organization_id = iopn.organization_id
+            and wwom.inventory_item_id = iopn.inventory_item_id)
+        <where>
+            and ppldha.id = ppldla.id
+            AND ppldla.organization_id = wwob.organization_id
+            AND ppldla.work_order_id = wwob.work_order_id
+            AND wwob.organization_id = wwom.organization_id
+            AND wwob.work_order_id = wwom.work_order_id
+            and wwom.material_sequence_number > 0
+            and ppldha.is_ww_flag = 'Y'
+            <if test="lotNum != null "> and ppldha.lot_num = #{lotNum}</if>
+            <if test="beginTime != null and beginTime != ''"> and ppldha.lot_num_date &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and ppldha.lot_num_date &lt;= #{endTime}</if>
+            <if test="xianBieFlag != null and xianBieFlag != ''"> and ppldla.xian_bie_flag = #{xianBieFlag}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and wwob.order_number like (#{orderNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and wwob.customer_name like ('%' + #{partyName} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwom.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wwob.p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="planName != null  and planName != ''"> and (wwob.plan_name = #{planName} or ppldla.create_by = #{planName})</if>
+--             <if test="createBy != null  and createBy != ''"> and ppldla.create_by = #{createBy}</if>
+            <if test="workOrderStatusIdAll != null and workOrderStatusIdAll != ''"> and wwob.work_order_status_id in (
+                <foreach collection="workOrderStatusIdAll.split(',')" item="workOrderStatusId" index="index" separator=",">
+                    #{workOrderStatusId}
+                </foreach>
+                )</if>
+--             <if test="prodLineFlag != null  and prodLineFlag != ''"> and ppldha.prod_line_flag = #{prodLineFlag}</if>
+        </where>
+    </select>
+
+
+</mapper>

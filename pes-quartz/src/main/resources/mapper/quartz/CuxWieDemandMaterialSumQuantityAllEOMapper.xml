@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.CuxWieDemandMaterialSumQuantityAllEOMapper">
+
+    <resultMap type="CuxWieDemandMaterialSumQuantityAllEO" id="CuxWieDemandMaterialSumQuantityAllEOResult">
+    </resultMap>
+
+    <delete id="deleteWieDemandSyncInvMaterialTxnsEO">
+        delete from CUX_WIE_DEMAND_MATERIAL_SUM_QUANTITY_ALL where
+        <foreach collection="list" item="item" index="index" separator="or">
+            ( INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT}
+            AND transaction_year=#{item.transactionYear,jdbcType=INTEGER})
+        </foreach>
+    </delete>
+
+    <insert id="batchWieDemandSyncInvMaterialTxnsEO">
+        insert into CUX_WIE_DEMAND_MATERIAL_SUM_QUANTITY_ALL( organization_id, inventory_item_id, jan_quantity, feb_quantity, mar_quantity, apr_quantity, may_quantity, jun_quantity, jul_quantity, aug_quantity, sep_quantity, oct_quantity, nov_quantity, dec_quantity, transaction_year) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, cast(#{item.janQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.febQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.marQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.aprQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.mayQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.junQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.julQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.augQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.sepQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.octQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.novQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.decQuantity,jdbcType=DECIMAL} as decimal(15,5)),#{item.transactionYear,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+</mapper>

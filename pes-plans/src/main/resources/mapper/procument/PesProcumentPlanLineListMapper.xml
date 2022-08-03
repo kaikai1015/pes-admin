@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.procument.mapper.PesProcumentPlanLineListMapper">
+
+    <resultMap type="PesProcumentPlanLineList" id="PesProcumentPlanLineListResult">
+                    <result property="lineId"    column="line_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="level"    column="level"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="levelTreeCode"    column="level_tree_code"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="componentQuantity"    column="component_quantity"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="planPoQuantity"    column="plan_po_quantity"    />
+                    <result property="planRcvtDate"    column="plan_rcvt_date"    />
+                    <result property="planPoDate"    column="plan_po_date"    />
+                    <result property="grossQuantity"    column="gross_quantity"    />
+                    <result property="grossDate"    column="gross_date"    />
+                    <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="parentLevelTreeCode"    column="parent_level_tree_code"    />
+                    <result property="parentGrossQuantity"    column="parent_gross_quantity"    />
+                    <result property="parentGrossDate"    column="parent_gross_date"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planLotLineNum"    column="plan_lot_line_num"    />
+                    <result property="planItemNumber"    column="plan_item_number"    />
+                    <result property="planItemType"    column="plan_item_type"    />
+                    <result property="planItemQuantity"    column="plan_item_quantity"    />
+                    <result property="planDate"    column="plan_date"    />
+                    <result property="planTreeCode"    column="plan_tree_code"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="buyerName"    column="buyer_name"    />
+            </resultMap>
+
+    <sql id="selectPesProcumentPlanLineListVo">
+        select line_id, organization_id, level, line_num, plan_type, level_tree_code, inventory_item_id, item_number, item_description, item_type, component_quantity, uom, plan_po_quantity, plan_rcvt_date, plan_po_date, gross_quantity, gross_date, p_inventory_item_id, p_item_number, p_item_description, parent_level_tree_code, parent_gross_quantity, parent_gross_date, plan_lot_num, plan_lot_line_num, plan_item_number, plan_item_type, plan_item_quantity, plan_date, plan_tree_code, create_date, create_by, last_update_date, last_update_by from pes_procument_plan_line_list
+    </sql>
+
+    <select id="selectPesProcumentPlanLineListList" parameterType="PesProcumentPlanLineList" resultMap="PesProcumentPlanLineListResult">
+        <include refid="selectPesProcumentPlanLineListVo"/>
+        <where>
+        <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+        <if test="planLotNum != null  and planLotNum != ''"> and plan_lot_num = #{planLotNum}</if>
+        </where>
+    </select>
+
+    <insert id="insertPesProcumentPlanLineList" parameterType="sinexcel.procument.domain.PesProcumentPlanLineList">
+        INSERT INTO pes_procument_plan_line_list (
+        organization_id,
+        LEVEL,
+        line_num,
+        plan_type,
+        level_tree_code,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        component_quantity,
+        uom,
+        plan_po_quantity,
+        plan_rcvt_date,
+        plan_po_date,
+        gross_quantity,
+        gross_date,
+        p_inventory_item_id,
+        p_item_number,
+        p_item_description,
+        parent_level_tree_code,
+        parent_gross_quantity,
+        parent_gross_date,
+        plan_lot_num,
+        plan_lot_line_num,
+        plan_item_number,
+        plan_item_type,
+        plan_item_quantity,
+        plan_date,
+        plan_tree_code,
+        create_date,
+        create_by,
+        last_update_date,
+        last_update_by
+        )(
+        SELECT
+            organization_id,
+            LEVEL,
+            line_num,
+            plan_type,
+            level_tree_code,
+            inventory_item_id,
+            item_number,
+            item_description,
+            item_type,
+            component_quantity,
+            uom,
+            plan_po_quantity,
+            plan_rcvt_date,
+            plan_po_date,
+            gross_quantity,
+            gross_date,
+            p_inventory_item_id,
+            p_item_number,
+            p_item_description,
+            parent_level_tree_code,
+            parent_gross_quantity,
+            parent_gross_date,
+            plan_lot_num,
+            plan_lot_line_num,
+            plan_item_number,
+            plan_item_type,
+            plan_item_quantity,
+            plan_date,
+            plan_tree_code,
+            getdate(),
+            #{createBy},
+            getdate(),
+            #{createBy}
+        FROM
+            pes_po_plan_line_list
+        WHERE
+            plan_lot_num = #{planLotNum}
+            and plan_po_quantity &gt; 0
+        )
+    </insert>
+
+    <select id="selectBuyer" parameterType="PesProcumentPlanLineList" resultMap="PesProcumentPlanLineListResult">
+        SELECT
+        list.line_num,
+        list.organization_id,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        list.item_type,
+        esb.BUYER_NAME,
+        list.uom,
+        list.plan_po_quantity,
+        list.plan_rcvt_date,
+        list.plan_po_date,
+        list.gross_quantity,
+        list.gross_date
+        FROM
+        pes_procument_plan_line_list list
+        LEFT JOIN sync_egp_system_items_b_w esb ON (
+        list.organization_id = esb.ORGANIZATION_ID
+        AND list.inventory_item_id = esb.INVENTORY_ITEM_ID
+        )
+        <where>
+            and relase_flag = '0'
+            <if test="planLotNum != null  and planLotNum != ''"> and list.plan_lot_num = #{planLotNum}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.item_number = #{itemNumber}</if>
+            <if test="buyerName != null  and buyerName != ''"> and esb.buyer_name = #{buyerName}</if>
+        </where>
+    </select>
+
+    <update id="deletePesProcumentPlanLineListByIds" parameterType="Long">
+        update pes_procument_plan_line_list set relase_flag = '1' where line_num = #{lineNum}
+    </update>
+
+</mapper>

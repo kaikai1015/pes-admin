@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncDooLinesAllEOMapper">
+
+    <resultMap type="SyncDooLinesAllEO" id="SyncDooLinesAllEOResult">
+        <result property="headerId"    column="HEADER_ID"    />
+        <result property="lineId"    column="LINE_ID"    />
+        <result property="lineNumber"    column="LINE_NUMBER"    />
+        <result property="statusCode"    column="STATUS_CODE"    />
+        <result property="ownerId"    column="OWNER_ID"    />
+        <result property="sourceLineId"    column="SOURCE_LINE_ID"    />
+        <result property="sourceLineNumber"    column="SOURCE_LINE_NUMBER"    />
+        <result property="sourceOrderId"    column="SOURCE_ORDER_ID"    />
+        <result property="sourceOrderNumber"    column="SOURCE_ORDER_NUMBER"    />
+        <result property="sourceOrderSystem"    column="SOURCE_ORDER_SYSTEM"    />
+        <result property="sourceScheduleId"    column="SOURCE_SCHEDULE_ID"    />
+        <result property="sourceScheduleNumber"    column="SOURCE_SCHEDULE_NUMBER"    />
+        <result property="sourceRevisionNumber"    column="SOURCE_REVISION_NUMBER"    />
+        <result property="itemTypeCode"    column="ITEM_TYPE_CODE"    />
+        <result property="orderedQty"    column="ORDERED_QTY"    />
+        <result property="canceledQty"    column="CANCELED_QTY"    />
+        <result property="orderedUom"    column="ORDERED_UOM"    />
+        <result property="sourceOrgId"    column="SOURCE_ORG_ID"    />
+        <result property="orgId"    column="ORG_ID"    />
+        <result property="actualShipDate"    column="ACTUAL_SHIP_DATE"    />
+        <result property="scheduleShipDate"    column="SCHEDULE_SHIP_DATE"    />
+        <result property="rmaDeliveredQty"    column="RMA_DELIVERED_QTY"    />
+        <result property="extendedAmount"    column="EXTENDED_AMOUNT"    />
+        <result property="fulfilledQty"    column="FULFILLED_QTY"    />
+        <result property="fulfillmentDate"    column="FULFILLMENT_DATE"    />
+        <result property="lineTypeCode"    column="LINE_TYPE_CODE"    />
+        <result property="openFlag"    column="OPEN_FLAG"    />
+        <result property="canceledFlag"    column="CANCELED_FLAG"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="compSeqPath"    column="COMP_SEQ_PATH"    />
+        <result property="parentLineId"    column="PARENT_LINE_ID"    />
+        <result property="origSysDocumentRef"    column="ORIG_SYS_DOCUMENT_REF"    />
+        <result property="origSysDocumentLineRef"    column="ORIG_SYS_DOCUMENT_LINE_REF"    />
+        <result property="rootParentLineId"    column="ROOT_PARENT_LINE_ID"    />
+        <result property="shippedQty"    column="SHIPPED_QTY"    />
+        <result property="unitListPrice"    column="UNIT_LIST_PRICE"    />
+        <result property="unitSellingPrice"    column="UNIT_SELLING_PRICE"    />
+        <result property="deltaType"    column="DELTA_TYPE"    />
+        <result property="referenceLineId"    column="REFERENCE_LINE_ID"    />
+        <result property="onHold"    column="ON_HOLD"    />
+        <result property="inventoryOrganizationId"    column="INVENTORY_ORGANIZATION_ID"    />
+        <result property="categoryCode"    column="CATEGORY_CODE"    />
+        <result property="transformFromLineId"    column="TRANSFORM_FROM_LINE_ID"    />
+        <result property="itemSubTypeCode"    column="ITEM_SUB_TYPE_CODE"    />
+        <result property="quantityPerModel"    column="QUANTITY_PER_MODEL"    />
+        <result property="modifiedFlag"    column="MODIFIED_FLAG"    />
+        <result property="displayLineNumber"    column="DISPLAY_LINE_NUMBER"    />
+        <result property="createdInRelease"    column="CREATED_IN_RELEASE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateLogin"    column="LAST_UPDATE_LOGIN"    />
+        <result property="objectVersionNumber"    column="OBJECT_VERSION_NUMBER"    />
+        <result property="requestShipDate"    column="REQUEST_SHIP_DATE"    />
+    </resultMap>
+
+    <sql id="selectSyncDooLinesAllVo">
+        SELECT
+            dla.HEADER_ID,
+            dla.LINE_ID,
+            dla.LINE_NUMBER,
+            dla.STATUS_CODE,
+            dla.OWNER_ID,
+            dla.SOURCE_LINE_ID,
+            dla.SOURCE_LINE_NUMBER,
+            dla.SOURCE_ORDER_ID,
+            dla.SOURCE_ORDER_NUMBER,
+            dla.SOURCE_ORDER_SYSTEM,
+            dla.SOURCE_SCHEDULE_ID,
+            dla.SOURCE_SCHEDULE_NUMBER,
+            dla.SOURCE_REVISION_NUMBER,
+            dla.ITEM_TYPE_CODE,
+            dla.ORDERED_QTY,
+            dla.CANCELED_QTY,
+            dla.ORDERED_UOM,
+            dla.SOURCE_ORG_ID,
+            dla.ORG_ID,
+            dla.ACTUAL_SHIP_DATE,
+            dla.SCHEDULE_SHIP_DATE,
+            dla.RMA_DELIVERED_QTY,
+            dla.EXTENDED_AMOUNT,
+            dla.FULFILLED_QTY,
+            dla.FULFILLMENT_DATE,
+            dla.LINE_TYPE_CODE,
+            dla.OPEN_FLAG,
+            dla.CANCELED_FLAG,
+            dla.INVENTORY_ITEM_ID,
+            dla.COMP_SEQ_PATH,
+            dla.PARENT_LINE_ID,
+            dla.ORIG_SYS_DOCUMENT_REF,
+            dla.ORIG_SYS_DOCUMENT_LINE_REF,
+            dla.ROOT_PARENT_LINE_ID,
+            dla.SHIPPED_QTY,
+            dla.UNIT_LIST_PRICE,
+            dla.UNIT_SELLING_PRICE,
+            dla.DELTA_TYPE,
+            dla.REFERENCE_LINE_ID,
+            dla.ON_HOLD,
+            dla.INVENTORY_ORGANIZATION_ID,
+            dla.CATEGORY_CODE,
+            dla.TRANSFORM_FROM_LINE_ID,
+            dla.ITEM_SUB_TYPE_CODE,
+            dla.QUANTITY_PER_MODEL,
+            dla.MODIFIED_FLAG,
+            dla.DISPLAY_LINE_NUMBER,
+            dla.CREATED_IN_RELEASE,
+            dla.LAST_UPDATE_DATE,
+            dla.CREATION_DATE,
+            dla.CREATED_BY,
+            dla.LAST_UPDATED_BY,
+            dla.LAST_UPDATE_LOGIN,
+            dla.OBJECT_VERSION_NUMBER,
+        (select max(dfll.request_ship_date) from sync_doo_fulfill_lines_all dfll where dfll.HEADER_ID = dla.header_id and dfll.LINE_ID = dla.LINE_ID) as request_ship_date
+        FROM
+            sync_doo_lines_all dla
+    </sql>
+
+    <select id="selectSyncDooLinesAllList" parameterType="SyncDooLinesAllEO" resultMap="SyncDooLinesAllEOResult">
+        <include refid="selectSyncDooLinesAllVo"/>
+        <where>
+            <if test="headerId != null "> and dla.HEADER_ID = #{headerId}</if>
+            <if test="lineId != null "> and dla.LINE_ID = #{lineId}</if>
+            <if test="inventoryItemId != null "> and dla.INVENTORY_ITEM_ID = #{inventoryItemId}</if>
+            <if test="beginTime != null and beginTime != ''"> and dla.LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and dla.LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncDooLinesAllEO">
+        delete from sync_doo_lines_all where LINE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.lineId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncDooLinesAllEO">
+        insert into sync_doo_lines_all( HEADER_ID, LINE_ID, LINE_NUMBER, STATUS_CODE, OWNER_ID, SOURCE_LINE_ID, SOURCE_LINE_NUMBER, SOURCE_ORDER_ID, SOURCE_ORDER_NUMBER, SOURCE_ORDER_SYSTEM, SOURCE_SCHEDULE_ID, SOURCE_SCHEDULE_NUMBER, SOURCE_REVISION_NUMBER, ITEM_TYPE_CODE, ORDERED_QTY, CANCELED_QTY, ORDERED_UOM, SOURCE_ORG_ID, ORG_ID, ACTUAL_SHIP_DATE, SCHEDULE_SHIP_DATE, RMA_DELIVERED_QTY, EXTENDED_AMOUNT, FULFILLED_QTY, FULFILLMENT_DATE, LINE_TYPE_CODE, OPEN_FLAG, CANCELED_FLAG, INVENTORY_ITEM_ID, COMP_SEQ_PATH, PARENT_LINE_ID, ORIG_SYS_DOCUMENT_REF, ORIG_SYS_DOCUMENT_LINE_REF, ROOT_PARENT_LINE_ID, SHIPPED_QTY, UNIT_LIST_PRICE, UNIT_SELLING_PRICE, DELTA_TYPE, REFERENCE_LINE_ID, ON_HOLD, INVENTORY_ORGANIZATION_ID, CATEGORY_CODE, TRANSFORM_FROM_LINE_ID, ITEM_SUB_TYPE_CODE, QUANTITY_PER_MODEL, MODIFIED_FLAG, DISPLAY_LINE_NUMBER, CREATED_IN_RELEASE, LAST_UPDATE_DATE, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_LOGIN, OBJECT_VERSION_NUMBER) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.headerId,jdbcType=BIGINT}, #{item.lineId,jdbcType=BIGINT}, #{item.lineNumber,jdbcType=INTEGER}, #{item.statusCode,jdbcType=VARCHAR}, #{item.ownerId,jdbcType=BIGINT}, #{item.sourceLineId,jdbcType=VARCHAR}, #{item.sourceLineNumber,jdbcType=VARCHAR}, #{item.sourceOrderId,jdbcType=VARCHAR}, #{item.sourceOrderNumber,jdbcType=VARCHAR}, #{item.sourceOrderSystem,jdbcType=VARCHAR}, #{item.sourceScheduleId,jdbcType=VARCHAR}, #{item.sourceScheduleNumber,jdbcType=VARCHAR}, #{item.sourceRevisionNumber,jdbcType=BIGINT}, #{item.itemTypeCode,jdbcType=VARCHAR}, cast(#{item.orderedQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.canceledQty,jdbcType=DECIMAL} as decimal(15,5)), #{item.orderedUom,jdbcType=VARCHAR}, #{item.sourceOrgId,jdbcType=BIGINT}, #{item.orgId,jdbcType=BIGINT}, #{item.actualShipDate,jdbcType=TIMESTAMP}, #{item.scheduleShipDate,jdbcType=TIMESTAMP}, cast(#{item.rmaDeliveredQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.extendedAmount,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.fulfilledQty,jdbcType=DECIMAL} as decimal(15,5)), #{item.fulfillmentDate,jdbcType=TIMESTAMP}, #{item.lineTypeCode,jdbcType=VARCHAR}, #{item.openFlag,jdbcType=VARCHAR}, #{item.canceledFlag,jdbcType=VARCHAR}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.compSeqPath,jdbcType=VARCHAR}, #{item.parentLineId,jdbcType=BIGINT}, #{item.origSysDocumentRef,jdbcType=VARCHAR}, #{item.origSysDocumentLineRef,jdbcType=VARCHAR}, #{item.rootParentLineId,jdbcType=BIGINT}, cast(#{item.shippedQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.unitListPrice,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.unitSellingPrice,jdbcType=DECIMAL} as decimal(15,5)), #{item.deltaType,jdbcType=BIGINT}, #{item.referenceLineId,jdbcType=BIGINT}, #{item.onHold,jdbcType=VARCHAR}, #{item.inventoryOrganizationId,jdbcType=BIGINT}, #{item.categoryCode,jdbcType=VARCHAR}, #{item.transformFromLineId,jdbcType=BIGINT}, #{item.itemSubTypeCode,jdbcType=VARCHAR}, cast(#{item.quantityPerModel,jdbcType=DECIMAL} as decimal(15,5)), #{item.modifiedFlag,jdbcType=VARCHAR}, #{item.displayLineNumber,jdbcType=VARCHAR}, #{item.createdInRelease,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateLogin,jdbcType=VARCHAR}, #{item.objectVersionNumber,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+</mapper>

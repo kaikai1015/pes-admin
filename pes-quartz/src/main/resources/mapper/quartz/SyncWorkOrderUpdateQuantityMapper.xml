@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWorkOrderUpdateQuantityMapper">
+
+    <resultMap type="SyncWorkOrderUpdateQuantityEO" id="SyncWorkOrderUpdateQuantityEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="transactionSourceId"    column="transaction_source_id"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="sumTransactionQuantity"    column="sum_transaction_quantity"    />
+    </resultMap>
+
+    <delete id="deleteSyncWorkOrderUpdateQuantityEO">
+        <foreach collection="list" item="item" index="index" separator=";">
+            delete from pes_wie_work_orders_b_erp_quantity where
+            INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT}
+            AND transaction_source_id=#{item.transactionSourceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <update id="updateSyncWorkOrderUpdateQuantityEO">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update pes_wie_work_orders_b_erp set completed_quantity = cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)),work_order_status_id = (case when planned_start_quantity = cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)) and  work_order_status_id = 10004 then 10002 ELSE work_order_status_id end),erp_submit_date = (case when planned_start_quantity = cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)) then erp_submit_date ELSE #{item.createDate,jdbcType=TIMESTAMP} end),last_update_date = #{item.createDate,jdbcType=TIMESTAMP},last_update_by = (case when planned_start_quantity = cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)) then 'INTG_ADMIN' ELSE last_update_by end),completed_subinventory_code = #{item.subinventoryCode,jdbcType=VARCHAR}
+            where INVENTORY_ITEM_ID = #{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID = #{item.organizationId,jdbcType=BIGINT}
+            AND work_order_id = #{item.transactionSourceId,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <insert id="batchSyncWorkOrderUpdateQuantityEO">
+        insert into pes_wie_work_orders_b_erp_quantity( organization_id, inventory_item_id, transaction_source_id, subinventory_code, sum_transaction_quantity) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT},#{item.inventoryItemId,jdbcType=BIGINT},#{item.transactionSourceId,jdbcType=BIGINT},#{item.subinventoryCode,jdbcType=VARCHAR},cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+
+</mapper>

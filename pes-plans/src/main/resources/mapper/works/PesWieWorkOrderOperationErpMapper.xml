@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkOrderOperationErpMapper">
+
+    <resultMap type="PesWieWorkOrderOperationErp" id="PesWieWorkOrderOperationErpResult">
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="operationSequenceNumber"    column="operation_sequence_number"    />
+                    <result property="workOrderOperationId"    column="work_order_operation_id"    />
+                    <result property="standardOperationCode"    column="standard_operation_code"    />
+                    <result property="operationType"    column="operation_type"    />
+                    <result property="operationName"    column="operation_name"    />
+                    <result property="workCenterId"    column="work_center_id"    />
+                    <result property="pesWorkOrderId"    column="pes_work_order_id"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="pesWorkOrderOperationId"    column="pes_work_order_operation_id"    />
+        <result property="workOrderTypeId"    column="work_order_type_id"    />
+        <result property="ospItemId"    column="osp_item_id"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="ospItemNumber"    column="osp_item_number"    />
+        <result property="supplierName"    column="supplier_name"    />
+        <result property="requisitionNumber"    column="requisition_number"    />
+        <result property="workCenterCode"    column="work_center_code"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="supplierSiteId"    column="supplier_site_id"    />
+        <result property="segment1"    column="segment1"    />
+            </resultMap>
+
+    <sql id="selectPesWieWorkOrderOperationErpVo">
+        SELECT
+            wwop.work_order_id,
+            wwop.osp_item_id,
+            wwop.osp_item_number,
+            wwop.supplier_id,
+            wwop.supplier_site_id,
+            wwop.supplier_name,
+            wwop.operation_sequence_number,
+            wwop.work_order_operation_id,
+            wwop.standard_operation_code,
+            wwop.operation_type,
+            wwop.operation_name,
+            wwop.work_center_id,
+            (select pwda.work_center_code from pes_work_center_description_all pwda where pwda.work_center_id = wwop.work_center_id) as work_center_code,
+            wwop.pes_work_order_id,
+            wwop.create_date,
+            wwop.create_by,
+            wwop.last_update_date,
+            wwop.last_update_by,
+            wwop.pes_work_order_operation_id,
+            wwpr.requisition_number,
+            wwpr.segment1
+        FROM
+            pes_wie_work_order_operation_erp wwop
+            left join pes_wie_work_order_operation_erp_pr_v wwpr
+            on (wwop.work_order_operation_id = wwpr.work_order_operation_id)
+    </sql>
+
+    <select id="selectPesWieWorkOrderOperationErpList" parameterType="PesWieWorkOrderOperationErp" resultMap="PesWieWorkOrderOperationErpResult">
+        <include refid="selectPesWieWorkOrderOperationErpVo"/>
+        <where>
+            <if test="pesWorkOrderId != null "> and wwop.pes_work_order_id = #{pesWorkOrderId}</if>
+        </where>
+    </select>
+
+    <select id="selectPesWieWorkOrderOperationOspErpById" parameterType="Long" resultMap="PesWieWorkOrderOperationErpResult">
+        <include refid="selectPesWieWorkOrderOperationErpVo"/>
+        where wwop.pes_work_order_operation_id = #{pesWorkOrderOperationId}
+    </select>
+
+    <select id="selectPesWieWorkOrderOperationErpById" parameterType="Long" resultMap="PesWieWorkOrderOperationErpResult">
+        <include refid="selectPesWieWorkOrderOperationErpVo"/>
+        where wwop.pes_work_order_id = #{pesWorkOrderId}
+        and wwop.work_order_id > 0
+        and wwop.work_order_operation_id = 0
+        order by wwop.operation_sequence_number desc
+    </select>
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWorkOrderOperationErpResult">
+        SELECT
+            wwob.pes_work_order_id
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_work_order_operation_erp wwop
+        WHERE
+            wwob.pes_work_order_id = wwop.pes_work_order_id
+        AND wwob.work_order_id > 0
+        AND wwob.work_order_status_id = 10005
+        AND wwop.work_order_operation_id = 0
+    </select>
+
+    <insert id="insertPesWieWorkOrderOperationErp" parameterType="PesWieWorkOrderOperationErp" useGeneratedKeys="true" keyProperty="pesWorkOrderOperationId">
+        INSERT INTO pes_wie_work_order_operation_erp (
+                    operation_sequence_number,
+                    standard_operation_code,
+                    operation_type,
+                    operation_name,
+                    work_center_id,
+                    pes_work_order_id,
+                    create_date,
+                    create_by,
+                    last_update_date,
+                    last_update_by,
+                    work_order_id,
+                    erp_submit_date,
+                    osp_item_id,
+                    supplier_id,
+                    supplier_site_id,
+                    osp_item_number,
+                    supplier_name,
+                    work_order_operation_id)
+                    (SELECT
+                        #{operationSequenceNumber},
+                        #{standardOperationCode},
+                        #{operationType},
+                        #{operationName},
+                        #{workCenterId},
+                        #{pesWorkOrderId},
+                        #{createDate},
+                        #{createBy},
+                        #{createDate},
+                        #{createBy},
+                        0,
+                        #{createDate},
+                        #{ospItemId},
+                        #{supplierId},
+                        #{supplierSiteId},
+                        #{ospItemNumber},
+                        #{supplierName},
+                        0)
+    </insert>
+
+    <update id="updatePesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWorkOrderOperationErp">
+        update pes_wie_work_order_operation_erp set work_order_operation_id = #{workOrderOperationId},last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = (case when last_update_date > #{lastUpdateDate} then #{lastUpdateDate} else #{createDate} end) where pes_work_order_operation_id = #{pesWorkOrderOperationId} and pes_work_order_id = #{pesWorkOrderId};
+        update pes_wie_work_order_operation_resource_erp set work_order_operation_id = #{workOrderOperationId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_operation_id = #{pesWorkOrderOperationId} and pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <insert id="insertPesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWorkOrderOperationErp">
+        insert into pes_wie_work_submit_erp_infor_list (pes_work_order_id,pes_id,erp_id,count_number,item_number,item_description,erp_type,type,erp_flag,remark,create_by,create_date,last_update_by,last_update_date) values
+        ( #{pesWorkOrderId,jdbcType=BIGINT},#{pesWorkOrderOperationId,jdbcType=BIGINT}, #{workOrderOperationId,jdbcType=BIGINT},#{operationSequenceNumber,jdbcType=INTEGER},#{standardOperationCode,jdbcType=VARCHAR},(case when #{standardOperationCode,jdbcType=VARCHAR} = 'CK01' then '仓管员发料过程' when #{standardOperationCode,jdbcType=VARCHAR} = 'CK02' then '仓库完工入库工序' when #{standardOperationCode,jdbcType=VARCHAR} = 'WX01' then '外协工序' when #{standardOperationCode,jdbcType=VARCHAR} = 'WX02' then '委外发料工序' when #{standardOperationCode,jdbcType=VARCHAR} = 'WX03' then '委外完工工序' when #{standardOperationCode,jdbcType=VARCHAR} = 'HZDY_01' then '惠州电源加工工序' when #{standardOperationCode,jdbcType=VARCHAR} = 'INTER_FEE_1' then '内部代加工工序' else null end),#{erpType,jdbcType=INTEGER},1,#{erpFlag,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <update id="updatePesWieWorkOrdersBErpByWorkOrderOperationId" parameterType="PesWieWorkOrderOperationErp">
+        update pes_wie_work_order_operation_erp set work_order_operation_id = #{workOrderOperationId},erp_submit_date = #{createDate},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_operation_id = #{pesWorkOrderOperationId} and pes_work_order_id = #{pesWorkOrderId};
+        update pes_wie_wo_operation_materials_erp set work_order_operation_id = #{workOrderOperationId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_operation_id = #{pesWorkOrderOperationId} and pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <select id="selectPesWieWorkOrderOperationErp" parameterType="Long" resultMap="PesWieWorkOrderOperationErpResult">
+        SELECT
+            wwob.pes_work_order_id,
+            wwob.work_order_type_id,
+            wwob.work_center_id,
+            wwob.organization_id,
+            osp.osp_item_id,
+            osp.supplier_id,
+            osp.supplier_site_id,
+            osp.osp_item_number,
+            osp.supplier_name,
+            isnull(osp.work_center_code,pwd.work_center_code) as work_center_code
+        FROM
+            pes_wie_work_orders_b_erp wwob
+            left join pes_wie_work_orders_ops_item_erp osp
+            on (wwob.inventory_item_id = osp.inventory_item_id
+            and wwob.organization_id = osp.organization_id
+            and wwob.work_center_id = osp.work_center_id
+            and osp.prioryty = 1)
+            LEFT JOIN pes_work_center_description_all pwd
+            ON (wwob.organization_id = pwd.organization_id
+            AND wwob.work_center_id = pwd.work_center_id)
+        where wwob.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+
+    <select id="selectPesWieWorkOrdersOperationErpListById" parameterType="Long" resultMap="PesWieWorkOrderOperationErpResult">
+        <include refid="selectPesWieWorkOrderOperationErpVo"/>
+        <where>
+            AND wwop.operation_type = 'SUPPLIER'
+            and wwop.pes_work_order_id = #{pesWorkOrderId}
+        </where>
+    </select>
+
+    <select id="selectUpdatePesWieWorkOrdersOperationErpList" resultMap="PesWieWorkOrderOperationErpResult">
+        <include refid="selectPesWieWorkOrderOperationErpVo"/>
+        where 1=1
+        and wwop.work_order_id > 0
+        and wwop.last_update_date > wwop.create_date
+        and wwop.last_update_date > wwop.erp_submit_date
+        and wwop.work_order_operation_id > 0
+    </select>
+
+    <insert id="insertResourcePesWieWorkOrderOperationErpByOperationId" parameterType="Long">
+        INSERT INTO pes_wie_work_order_operation_erp (
+        operation_sequence_number,
+        standard_operation_code,
+        operation_type,
+        operation_name,
+        work_center_id,
+        pes_work_order_id,
+        create_date,
+        create_by,
+        last_update_date,
+        last_update_by,
+        work_order_id,
+        erp_submit_date,
+        osp_item_id,
+        supplier_id,
+        supplier_site_id,
+        osp_item_number,
+        supplier_name,
+        work_order_operation_id)
+        (SELECT
+        #{operationSequenceNumber},
+        #{standardOperationCode},
+        #{operationType},
+        #{operationName},
+        #{workCenterId},
+        #{pesWorkOrderId},
+        #{createDate},
+        #{createBy},
+        #{createDate},
+        #{createBy},
+        0,
+        #{createDate},
+        #{ospItemId},
+        #{supplierId},
+        #{supplierSiteId},
+        #{ospItemNumber},
+        #{supplierName},
+        0)
+    </insert>
+
+
+</mapper>

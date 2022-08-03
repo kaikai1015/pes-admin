@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncInvSecondaryInventoriesMapper">
+
+    <resultMap type="SyncInvSecondaryInventoriesEO" id="SyncInvSecondaryInventoriesEOResult">
+        <result property="secondaryInventoryName"    column="SECONDARY_INVENTORY_NAME"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="description"    column="DESCRIPTION"    />
+        <result property="disableDate"    column="DISABLE_DATE"    />
+        <result property="inventoryAtpCode"    column="INVENTORY_ATP_CODE"    />
+        <result property="availabilityType"    column="AVAILABILITY_TYPE"    />
+        <result property="reservableType"    column="RESERVABLE_TYPE"    />
+        <result property="locatorType"    column="LOCATOR_TYPE"    />
+        <result property="pickingOrder"    column="PICKING_ORDER"    />
+        <result property="quantityTracked"    column="QUANTITY_TRACKED"    />
+        <result property="subinventoryId"    column="SUBINVENTORY_ID"    />
+        <result property="assetInventory"    column="ASSET_INVENTORY"    />
+        <result property="fillKillToLookup"    column="FILL_KILL_TO_LOOKUP"    />
+        <result property="locationId"    column="LOCATION_ID"    />
+        <result property="pickUomCode"    column="PICK_UOM_CODE"    />
+        <result property="depreciableFlag"    column="DEPRECIABLE_FLAG"    />
+        <result property="statusId"    column="STATUS_ID"    />
+        <result property="subinventoryType"    column="SUBINVENTORY_TYPE"    />
+        <result property="planningLevel"    column="PLANNING_LEVEL"    />
+        <result property="defaultCountTypeCode"    column="DEFAULT_COUNT_TYPE_CODE"    />
+        <result property="countMethod"    column="COUNT_METHOD"    />
+    </resultMap>
+
+    <sql id="selectSyncInvSecondaryInventoriesVo">
+        select SECONDARY_INVENTORY_NAME, ORGANIZATION_ID, LAST_UPDATE_DATE, LAST_UPDATED_BY, DESCRIPTION, DISABLE_DATE, INVENTORY_ATP_CODE, AVAILABILITY_TYPE, RESERVABLE_TYPE, LOCATOR_TYPE, PICKING_ORDER, QUANTITY_TRACKED, SUBINVENTORY_ID, ASSET_INVENTORY, FILL_KILL_TO_LOOKUP, LOCATION_ID, PICK_UOM_CODE, DEPRECIABLE_FLAG, STATUS_ID, SUBINVENTORY_TYPE, PLANNING_LEVEL, DEFAULT_COUNT_TYPE_CODE, COUNT_METHOD from sync_inv_secondary_inventories
+    </sql>
+
+    <select id="selectSyncInvSecondaryInventoriesList" parameterType="SyncInvSecondaryInventoriesEO" resultMap="SyncInvSecondaryInventoriesEOResult">
+        <include refid="selectSyncInvSecondaryInventoriesVo"/>
+        <where>
+            <if test="secondaryInventoryName != null  and secondaryInventoryName != ''"> and SECONDARY_INVENTORY_NAME = #{secondaryInventoryName}</if>
+            <if test="organizationId != null "> and ORGANIZATION_ID = #{organizationId}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncInvSecondaryInventoriesEO">
+        delete from sync_inv_secondary_inventories where
+        <foreach collection="list" item="item" index="index" separator="or">
+            ( SECONDARY_INVENTORY_NAME=#{item.secondaryInventoryName,jdbcType=VARCHAR}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT} )
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncInvSecondaryInventoriesEO">
+        insert into sync_inv_secondary_inventories( SECONDARY_INVENTORY_NAME, ORGANIZATION_ID, LAST_UPDATE_DATE, LAST_UPDATED_BY, DESCRIPTION, DISABLE_DATE, INVENTORY_ATP_CODE, AVAILABILITY_TYPE, RESERVABLE_TYPE, LOCATOR_TYPE, PICKING_ORDER, QUANTITY_TRACKED, SUBINVENTORY_ID, ASSET_INVENTORY, FILL_KILL_TO_LOOKUP, LOCATION_ID, PICK_UOM_CODE, DEPRECIABLE_FLAG, STATUS_ID, SUBINVENTORY_TYPE, PLANNING_LEVEL, DEFAULT_COUNT_TYPE_CODE, COUNT_METHOD) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.secondaryInventoryName,jdbcType=VARCHAR}, #{item.organizationId,jdbcType=BIGINT}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.disableDate,jdbcType=TIMESTAMP}, #{item.inventoryAtpCode,jdbcType=INTEGER}, #{item.availabilityType,jdbcType=INTEGER}, #{item.reservableType,jdbcType=INTEGER}, #{item.locatorType,jdbcType=VARCHAR}, #{item.pickingOrder,jdbcType=DECIMAL}, #{item.quantityTracked,jdbcType=INTEGER}, #{item.subinventoryId,jdbcType=BIGINT}, #{item.assetInventory,jdbcType=INTEGER}, #{item.fillKillToLookup,jdbcType=VARCHAR}, #{item.locationId,jdbcType=BIGINT}, #{item.pickUomCode,jdbcType=VARCHAR}, #{item.depreciableFlag,jdbcType=INTEGER}, #{item.statusId,jdbcType=BIGINT}, #{item.subinventoryType,jdbcType=VARCHAR}, #{item.planningLevel,jdbcType=INTEGER}, #{item.defaultCountTypeCode,jdbcType=VARCHAR}, #{item.countMethod,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

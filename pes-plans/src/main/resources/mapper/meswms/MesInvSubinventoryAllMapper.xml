@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.meswms.mapper.MesInvSubinventoryAllMapper">
+
+    <resultMap type="MesInvSubinventoryAll" id="MesInvSubinventoryAllResult">
+                    <result property="id"    column="id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="subinventoryCode"    column="subinventory_code"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+            </resultMap>
+
+    <sql id="selectMesInvSubinventoryAllVo">
+        select id,inventory_item_id, organization_id, item_number, subinventory_code, create_date, create_by, last_update_date, last_update_by from mes_inv_onhand_subinventory_all
+    </sql>
+
+    <select id="selectMesInvSubinventoryAllList" parameterType="MesInvSubinventoryAll" resultMap="MesInvSubinventoryAllResult">
+        <include refid="selectMesInvSubinventoryAllVo"/>
+        <where>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number like ('%' + #{itemNumber} + '%')</if>
+            <if test="subinventoryCode != null  and subinventoryCode != ''"> and subinventory_code = #{subinventoryCode}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectMesInvSubinventoryAllById" parameterType="Long" resultMap="MesInvSubinventoryAllResult">
+        <include refid="selectMesInvSubinventoryAllVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMesInvSubinventoryAll" parameterType="MesInvSubinventoryAll">
+        insert into mes_inv_onhand_subinventory_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="itemNumber != null and itemNumber != ''">item_number,</if>
+            <if test="subinventoryCode != null and subinventoryCode != ''">subinventory_code,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+           last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="itemNumber != null and itemNumber != ''">#{itemNumber},</if>
+            <if test="subinventoryCode != null and subinventoryCode != ''">#{subinventoryCode},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMesInvSubinventoryAll" parameterType="MesInvSubinventoryAll">
+        update mes_inv_onhand_subinventory_all
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="subinventoryCode != null and subinventoryCode != ''">subinventory_code = #{subinventoryCode},</if>
+            last_update_date = getdate(),
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <select id="checkUnique" parameterType="MesInvSubinventoryAll" resultType="int">
+        select count(1) from mes_inv_onhand_subinventory_all where organization_id = #{organizationId} and item_number = #{itemNumber}
+    </select>
+
+    <select id="getItemNumberId" parameterType="MesInvSubinventoryAll" resultMap="MesInvSubinventoryAllResult">
+        select inventory_item_id from sync_items_num_des_list where organization_id = #{organizationId} and item_number = #{itemNumber}
+    </select>
+
+</mapper>

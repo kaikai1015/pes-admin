@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncDooOrderDataListMapper">
+
+    <resultMap type="SyncDooOrderDataListEO" id="SyncDooOrderDataListEOResult">
+        <result property="buName"    column="bu_name"    />
+        <result property="partyName"    column="party_name"    />
+        <result property="salsesName"    column="salses_name"    />
+        <result property="agentSale"    column="agent_sale"    />
+        <result property="orderSalsesName"    column="order_salses_name"    />
+        <result property="orderSalsesNameAgent"    column="order_salses_name_agent"    />
+        <result property="createdBy"    column="created_by"    />
+        <result property="accountNumber"    column="account_number"    />
+        <result property="customerPoNumber"    column="customer_po_number"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="orderType"    column="order_type"    />
+        <result property="prodLines"    column="prod_lines"    />
+        <result property="orderChangType"    column="order_chang_type"    />
+        <result property="orderChangReason"    column="order_chang_reason"    />
+        <result property="xieYiNumber"    column="xie_yi_number"    />
+        <result property="lineNumber"    column="LINE_NUMBER"    />
+        <result property="sourceOrderNumber"    column="source_order_number"    />
+        <result property="sourceLineNumber"    column="source_line_number"    />
+        <result property="displayLineNumber"    column="DISPLAY_LINE_NUMBER"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="description"    column="DESCRIPTION"    />
+        <result property="erpCategory"    column="erp_category"    />
+        <result property="prodCategory"    column="prod_category"    />
+        <result property="orderedQty"    column="ordered_qty"    />
+        <result property="fulfilledQty"    column="FULFILLED_QTY"    />
+        <result property="transactionalCurrencyCode"    column="TRANSACTIONAL_CURRENCY_CODE"    />
+        <result property="unitListPrice"    column="UNIT_LIST_PRICE"    />
+        <result property="taxClassificationCode"    column="TAX_CLASSIFICATION_CODE"    />
+        <result property="conversionRate"    column="CONVERSION_RATE"    />
+        <result property="statusCode"    column="status_code"    />
+        <result property="orderCreationDate"    column="order_CREATION_DATE"    />
+        <result property="lineCreationDate"    column="line_CREATION_DATE"    />
+        <result property="submittedDate"    column="SUBMITTED_DATE"    />
+        <result property="newSubmittedDate"    column="new_SUBMITTED_DATE"    />
+        <result property="scheduleShipDate"    column="SCHEDULE_SHIP_DATE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="orderStatusCode"    column="order_STATUS_CODE"    />
+        <result property="taxCode"    column="tax_code"    />
+        <result property="extendedAmount"    column="EXTENDED_AMOUNT"    />
+        <result property="diffQuantity"    column="diff_quantity"    />
+        <result property="untaxUnitListPrice"    column="untax_UNIT_LIST_PRICE"    />
+        <result property="untaxExtendedAmount"    column="untax_EXTENDED_AMOUNT"    />
+        <result property="taxAmount"    column="tax_amount"    />
+        <result property="untaxDiffQuantityAmount"    column="untax_diff_quantity_amount"    />
+        <result property="untaxDiffQuantityAmountCny"    column="untax_diff_quantity_amount_cny"    />
+    </resultMap>
+
+    <sql id="selectSyncDooOrderDataListVo">
+        SELECT
+                bu_name,
+                party_name,
+                salses_name,
+                agent_sale,
+                order_salses_name,
+                order_salses_name_agent,
+                created_by,
+                account_number,
+                customer_po_number,
+                order_number,
+                order_type,
+                prod_lines,
+                order_chang_type,
+                order_chang_reason,
+                xie_yi_number,
+                LINE_NUMBER,
+                source_order_number,
+                source_line_number,
+                DISPLAY_LINE_NUMBER,
+                item_number,
+                DESCRIPTION,
+                erp_category,
+                prod_category,
+                ordered_qty,
+                TRANSACTIONAL_CURRENCY_CODE,
+                UNIT_LIST_PRICE,
+                cast((ordered_qty * UNIT_LIST_PRICE) as decimal(15,5)) as EXTENDED_AMOUNT,
+                (ordered_qty - FULFILLED_QTY) as diff_quantity,
+                TAX_CLASSIFICATION_CODE,
+                tax_code,
+                CONVERSION_RATE,
+                cast(UNIT_LIST_PRICE/(1+tax_code) as decimal(15,5)) as untax_UNIT_LIST_PRICE,
+                cast((ordered_qty * (UNIT_LIST_PRICE/(1+tax_code))) as decimal(15,5)) as untax_EXTENDED_AMOUNT,
+                cast((tax_code * (ordered_qty * (UNIT_LIST_PRICE/(1+tax_code)))) as decimal(15,5)) as tax_amount,
+                cast((ordered_qty - FULFILLED_QTY) * (UNIT_LIST_PRICE/(1+tax_code)) as decimal(15,5)) as untax_diff_quantity_amount,
+                cast((ordered_qty - FULFILLED_QTY) * (UNIT_LIST_PRICE/(1+tax_code)) * CONVERSION_RATE as decimal(15,5)) as untax_diff_quantity_amount_cny,
+                status_code,
+                order_CREATION_DATE,
+                line_CREATION_DATE,
+                SUBMITTED_DATE,
+                new_SUBMITTED_DATE,
+                SCHEDULE_SHIP_DATE,
+                LAST_UPDATE_DATE,
+                LAST_UPDATED_BY,
+                order_STATUS_CODE
+        FROM
+                sync_doo_order_data_list
+    </sql>
+
+    <select id="selectSyncDooOrderDataListList" parameterType="SyncDooOrderDataListEO" resultMap="SyncDooOrderDataListEOResult">
+        <include refid="selectSyncDooOrderDataListVo"/>
+        <where>
+            <if test="partyName != null  and partyName != ''"> and party_name like (#{partyName} + '%')</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and order_number like (#{orderNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number like (#{itemNumber} + '%')</if>
+            <if test="diffQuantity != null "> and (ordered_qty - FULFILLED_QTY) &gt; #{diffQuantity}</if>
+            <if test="params.beginOrderCreationDate != null and params.beginOrderCreationDate != '' and params.endOrderCreationDate != null and params.endOrderCreationDate != ''"> and order_CREATION_DATE between #{params.beginOrderCreationDate} and #{params.endOrderCreationDate}</if>
+            <if test="params.beginSubmittedDate != null and params.beginSubmittedDate != '' and params.endSubmittedDate != null and params.endSubmittedDate != ''"> and SUBMITTED_DATE between #{params.beginSubmittedDate} and #{params.endSubmittedDate}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncDooOrderDataListTempEO">
+        TRUNCATE TABLE sync_doo_order_data_list_temp
+    </delete>
+
+    <insert id="batchSyncDooOrderDataListTempEO">
+        insert into sync_doo_order_data_list_temp( bu_name, party_name, salses_name, agent_sale, order_salses_name, order_salses_name_agent, created_by, account_number, customer_po_number, order_number, order_type, prod_lines, order_chang_type, order_chang_reason, xie_yi_number, LINE_NUMBER, source_order_number, source_line_number, DISPLAY_LINE_NUMBER, item_number, DESCRIPTION, erp_category, prod_category, ordered_qty, FULFILLED_QTY, TRANSACTIONAL_CURRENCY_CODE, UNIT_LIST_PRICE, TAX_CLASSIFICATION_CODE, CONVERSION_RATE, status_code, order_CREATION_DATE, line_CREATION_DATE, SUBMITTED_DATE, new_SUBMITTED_DATE, SCHEDULE_SHIP_DATE, LAST_UPDATE_DATE, LAST_UPDATED_BY, order_STATUS_CODE,tax_code) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.buName,jdbcType=VARCHAR}, #{item.partyName,jdbcType=VARCHAR}, #{item.salsesName,jdbcType=VARCHAR}, #{item.agentSale,jdbcType=VARCHAR}, #{item.orderSalsesName,jdbcType=VARCHAR}, #{item.orderSalsesNameAgent,jdbcType=VARCHAR}, #{item.createdBy,jdbcType=VARCHAR}, #{item.accountNumber,jdbcType=VARCHAR}, #{item.customerPoNumber,jdbcType=VARCHAR}, #{item.orderNumber,jdbcType=VARCHAR}, #{item.orderType,jdbcType=VARCHAR}, #{item.prodLines,jdbcType=VARCHAR}, #{item.orderChangType,jdbcType=VARCHAR}, #{item.orderChangReason,jdbcType=VARCHAR}, #{item.xieYiNumber,jdbcType=VARCHAR}, #{item.lineNumber,jdbcType=INTEGER}, #{item.sourceOrderNumber,jdbcType=VARCHAR}, #{item.sourceLineNumber,jdbcType=VARCHAR}, #{item.displayLineNumber,jdbcType=VARCHAR}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.erpCategory,jdbcType=VARCHAR}, #{item.prodCategory,jdbcType=VARCHAR}, cast(#{item.orderedQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.fulfilledQty,jdbcType=DECIMAL} as decimal(15,5)), #{item.transactionalCurrencyCode,jdbcType=VARCHAR}, cast(#{item.unitListPrice,jdbcType=VARCHAR} as decimal(15,5)), #{item.taxClassificationCode,jdbcType=VARCHAR}, cast(#{item.conversionRate,jdbcType=DECIMAL} as decimal(15,5)), #{item.statusCode,jdbcType=VARCHAR}, #{item.orderCreationDate,jdbcType=TIMESTAMP}, #{item.lineCreationDate,jdbcType=TIMESTAMP}, #{item.submittedDate,jdbcType=TIMESTAMP}, #{item.newSubmittedDate,jdbcType=TIMESTAMP}, #{item.scheduleShipDate,jdbcType=TIMESTAMP}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.orderStatusCode,jdbcType=VARCHAR},cast(#{item.taxCode,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="deleteSyncDooOrderDataListEO">
+        TRUNCATE TABLE sync_doo_order_data_list;
+        INSERT INTO sync_doo_order_data_list (
+            bu_name,
+            party_name,
+            salses_name,
+            agent_sale,
+            order_salses_name,
+            order_salses_name_agent,
+            created_by,
+            account_number,
+            customer_po_number,
+            order_number,
+            order_type,
+            prod_lines,
+            order_chang_type,
+            order_chang_reason,
+            xie_yi_number,
+            LINE_NUMBER,
+            source_order_number,
+            source_line_number,
+            DISPLAY_LINE_NUMBER,
+            item_number,
+            DESCRIPTION,
+            erp_category,
+            prod_category,
+            ordered_qty,
+            FULFILLED_QTY,
+            TRANSACTIONAL_CURRENCY_CODE,
+            UNIT_LIST_PRICE,
+            TAX_CLASSIFICATION_CODE,
+            CONVERSION_RATE,
+            status_code,
+            order_CREATION_DATE,
+            line_CREATION_DATE,
+            SUBMITTED_DATE,
+            new_SUBMITTED_DATE,
+            SCHEDULE_SHIP_DATE,
+            LAST_UPDATE_DATE,
+            LAST_UPDATED_BY,
+            order_STATUS_CODE,
+            tax_code
+        ) SELECT
+            bu_name,
+            party_name,
+            salses_name,
+            agent_sale,
+            order_salses_name,
+            order_salses_name_agent,
+            created_by,
+            account_number,
+            customer_po_number,
+            order_number,
+            order_type,
+            prod_lines,
+            order_chang_type,
+            order_chang_reason,
+            xie_yi_number,
+            LINE_NUMBER,
+            source_order_number,
+            source_line_number,
+            DISPLAY_LINE_NUMBER,
+            item_number,
+            DESCRIPTION,
+            erp_category,
+            prod_category,
+            ordered_qty,
+            FULFILLED_QTY,
+            TRANSACTIONAL_CURRENCY_CODE,
+            UNIT_LIST_PRICE,
+            TAX_CLASSIFICATION_CODE,
+            CONVERSION_RATE,
+            status_code,
+            order_CREATION_DATE,
+            line_CREATION_DATE,
+            SUBMITTED_DATE,
+            new_SUBMITTED_DATE,
+            SCHEDULE_SHIP_DATE,
+            LAST_UPDATE_DATE,
+            LAST_UPDATED_BY,
+            order_STATUS_CODE,
+            tax_code
+        FROM
+        sync_doo_order_data_list_temp
+    </delete>
+
+</mapper>

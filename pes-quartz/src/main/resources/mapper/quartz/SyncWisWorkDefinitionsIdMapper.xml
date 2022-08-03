@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWisWorkDefinitionsIdMapper">
+
+    <resultMap type="SyncWisWorkDefinitionsIdEO" id="SyncWisWorkDefinitionsIdEOResult">
+    </resultMap>
+
+    <delete id="deleteSyncWisWorkDefinitionsIdTempEO">
+        truncate table sync_wis_work_definitions_id_temp;
+    </delete>
+
+    <insert id="batchSyncWisWorkDefinitionsIdTempEO">
+        insert into sync_wis_work_definitions_id_temp(WORK_DEFINITION_ID) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workDefinitionId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <delete id="batchSyncWisWorkDefinitionsIdEO">
+        TRUNCATE TABLE sync_wis_work_definitions_id;
+        INSERT INTO sync_wis_work_definitions_id (
+        WORK_DEFINITION_ID
+        ) SELECT
+        WORK_DEFINITION_ID
+        FROM
+        sync_wis_work_definitions_id_temp
+    </delete>
+
+</mapper>

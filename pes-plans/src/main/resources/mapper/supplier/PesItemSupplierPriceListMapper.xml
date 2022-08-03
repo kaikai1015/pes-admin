@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.supplier.mapper.PesItemSupplierPriceListMapper">
+
+    <resultMap type="PesItemSupplierPriceList" id="PesItemSupplierPriceListResult">
+                    <result property="sourcingItemId"    column="sourcing_item_id"    />
+                    <result property="currencyCode"    column="currency_code"    />
+                    <result property="approvalStatus"    column="approval_status"    />
+                    <result property="taxCode"    column="tax_code"    />
+                    <result property="statusFlag"    column="status_flag"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="itemPriceId"    column="item_price_id"    />
+            </resultMap>
+
+    <sql id="selectPesItemSupplierPriceListVo">
+        select sourcing_item_id, currency_code, approval_status, tax_code, status_flag, create_by, create_date, last_update_by, last_update_date, item_price_id from pes_item_supplier_price_list
+    </sql>
+
+    <select id="selectPesItemSupplierPriceListList" parameterType="Long" resultMap="PesItemSupplierPriceListResult">
+        <include refid="selectPesItemSupplierPriceListVo"/>
+        <where>
+            and status_flag = '0'
+            <if test="sourcingItemId != null "> and sourcing_item_id = #{sourcingItemId}</if>
+        </where>
+    </select>
+
+    <insert id="insertPesItemSupplierPriceList" parameterType="PesItemSupplierPriceList">
+        insert into pes_item_supplier_price_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sourcingItemId != null">sourcing_item_id,</if>
+            <if test="currencyCode != null">currency_code,</if>
+            <if test="taxCode != null">tax_code,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sourcingItemId != null">#{sourcingItemId},</if>
+            <if test="currencyCode != null">#{currencyCode},</if>
+            <if test="taxCode != null">#{taxCode},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <select id="checkItemPriceListUnique" parameterType="PesItemSupplierPriceList" resultType="int">
+        select count(1) from pes_item_supplier_price_list where sourcing_item_id = #{sourcingItemId} and currency_code = #{currencyCode} and tax_code = #{taxCode} and status_flag = '0'
+    </select>
+
+    <delete id="deletePesItemSupplierPriceListByIds" parameterType="String">
+        <foreach item="itemPriceId" collection="array" separator=";">
+            UPDATE pes_item_supplier_price_list set status_flag = '1' where item_price_id = #{itemPriceId};
+            delete from pes_item_quantity_price_list where item_price_id = #{itemPriceId}
+        </foreach>
+    </delete>
+
+</mapper>

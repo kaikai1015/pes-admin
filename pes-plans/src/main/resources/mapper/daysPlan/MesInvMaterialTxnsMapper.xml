@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.MesInvMaterialTxnsMapper">
+
+    <resultMap type="MesInvMaterialTxns" id="MesInvMaterialTxnsResult">
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdatedBy"    column="last_updated_by"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="subinventoryCode"    column="subinventory_code"    />
+                    <result property="transactionType"    column="transaction_type"    />
+                    <result property="transactionSourceCategory"    column="transaction_source_category"    />
+                    <result property="transactionSourceType"    column="transaction_source_type"    />
+                    <result property="transactionSourceCode"    column="transaction_source_code"    />
+                    <result property="transactionSourceName"    column="transaction_source_name"    />
+                    <result property="transactionQuantity"    column="transaction_quantity"    />
+                    <result property="primaryQuantity"    column="primary_quantity"    />
+                    <result property="transactionDate"    column="transaction_date"    />
+                    <result property="transactionSourceReferenceId"    column="transaction_source_reference_id"    />
+                    <result property="transactionSourceId"    column="transaction_source_id"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="checkResult"    column="check_result"    />
+                    <result property="mesTransferId"    column="mes_transfer_id"    />
+                    <result property="state"    column="state"    />
+            </resultMap>
+
+    <sql id="selectMesInvMaterialTxnsVo">
+        select  last_update_date, last_updated_by, inventory_item_id, organization_id, subinventory_code, transaction_type, transaction_source_category, transaction_source_type, transaction_source_code, transaction_source_name, transaction_quantity, primary_quantity, transaction_date, transaction_source_reference_id, transaction_source_id, create_by, create_date, check_result, mes_transfer_id, state from mes_inv_material_txns
+    </sql>
+
+    <select id="selectMesInvMaterialTxnsList" parameterType="MesInvMaterialTxns" resultMap="MesInvMaterialTxnsResult">
+        <include refid="selectMesInvMaterialTxnsVo"/>
+        <where>
+        <if test="lastUpdateDate != null "> and last_update_date = #{lastUpdateDate}</if>
+                <if test="lastUpdatedBy != null  and lastUpdatedBy != ''"> and last_updated_by = #{lastUpdatedBy}</if>
+                <if test="inventoryItemId != null "> and inventory_item_id = #{inventoryItemId}</if>
+                <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+                <if test="subinventoryCode != null  and subinventoryCode != ''"> and subinventory_code = #{subinventoryCode}</if>
+                <if test="transactionType != null  and transactionType != ''"> and transaction_type = #{transactionType}</if>
+                <if test="transactionSourceCategory != null  and transactionSourceCategory != ''"> and transaction_source_category = #{transactionSourceCategory}</if>
+                <if test="transactionSourceType != null  and transactionSourceType != ''"> and transaction_source_type = #{transactionSourceType}</if>
+                <if test="transactionSourceCode != null  and transactionSourceCode != ''"> and transaction_source_code = #{transactionSourceCode}</if>
+                <if test="transactionSourceName != null  and transactionSourceName != ''"> and transaction_source_name like ('%' + #{transactionSourceName} + '%')</if>
+                <if test="transactionQuantity != null "> and transaction_quantity = #{transactionQuantity}</if>
+                <if test="primaryQuantity != null "> and primary_quantity = #{primaryQuantity}</if>
+                <if test="transactionDate != null "> and transaction_date = #{transactionDate}</if>
+                <if test="transactionSourceReferenceId != null "> and transaction_source_reference_id = #{transactionSourceReferenceId}</if>
+                <if test="transactionSourceId != null "> and transaction_source_id = #{transactionSourceId}</if>
+                <if test="createDate != null "> and create_date = #{createDate}</if>
+                <if test="checkResult != null  and checkResult != ''"> and check_result = #{checkResult}</if>
+                <if test="mesTransferId != null "> and mes_transfer_id = #{mesTransferId}</if>
+                <if test="state != null  and state != ''"> and state = #{state}</if>
+        </where>
+    </select>
+    <select id="getSynData" resultMap="MesInvMaterialTxnsResult">
+        <include refid="selectMesInvMaterialTxnsVo"/>
+        <where>
+        1=1
+         and (state = '0' or state = '3')
+         and  transaction_type = 'IN'
+        </where>
+    </select>
+
+    <select id="selectMesInvMaterialTxnsById" parameterType="Long" resultMap="MesInvMaterialTxnsResult">
+        <include refid="selectMesInvMaterialTxnsVo"/>
+        where mes_transfer_id = #{mesTransferId}
+    </select>
+
+    <insert id="insertSynData" parameterType="MesInvMaterialTxns">
+
+            insert into
+            pes_inv_material_txns
+            (
+            last_update_date,
+            last_updated_by,
+            inventory_item_id,
+            organization_id,
+            subinventory_code,
+            transaction_type,
+            transaction_source_category,
+            transaction_source_type,
+            transaction_source_code,
+            transaction_source_name,
+            transaction_quantity,
+            primary_quantity,
+            transaction_date,
+            transaction_source_reference_id,
+            transaction_source_id,
+            create_by,
+            create_date,
+            check_result,
+            mes_transfer_id
+            )
+            SELECT
+            mimt.last_update_date,
+            mimt.last_updated_by,
+            mimt.inventory_item_id,
+            mimt.organization_id,
+            mimt.subinventory_code,
+            mimt.transaction_type,
+            mimt.transaction_source_category,
+            mimt.transaction_source_type,
+            mimt.transaction_source_code,
+            mimt.transaction_source_name,
+            mimt.transaction_quantity,
+            mimt.primary_quantity,
+            mimt.transaction_date,
+            mimt.transaction_source_reference_id,
+            mimt.transaction_source_id,
+            mimt.create_by,
+            mimt.create_date,
+            mimt.check_result,
+            mimt.mes_transfer_id
+            FROM
+            dbo.mes_inv_material_txns AS mimt
+            where mimt.mes_transfer_id in
+            <foreach item="mesTransferId"   collection="ids" open="(" separator="," close=")">
+                #{mesTransferId}
+            </foreach>
+
+    </insert>
+    <insert id="insertMesInvMaterialTxns" parameterType="MesInvMaterialTxns">
+        insert into mes_inv_material_txns
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lastUpdateDate != null">last_update_date,</if>
+            <if test="lastUpdatedBy != null">last_updated_by,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="subinventoryCode != null">subinventory_code,</if>
+            <if test="transactionType != null">transaction_type,</if>
+            <if test="transactionSourceCategory != null">transaction_source_category,</if>
+            <if test="transactionSourceType != null">transaction_source_type,</if>
+            <if test="transactionSourceCode != null">transaction_source_code,</if>
+            <if test="transactionSourceName != null">transaction_source_name,</if>
+            <if test="transactionQuantity != null">transaction_quantity,</if>
+            <if test="primaryQuantity != null">primary_quantity,</if>
+            <if test="transactionDate != null">transaction_date,</if>
+            <if test="transactionSourceReferenceId != null">transaction_source_reference_id,</if>
+            <if test="transactionSourceId != null">transaction_source_id,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="checkResult != null">check_result,</if>
+            <if test="mesTransferId != null">mes_transfer_id,</if>
+            <if test="state != null">state,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lastUpdateDate != null">#{lastUpdateDate},</if>
+            <if test="lastUpdatedBy != null">#{lastUpdatedBy},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="subinventoryCode != null">#{subinventoryCode},</if>
+            <if test="transactionType != null">#{transactionType},</if>
+            <if test="transactionSourceCategory != null">#{transactionSourceCategory},</if>
+            <if test="transactionSourceType != null">#{transactionSourceType},</if>
+            <if test="transactionSourceCode != null">#{transactionSourceCode},</if>
+            <if test="transactionSourceName != null">#{transactionSourceName},</if>
+            <if test="transactionQuantity != null">#{transactionQuantity},</if>
+            <if test="primaryQuantity != null">#{primaryQuantity},</if>
+            <if test="transactionDate != null">#{transactionDate},</if>
+            <if test="transactionSourceReferenceId != null">#{transactionSourceReferenceId},</if>
+            <if test="transactionSourceId != null">#{transactionSourceId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="checkResult != null">#{checkResult},</if>
+            <if test="mesTransferId != null">#{mesTransferId},</if>
+            <if test="state != null">#{state},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStates">
+        update mes_inv_material_txns
+        set state = #{state}
+        where
+        mes_transfer_id in
+        <foreach item="mesTransferId"   collection="ids" open="(" separator="," close=")">
+            #{mesTransferId}
+        </foreach>
+
+    </update>
+    <update id="updateMesInvMaterialTxns" parameterType="MesInvMaterialTxns">
+        update mes_inv_material_txns
+        <trim prefix="SET" suffixOverrides=",">
+                <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+                <if test="lastUpdatedBy != null">last_updated_by = #{lastUpdatedBy},</if>
+                <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+                <if test="organizationId != null">organization_id = #{organizationId},</if>
+                <if test="subinventoryCode != null">subinventory_code = #{subinventoryCode},</if>
+                <if test="transactionType != null">transaction_type = #{transactionType},</if>
+                <if test="transactionSourceCategory != null">transaction_source_category = #{transactionSourceCategory},</if>
+                <if test="transactionSourceType != null">transaction_source_type = #{transactionSourceType},</if>
+                <if test="transactionSourceCode != null">transaction_source_code = #{transactionSourceCode},</if>
+                <if test="transactionSourceName != null">transaction_source_name = #{transactionSourceName},</if>
+                <if test="transactionQuantity != null">transaction_quantity = #{transactionQuantity},</if>
+                <if test="primaryQuantity != null">primary_quantity = #{primaryQuantity},</if>
+                <if test="transactionDate != null">transaction_date = #{transactionDate},</if>
+                <if test="transactionSourceReferenceId != null">transaction_source_reference_id = #{transactionSourceReferenceId},</if>
+                <if test="transactionSourceId != null">transaction_source_id = #{transactionSourceId},</if>
+                <if test="createBy != null">create_by = #{createBy},</if>
+                <if test="createDate != null">create_date = #{createDate},</if>
+                <if test="checkResult != null">check_result = #{checkResult},</if>
+                <if test="mesTransferId != null">mes_transfer_id = #{mesTransferId},</if>
+                <if test="state != null">state = #{state},</if>
+        </trim>
+        where mes_transfer_id = #{mesTransferId}
+    </update>
+
+    <delete id="deleteMesInvMaterialTxnsById" parameterType="Long">
+        delete from mes_inv_material_txns where mes_transfer_id = #{mesTransferId}
+    </delete>
+
+    <delete id="deleteMesInvMaterialTxnsByIds" parameterType="String">
+        delete from mes_inv_material_txns where mes_transfer_id in
+        <foreach item="mesTransferId" collection="array" open="(" separator="," close=")">
+            #{mesTransferId}
+        </foreach>
+    </delete>
+
+
+
+</mapper>

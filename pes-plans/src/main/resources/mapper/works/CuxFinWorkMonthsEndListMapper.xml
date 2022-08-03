@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.CuxFinWorkMonthsEndListMapper">
+
+    <resultMap type="CuxFinWorkMonthsEndList" id="CuxFinWorkMonthsEndListResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="erpFlag"    column="erp_flag"    />
+                    <result property="erpUpdateDate"    column="erp_update_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="id"    column="id"    />
+                    <result property="monthsFlag"    column="months_flag"    />
+        <result property="monthsFlagStstus"    column="months_flag_ststus"    />
+        <result property="remark"    column="remark"    />
+            </resultMap>
+
+    <sql id="selectCuxFinWorkMonthsEndListVo">
+        select organization_id, work_order_id, work_order_number, erp_flag, erp_update_date, create_by, create_date, lot_num, id,remark from cux_fin_work_months_end_list
+    </sql>
+
+    <select id="selectCuxFinWorkMonthsEndListList" parameterType="CuxFinWorkMonthsEndList" resultMap="CuxFinWorkMonthsEndListResult">
+        <include refid="selectCuxFinWorkMonthsEndListVo"/>
+        <where>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number = #{workOrderNumber}</if>
+            <if test="erpFlag != null  and erpFlag != ''"> and erp_flag = #{erpFlag}</if>
+            <if test="lotNum != null "> and lot_num = #{lotNum}</if>
+            <if test="erpFlag != null "> and erp_flag = #{erpFlag}</if>
+        </where>
+    </select>
+
+    <insert id="insertCuxFinWorkMonthsEndList">
+        insert into cux_fin_work_months_end_list( organization_id,work_order_id, work_order_number, create_by,last_update_by, lot_num,remark) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT},#{item.workOrderId,jdbcType=BIGINT}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR},#{item.createBy,jdbcType=VARCHAR}, #{item.lotNum,jdbcType=BIGINT},#{item.remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <select id="getWorkDatas" parameterType="CuxFinWorkMonthsEndList" resultMap="CuxFinWorkMonthsEndListResult">
+        SELECT
+        WORK_ORDER_ID,
+        ORGANIZATION_ID
+        FROM
+        sync_wie_work_orders_b
+        WHERE
+        WORK_ORDER_NUMBER = #{workOrderNumber}
+        AND ORGANIZATION_ID = (select ORGANIZATION_ID from sync_inv_org_parameters where ORGANIZATION_CODE = #{organizationcode})
+    </select>
+
+    <select id="selectCount" parameterType="CuxFinWorkMonthsEndList" resultMap="CuxFinWorkMonthsEndListResult">
+        <include refid="selectCuxFinWorkMonthsEndListVo"/>
+        <where>
+            <if test="lotNum != null  and lotNum != ''"> and lot_num = #{lotNum}</if>
+            <if test="organizationId != null  and organizationId != ''"> and organization_id = #{organizationId}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number = #{workOrderNumber}</if>
+        </where>
+    </select>
+
+
+    <select id="getMonthsFlag" parameterType="Long" resultMap="CuxFinWorkMonthsEndListResult">
+        select lot_num,months_flag,months_flag_ststus from cux_fin_work_months_end_heads where lot_num = #{lotNum}
+    </select>
+
+    <update id="updateErpFlag" parameterType="CuxFinWorkMonthsEndList">
+        update cux_fin_work_months_end_list set LAST_UPDATE_DATE = #{createDate},last_update_by = #{lastUpdateBy},erp_flag = #{erpFlag} where id = #{id};
+        update pes_wie_work_orders_b_erp set work_order_status_id = #{workOrderStatusId},remark = isnull(remark,'')+#{remark},last_update_by = #{lastUpdateBy},last_update_date = #{createDate},erp_submit_date = #{createDate} where organization_id = #{organizationId} and work_order_id = #{workOrderId} and work_order_id > 0
+    </update>
+
+    <update id="updateErpFlagFalse" parameterType="CuxFinWorkMonthsEndList">
+        update cux_fin_work_months_end_list set LAST_UPDATE_DATE = #{createDate},last_update_by = #{lastUpdateBy},erp_flag = #{erpFlag} where id = #{id}
+    </update>
+
+</mapper>

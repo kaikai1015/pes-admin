@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.procument.mapper.PesProcumentPlanHeaderListMapper">
+
+    <resultMap type="PesProcumentPlanHeaderList" id="PesProcumentPlanHeaderListResult">
+                    <result property="headerId"    column="header_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="activeCode"    column="active_code"    />
+                    <result property="approvalCode"    column="approval_code"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+            </resultMap>
+
+    <sql id="selectPesProcumentPlanHeaderListVo">
+        select header_id, organization_id, plan_lot_num, plan_type, active_code, approval_code, create_date, create_by, last_update_date, last_update_by from pes_procument_plan_header_list
+    </sql>
+
+    <select id="selectPesProcumentPlanHeaderListList" parameterType="PesProcumentPlanHeaderList" resultMap="PesProcumentPlanHeaderListResult">
+        <include refid="selectPesProcumentPlanHeaderListVo"/>
+        <where>
+                                                                                                                                <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>
+                                                                                                                                                                                                                                                            </where>
+    </select>
+
+    <select id="selectPesProcumentPlanHeaderListById" parameterType="Long" resultMap="PesProcumentPlanHeaderListResult">
+        <include refid="selectPesProcumentPlanHeaderListVo"/>
+        where plan_lot_num = #{planLotNum}
+    </select>
+
+    <insert id="insertMrpHeaderList" parameterType="PesProcumentPlanHeaderList">
+        insert into pes_procument_plan_header_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="planLotNum != null">plan_lot_num,</if>
+            <if test="planType != null">plan_type,</if>
+            <if test="activeCode != null">active_code,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="planLotNum != null">#{planLotNum},</if>
+            <if test="planType != null">#{planType},</if>
+            <if test="activeCode != null">#{activeCode},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+</mapper>

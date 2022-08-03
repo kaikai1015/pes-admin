@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncSupplyDemandListMapper">
+
+    <resultMap type="SyncSupplyDemandList" id="SyncSupplyDemandListResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="wieS"    column="WIE_S"    />
+        <result property="wieD"    column="WIE_D"    />
+        <result property="prS"    column="PR_S"    />
+        <result property="poS"    column="PO_S"    />
+        <result property="dooD"    column="DOO_D"    />
+    </resultMap>
+
+    <delete id="deleteSyncSupplyDemandListTemp">
+        truncate table pes_item_supply_demand_list_temp
+    </delete>
+
+    <insert id="batchSyncSupplyDemandListTemp">
+        insert into pes_item_supply_demand_list_temp( ORGANIZATION_ID, INVENTORY_ITEM_ID, DOCUMENT_ID,DOCUMENT_LINE_ID,TYPE, QUANTITY, DATE, DOCUMENT_NUMBER, UOM) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT},#{item.documentId,jdbcType=BIGINT},#{item.documentLineId,jdbcType=BIGINT},#{item.type,jdbcType=VARCHAR}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.date,jdbcType=TIMESTAMP}, #{item.documentNumber,jdbcType=VARCHAR}, #{item.uom,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <insert id="deleteSyncSupplyDemandList">
+        TRUNCATE TABLE pes_item_supply_demand_list;
+        INSERT INTO pes_item_supply_demand_list (
+        ORGANIZATION_ID,
+        INVENTORY_ITEM_ID,
+        DOCUMENT_ID,
+        DOCUMENT_LINE_ID,
+        TYPE,
+        QUANTITY,
+        DATE,
+        DOCUMENT_NUMBER,
+        UOM
+        ) SELECT
+        ORGANIZATION_ID,
+        INVENTORY_ITEM_ID,
+        DOCUMENT_ID,
+        DOCUMENT_LINE_ID,
+        TYPE,
+        QUANTITY,
+        DATE,
+        DOCUMENT_NUMBER,
+        UOM
+        FROM
+        pes_item_supply_demand_list_temp
+    </insert>
+
+    <insert id="batchSyncSupplyDemandHeaderList">
+        truncate table pes_item_supply_demand_header_list;
+        INSERT INTO pes_item_supply_demand_header_list
+        (
+        ORGANIZATION_ID,
+        INVENTORY_ITEM_ID
+        )
+        SELECT DISTINCT
+        ORGANIZATION_ID,
+        INVENTORY_ITEM_ID
+        FROM
+        pes_item_supply_demand_list
+    </insert>
+
+    <insert id="batchSyncSupplyDemandQuantity">
+        truncate table pes_item_supply_demand_quantity;
+        INSERT INTO pes_item_supply_demand_quantity (
+        ORGANIZATION_ID,
+        INVENTORY_ITEM_ID,
+        WIE_S,
+        WIE_D,
+        PR_S,
+        PO_S,
+        DOO_D
+        )(SELECT
+            ORGANIZATION_ID,
+            INVENTORY_ITEM_ID,
+            sum(case type when 'WIE_S' then QUANTITY else 0 end) as WIE_S,
+            sum(case type when 'WIE_D' then QUANTITY else 0 end) as WIE_D,
+            sum(case type when 'PR_S' then QUANTITY else 0 end) as PR_S,
+            sum(case type when 'PO_S' then QUANTITY else 0 end) as PO_S,
+            sum(case type when 'DOO_D' then QUANTITY else 0 end) as DOO_D
+        FROM
+            pes_item_supply_demand_list
+        group by
+            ORGANIZATION_ID,
+            INVENTORY_ITEM_ID)
+    </insert>
+
+</mapper>

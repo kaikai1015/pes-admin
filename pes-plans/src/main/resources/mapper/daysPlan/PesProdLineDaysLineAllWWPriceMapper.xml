@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdLineDaysLineAllWWPriceMapper">
+
+    <resultMap type="PesProdLineDaysLineAllWWPrice" id="PesProdLineDaysLineAllWWPriceResult">
+                <result property="xianBieFlag"    column="xian_bie_flag"    />
+                <result property="partyId"    column="party_id"    />
+                <result property="partyName"    column="party_name"    />
+                <result property="orderHeaderId"    column="order_header_id"    />
+                <result property="orderNumber"    column="order_number"    />
+                <result property="lineNumberId"    column="line_number_id"    />
+                <result property="lineNumber"    column="line_number"    />
+                <result property="inventoryItemId"    column="inventory_item_id"    />
+                <result property="itemNumber"    column="item_number"    />
+                <result property="itemDescription"    column="item_description"    />
+                <result property="organizationId"    column="organization_id"    />
+                <result property="workOrderId"    column="work_order_id"    />
+                <result property="workOrderNumber"    column="work_order_number"    />
+                <result property="planStartQuantity"    column="plan_start_quantity"    />
+                <result property="workHours"    column="work_hours"    />
+                <result property="wieWorkHours"    column="wie_work_hours"    />
+                <result property="completeDate"    column="complete_date"    />
+                <result property="planCompleteQuantity"    column="plan_complete_quantity"    />
+                <result property="isFlag"    column="is_flag"    />
+                <result property="createDate"    column="create_date"    />
+                <result property="createBy"    column="create_by"    />
+                <result property="lastUpdateDate"    column="last_update_date"    />
+                <result property="lastUpdateBy"    column="last_update_by"    />
+                <result property="remark"    column="remark"    />
+                <result property="id"    column="id"    />
+                <result property="lineId"    column="line_id"    />
+                <result property="plannedCompletionDate"    column="planned_completion_date"    />
+                <result property="completedQuantity"    column="completed_quantity"    />
+                <result property="workPlanQuantity"    column="work_plan_quantity"    />
+                <result property="xianBieFlagName"    column="xian_bie_flag_name"    />
+                <result property="lotNum"    column="lot_num"    />
+                <result property="lotNumDate"    column="lot_num_date"    />
+                <result property="customerPoNumber"    column="customer_po_number"    />
+                <result property="buId"    column="bu_id"    />
+                <result property="plannedStartDate"    column="planned_start_date"    />
+                <result property="baoZhuangQuantity"    column="bao_zhuang_quantity"    />
+                <result property="baoZhuangDate"    column="bao_zhuang_date"    />
+                <result property="laoHuaQuantity"    column="lao_hua_quantity"    />
+                <result property="laoHuaDate"    column="lao_hua_date"    />
+                <result property="testQuantity"    column="test_quantity"    />
+                <result property="testDate"    column="test_date"    />
+                <result property="zuZhuangStartQuantity"    column="zu_zhuang_start_quantity"    />
+                <result property="zuZhuangStartDate"    column="zu_zhuang_start_date"    />
+                <result property="zuZhuangCaiQuantity"    column="zu_zhuang_cai_quantity"    />
+                <result property="zuZhuangCaiDate"    column="zu_zhuang_cai_date"    />
+                <result property="zuZhuangEndQuantity"    column="zu_zhuang_end_quantity"    />
+                <result property="zuZhuangEndDate"    column="zu_zhuang_end_date"    />
+                <result property="qeductionQuantity"    column="qeduction_quantity"    />
+                <result property="qeductionDate"    column="qeduction_date"    />
+                <result property="planLotsId"    column="plan_lots_id"    />
+                <result property="isWwFlag"    column="is_ww_flag"    />
+        <result property="chanPingXian"    column="chan_ping_xian"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+            </resultMap>
+
+    <sql id="selectPesProdLineDaysLineAllPriceVo">
+        SELECT
+            ppldl.xian_bie_flag,
+            (select sdd.dict_label from sys_dict_data sdd where sdd.dict_type = 'xian_bie_flag' and sdd.dict_value = ppldl.xian_bie_flag) as xian_bie_flag_name,
+            hp.party_name,
+            ppldl.order_number,
+            ppldl.line_number,
+            ppldl.item_number,
+            ppldl.item_description,
+            ppldl.work_order_number,
+            ppldl.organization_id,
+            ppldl.plan_start_quantity,
+            ppldl.work_plan_quantity,
+            isnull(ppldl.work_hours,0) as work_hours,
+            isnull(ppldl.wie_work_hours,0) as wie_work_hours,
+            ppldl.is_flag,
+            ppldl.remark,
+            ppldl.id,
+            ppldl.line_id,
+            ppldl.planned_completion_date,
+	        ppldl.completed_quantity,
+	        ppldhl.lot_num,
+	        ppldhl.lot_num_date,
+	        ppldl.bu_id,
+	        ppldl.customer_po_number,
+	        ppldl.planned_start_date,
+	        isnull(mwwpql.zu_zhuang_start_quantity,0) as zu_zhuang_start_quantity,
+	        mwwpql.zu_zhuang_start_date,
+	        isnull(mwwpql.zu_zhuang_cai_quantity,0) as zu_zhuang_cai_quantity,
+	        mwwpql.zu_zhuang_cai_date,
+	        isnull(mwwpql.zu_zhuang_end_quantity,0) as zu_zhuang_end_quantity,
+	        mwwpql.zu_zhuang_end_date,
+            isnull(mwwpql.lao_hua_quantity,0) as lao_hua_quantity,
+	        mwwpql.lao_hua_date,
+	        isnull(mwwpql.test_quantity,0) as test_quantity,
+	        mwwpql.test_date,
+	        isnull(mwwpql.bao_zhuang_quantity,0) as bao_zhuang_quantity,
+	        mwwpql.bao_zhuang_date,
+	        isnull(mwwpql.complete_quantity,0) as plan_complete_quantity,
+            mwwpql.complete_date,
+            isnull( mwwpql.qeduction_quantity, 0 ) AS qeduction_quantity,
+	        mwwpql.qeduction_date,
+	        mwwpql.plan_lots_id,
+	        ppldl.create_date,
+	        wwob.completed_quantity,
+	        wwob.work_order_status_id
+
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_prod_line_days_header_all_ww ppldhl,
+            pes_prod_line_days_line_all_ww ppldl
+            LEFT JOIN sync_doo_headers_eff_b eff
+            on (ppldl.order_header_id = eff.header_id)
+            LEFT JOIN sync_cst_costed_vu_costs_v_unit_price pitem
+            on (ppldl.organization_id = pitem.organization_id
+            and ppldl.inventory_item_id = pitem.inventory_item_id)
+            left join sync_hz_parties hp
+            on (ppldl.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION')
+--             left join mes_wie_work_processing_quantity_list mwwpql
+            left join pes_wie_work_processing mwwpql
+            on (ppldl.work_order_id = mwwpql.work_order_id
+            AND ppldl.organization_id = mwwpql.organization_id),
+            sys_dept d
+    </sql>
+
+    <select id="selectPesProdLineDaysLineAllListPrice" parameterType="PesProdLineDaysLineAllWWPrice" resultMap="PesProdLineDaysLineAllWWPriceResult">
+        <include refid="selectPesProdLineDaysLineAllPriceVo"/>
+        <where>
+            AND ppldl.id = ppldhl.id
+            and ppldhl.prod_line_flag = d.dept_id
+            and ppldl.work_order_id = wwob.work_order_id
+            and ppldl.organization_id = wwob.organization_id
+            and wwob.work_order_id > 0
+            <if test="isProcess != null and isProcess  "> and mwwpql.work_order_id is not null  and mwwpql.is_ww_flag = 'Y'</if>
+            <if test="xianBieFlag != null and xianBieFlag != ''"> and ppldl.xian_bie_flag = #{xianBieFlag}</if>
+            <if test="id != null "> and ppldl.id = #{id}</if>
+            <if test="lotNum != null "> and ppldhl.lot_num = #{lotNum}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and ppldl.order_number like (#{orderNumber} + '%')</if>
+            <if test="customerPoNumber != null  and customerPoNumber != ''"> and ppldl.customer_po_number like (#{customerPoNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and ppldl.item_number like (#{itemNumber} + '%')</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and ppldl.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and hp.party_name like ('%' + #{partyName} + '%')</if>
+            <if test="beginTime != null and beginTime != ''"> and ppldhl.lot_num_date &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and ppldhl.lot_num_date &lt;= #{endTime}</if>
+            <if test="prodLineFlag != null "> and ppldhl.prod_line_flag = #{prodLineFlag}</if>
+            <if test="chanPingXian != null and chanPingXian != ''"> and isnull(eff.chan_ping_xian,0) = #{chanPingXian}</if>
+            ${params.dataScope}
+        </where>
+        order by ppldl.xian_bie_flag
+    </select>
+
+</mapper>

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWorkPlanHeaderListMapper">
+
+    <resultMap type="PesWorkPlanHeaderList" id="PesWorkPlanHeaderListResult">
+                    <result property="headerId"    column="header_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="activeCode"    column="active_code"    />
+                    <result property="approvalCode"    column="approval_code"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+            </resultMap>
+
+    <sql id="selectPesWorkPlanHeaderListVo">
+        SELECT
+            organization_id,
+            plan_lot_num,
+            plan_type,
+            active_code,
+            approval_code,
+            create_date,
+            create_by
+        FROM
+            pes_work_plan_header_list
+    </sql>
+
+    <select id="selectPesWorkPlanHeaderListList" parameterType="PesWorkPlanHeaderList" resultMap="PesWorkPlanHeaderListResult">
+        <include refid="selectPesWorkPlanHeaderListVo"/>
+        <where>
+            <if test="planLotNum != null  and planLotNum != ''"> and plan_lot_num = #{planLotNum}</if>
+        </where>
+        ORDER BY header_id DESC
+    </select>
+
+    <select id="workPlanHeader" parameterType="Long" resultMap="PesWorkPlanHeaderListResult">
+        SELECT
+            organization_id,
+            plan_lot_num,
+            plan_type,
+            active_code
+        FROM
+            pes_wie_plan_header_list
+        WHERE
+            plan_lot_num = #{planLotNum}
+    </select>
+
+    <insert id="insertPesWorkPlanHeaderList" parameterType="PesWorkPlanHeaderList">
+        insert into pes_work_plan_header_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="planLotNum != null">plan_lot_num,</if>
+            <if test="planType != null">plan_type,</if>
+            <if test="activeCode != null">active_code,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="planLotNum != null">#{planLotNum},</if>
+            <if test="planType != null">#{planType},</if>
+            <if test="activeCode != null">#{activeCode},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertPesWorkPlanLineList" parameterType="PesWorkPlanHeaderList">
+        INSERT INTO pes_work_plan_line_list (
+        organization_id,
+        line_num,
+        level,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        uom,
+        plan_wie_quantity,
+        plan_start_date,
+        plan_end_date,
+        gross_quantity,
+        gross_date,
+        level_tree_code,
+        parent_level_tree_code,
+        plan_lot_num,
+        DOCUMENT_NUMBER,
+        DOCUMENT_LINE_NUM,
+	    CUST_PO_NUMBER,
+	    customer_name,
+        create_date,
+        create_by,
+        last_update_date,
+        last_update_by,
+        prod_line)
+        (SELECT
+        organization_id,
+        line_num,
+        level,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        uom,
+        plan_wie_quantity,
+        plan_start_date,
+        DATEADD(DAY ,- 1, plan_date) AS plan_end_date,
+        gross_quantity,
+        gross_date,
+        level_tree_code,
+        parent_level_tree_code,
+        plan_lot_num,
+        plan_lot_num,
+        plan_lot_line_num,
+        plan_item_number,
+        plan_item_number,
+        getdate(),
+        #{createBy},
+        getdate(),
+        #{createBy},
+        prod_line
+        FROM
+        pes_wie_plan_line_list
+        WHERE
+        plan_lot_num = #{planLotNum}
+        AND plan_wie_quantity &gt; 0
+        and ITEM_TYPE in ('WWBCP','BCP','P','FG'))
+    </insert>
+
+    <delete id="updateActiveCode" parameterType="Long">
+        UPDATE pes_wie_plan_header_list set active_code = 'N' WHERE plan_lot_num = #{planLotNum};
+        UPDATE pes_plan_header_list set active_code = 'N' WHERE plan_lot_num = #{planLotNum}
+    </delete>
+
+</mapper>

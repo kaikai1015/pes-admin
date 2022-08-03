@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesToPesWieWorkProcessingQuantityListMapper">
+
+    <resultMap type="MesToPesWieWorkProcessingQuantityListEO" id="MesToPesWieWorkProcessingQuantityListEOResult">
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="completeQuantity"    column="complete_quantity"    />
+        <result property="completeDate"    column="complete_date"    />
+        <result property="laoHuaQuantity"    column="lao_hua_quantity"    />
+        <result property="laoHuaDate"    column="lao_hua_date"    />
+        <result property="testQuantity"    column="test_quantity"    />
+        <result property="testDate"    column="test_date"    />
+        <result property="baoZhuangQuantity"    column="bao_zhuang_quantity"    />
+        <result property="baoZhuangDate"    column="bao_zhuang_date"    />
+        <result property="zuZhuangStartQuantity"    column="zu_zhuang_start_quantity"    />
+        <result property="zuZhuangStartDate"    column="zu_zhuang_start_date"    />
+        <result property="zuZhuangCaiQuantity"    column="zu_zhuang_cai_quantity"    />
+        <result property="zuZhuangCaiDate"    column="zu_zhuang_cai_date"    />
+        <result property="zuZhuangEndQuantity"    column="zu_zhuang_end_quantity"    />
+        <result property="zuZhuangEndDate"    column="zu_zhuang_end_date"    />
+    </resultMap>
+
+    <select id="selectMesWieWorkProcessingQuantityListList" resultMap="MesToPesWieWorkProcessingQuantityListEOResult">
+        SELECT
+        MO.workOrderId as work_order_id,
+        MO.organizationId as organization_id,
+        MO.workOrderNumber as work_order_number,
+        MO.lastUpdateDate as last_update_date,
+        SUM(IIF(L.SpecificationId = 'SPE10000027Q', ML.Qty, 0)) as complete_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE10000027Q', L.LatestActivityDate, NULL)) as complete_date,
+        SUM(IIF(L.SpecificationId = 'SPE10000027S', ML.Qty, 0)) as lao_hua_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE10000027S', L.LatestActivityDate, NULL)) as lao_hua_date,
+        SUM(IIF(L.SpecificationId = 'SPE100000282', ML.Qty, 0)) as test_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE100000282', L.LatestActivityDate, NULL)) as test_date,
+        SUM(IIF(L.SpecificationId = 'SPE100000286', ML.Qty, 0)) as bao_zhuang_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE100000286', L.LatestActivityDate, NULL)) as bao_zhuang_date,
+        SUM(IIF(L.SpecificationId = 'SPE100000281', ML.Qty, 0)) as zu_zhuang_start_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE100000281', L.LatestActivityDate, NULL)) as zu_zhuang_start_date,
+        SUM(IIF(L.SpecificationId = 'SPE10000027R', ML.Qty, 0)) as zu_zhuang_cai_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE10000027R', L.LatestActivityDate, NULL)) as zu_zhuang_cai_date,
+        SUM(IIF(L.SpecificationId = 'SPE100000280', ML.Qty, 0)) as zu_zhuang_end_quantity,
+        MAX(IIF(L.SpecificationId = 'SPE100000280', L.LatestActivityDate, NULL)) as zu_zhuang_end_date
+        FROM dbo.MO AS MO with(nolock)
+        LEFT JOIN dbo.Lot AS L with(nolock)
+        ON L.MOId = MO.MOId
+        LEFT JOIN dbo.MOItemLot AS ML with(nolock)
+        ON ML.LotId = L.LotId
+        WHERE MO.MOStates = '10004'
+        AND ISNULL(ML.DeleteFlag, '') &lt;&gt; 'X'
+        GROUP BY
+        MO.workOrderId,
+        MO.organizationId,
+        MO.workOrderNumber,
+        MO.lastUpdateDate
+        HAVING MO.workOrderId IS NOT NULL
+    </select>
+
+
+    <delete id="deleteMesWieWorkProcessingQuantityListTemp">
+        TRUNCATE TABLE mes_wie_work_processing_quantity_list
+    </delete>
+
+    <insert id="insertMesWieWorkProcessingQuantityListTemp">
+        insert into mes_wie_work_processing_quantity_list( work_order_id, organization_id, work_order_number, last_update_date, complete_quantity, complete_date, lao_hua_quantity, lao_hua_date, test_quantity, test_date, bao_zhuang_quantity, bao_zhuang_date, zu_zhuang_start_quantity, zu_zhuang_start_date, zu_zhuang_cai_quantity, zu_zhuang_cai_date, zu_zhuang_end_quantity, zu_zhuang_end_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workOrderId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, cast(#{item.completeQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.completeDate,jdbcType=TIMESTAMP}, cast(#{item.laoHuaQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.laoHuaDate,jdbcType=TIMESTAMP}, cast(#{item.testQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.testDate,jdbcType=TIMESTAMP}, cast(#{item.baoZhuangQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.baoZhuangDate,jdbcType=TIMESTAMP}, cast(#{item.zuZhuangStartQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.zuZhuangStartDate,jdbcType=TIMESTAMP}, cast(#{item.zuZhuangCaiQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.zuZhuangCaiDate,jdbcType=TIMESTAMP}, cast(#{item.zuZhuangEndQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.zuZhuangEndDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <!--<delete id="deleteMesWieWorkProcessingQuantityList">-->
+        <!--TRUNCATE TABLE mes_wie_work_processing_quantity_list;-->
+        <!--INSERT INTO mes_wie_work_processing_quantity_list (-->
+            <!--work_order_id,-->
+            <!--organization_id,-->
+            <!--work_order_number,-->
+            <!--last_update_date,-->
+            <!--complete_quantity,-->
+            <!--complete_date,-->
+            <!--lao_hua_quantity,-->
+            <!--lao_hua_date,-->
+            <!--test_quantity,-->
+            <!--test_date,-->
+            <!--bao_zhuang_quantity,-->
+            <!--bao_zhuang_date,-->
+            <!--zu_zhuang_start_quantity,-->
+            <!--zu_zhuang_start_date,-->
+            <!--zu_zhuang_cai_quantity,-->
+            <!--zu_zhuang_cai_date,-->
+            <!--zu_zhuang_end_quantity,-->
+            <!--zu_zhuang_end_date-->
+        <!--) SELECT-->
+            <!--work_order_id,-->
+            <!--organization_id,-->
+            <!--work_order_number,-->
+            <!--last_update_date,-->
+            <!--complete_quantity,-->
+            <!--complete_date,-->
+            <!--lao_hua_quantity,-->
+            <!--lao_hua_date,-->
+            <!--test_quantity,-->
+            <!--test_date,-->
+            <!--bao_zhuang_quantity,-->
+            <!--bao_zhuang_date,-->
+            <!--zu_zhuang_start_quantity,-->
+            <!--zu_zhuang_start_date,-->
+            <!--zu_zhuang_cai_quantity,-->
+            <!--zu_zhuang_cai_date,-->
+            <!--zu_zhuang_end_quantity,-->
+            <!--zu_zhuang_end_date-->
+        <!--FROM-->
+            <!--mes_wie_work_processing_quantity_list_temp-->
+    <!--</delete>-->
+
+</mapper>

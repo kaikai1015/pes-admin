@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesWieWoCompleteLinesAllMapper">
+
+    <resultMap type="MesWieWoCompleteLinesAll" id="MesWieWoCompleteLinesAllResult">
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="quantityPerProduct"    column="quantity_per_product"    />
+                    <result property="erpFlag"    column="erp_flag"    />
+                    <result property="erpFlagDate"    column="erp_flag_date"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="wieLineId"    column="wie_line_id"    />
+                    <result property="uomCode"    column="uom_code"    />
+                    <result property="subinventoryCode"    column="subinventory_code"    />
+                    <result property="transactionQuantity"    column="transaction_quantity"    />
+                    <result property="errorInfor"    column="error_infor"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="workTransactionQuantity"    column="work_transaction_quantity"    />
+        <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+        <result property="chayiQuantity"    column="chayi_quantity"    />
+        <result property="transferQuantity"    column="transfer_quantity"    />
+        <result property="qichuQuantity"    column="qichu_quantity"    />
+        <result property="basisType"    column="BASIS_TYPE"    />
+        <result property="itemWorkName"    column="item_work_name"    />
+        <result property="suohaoQuantity"    column="suohao_quantity"    />
+            </resultMap>
+
+    <sql id="selectMesWieWoCompleteLinesAllVo">
+        SELECT
+            wwcla.work_order_id,
+            wwcla.work_order_number,
+            wwob.PLANNED_START_QUANTITY,
+            isnull(wwob.COMPLETED_QUANTITY,0) as COMPLETED_QUANTITY,
+            wwca.transaction_quantity as work_transaction_quantity,
+            wwcla.organization_id,
+            wwcla.item_number,
+            wwcla.inventory_item_id,
+            wwcla.quantity_per_product,
+            wwcla.erp_flag,
+            wwcla.erp_flag_date,
+            wwcla.remark,
+            wwcla.last_update_date,
+            wwcla.wie_line_id,
+            wwcla.uom_code,
+            (case when pica.item_work_name_flag = 4 then '3FCKL001' ELSE wwcla.subinventory_code end) as subinventory_code,
+            wwcla.transaction_quantity,
+            isnull(iopn.quantity,0) as onhand_quantity,
+            (case when isnull(iopn.quantity,0) &gt;= wwcla.transaction_quantity then 0 ELSE wwcla.transaction_quantity - isnull(iopn.quantity,0) end) as chayi_quantity,
+            wwcla.error_infor,
+            wwdv.REQUIRED_QUANTITY,
+            wwdv.ISSUED_QUANTITY,
+            isnull((SELECT
+                SUM (msta.QUANTITY) AS TRANSFER_QUANTITY
+            FROM
+                mes_subinventory_transfer_all msta
+            WHERE
+                msta.work_order_id IS NOT NULL
+            AND msta.ERP_FLAG = 1
+            AND msta.work_order_id = wwcla.work_order_id
+            AND msta.FROM_ORGANIZATION_ID = wwcla.organization_id
+            AND msta.INVENTORY_ITEM_ID = wwcla.INVENTORY_ITEM_ID
+            AND msta.TRANSFER_SUBINVENTORY_CODE = wwcla.subinventory_code
+            GROUP BY
+                msta.work_order_id,
+                msta.FROM_ORGANIZATION_ID,
+                msta.INVENTORY_ITEM_ID),0) as transfer_quantity,
+            isnull(qichu.transaction_quantity,0) as qichu_quantity,
+            (case when wwdv.BASIS_TYPE = '1' then '变动' when wwdv.BASIS_TYPE = '2' then '固定' ELSE null end) as BASIS_TYPE,
+            (CASE
+            WHEN pica.item_work_name_flag = 1 THEN
+                '贴片'
+            WHEN pica.item_work_name_flag = 2 THEN
+                '插件'
+            WHEN pica.item_work_name_flag = 3 THEN
+                '装配'
+            WHEN pica.item_work_name_flag = 4 THEN
+                '辅料'
+            WHEN pica.item_work_name_flag = 5 THEN
+                'SMT'
+            WHEN pica.item_work_name_flag = 6 THEN
+                'DIP'
+            ELSE
+                NULL
+            END) AS item_work_name,
+            isnull(sumWie.transaction_quantity,0) as suohao_quantity
+        FROM
+            mes_wie_wo_complete_all wwca,
+            sync_wie_work_orders_b wwob,
+            sync_wie_wo_demand_v wwdv,
+            mes_wie_wo_complete_lines_all wwcla
+            LEFT JOIN sync_inv_onhand_quantity_new_code iopn
+            ON (wwcla.organization_id = iopn.ORGANIZATION_ID
+            AND wwcla.inventory_item_id = iopn.inventory_item_id
+            AND wwcla.subinventory_code = iopn.subinventory_code)
+            LEFT JOIN pes_erp_wie_work_material_qichu_all qichu
+            ON (wwcla.work_order_id = qichu.transaction_source_id
+            AND wwcla.organization_id = qichu.organization_id
+            AND wwcla.inventory_item_id = qichu.inventory_item_id)
+            LEFT JOIN pes_item_techniques_code_all pica
+            ON (wwcla.organization_id = pica.organization_id
+            AND wwcla.inventory_item_id = pica.inventory_item_id)
+            LEFT JOIN (SELECT
+							mwma.work_order_id,
+							mwma.inventory_item_id,
+							mwma.ORGANIZATION_ID,
+							SUM (mwma.transaction_quantity) AS transaction_quantity
+						FROM
+							mes_work_material_all mwma
+						GROUP BY
+							mwma.work_order_id,
+							mwma.inventory_item_id,
+							mwma.ORGANIZATION_ID) sumWie
+					on (wwcla.ORGANIZATION_ID = sumWie.ORGANIZATION_ID
+					and wwcla.work_order_id = sumWie.work_order_id
+					and	wwcla.inventory_item_id = sumWie.inventory_item_id)
+    </sql>
+
+    <select id="selectMesWieWoCompleteLinesAllList" parameterType="MesWieWoCompleteLinesAll" resultMap="MesWieWoCompleteLinesAllResult">
+        <include refid="selectMesWieWoCompleteLinesAllVo"/>
+        <where>
+            and wwcla.work_order_id = wwdv.WORK_ORDER_ID
+            AND wwcla.organization_id = wwdv.ORGANIZATION_ID
+            AND wwcla.inventory_item_id = wwdv.inventory_item_id
+            and wwca.work_order_id = wwcla.work_order_id
+            AND wwca.organization_id = wwcla.organization_id
+            AND wwca.remark = wwcla.remark
+            and wwca.organization_id = wwob.ORGANIZATION_ID
+            and wwca.work_order_id = wwob.work_order_id
+            <if test="organizationId != null "> and wwca.organization_id = #{organizationId}</if>
+            <if test="workOrderId != null "> and wwca.work_order_id = #{workOrderId}</if>
+            <if test="remark != null  and remark != ''"> and ltrim(rtrim(wwca.remark)) = ltrim(rtrim(#{remark}))</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwcla.item_number = #{itemNumber}</if>
+            <if test="erpFlag != null  and erpFlag != ''"> and wwcla.erp_flag = #{erpFlag}</if>
+            <if test="headerErpFlag != null  and headerErpFlag != ''"> and wwca.erp_flag = #{headerErpFlag}</if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.por.mapper.CuxPorRequisitionHeaderAllMapper">
+
+    <resultMap type="CuxPorRequisitionHeaderAll" id="CuxPorRequisitionHeaderAllResult">
+                    <result property="requisitioningBuId"    column="requisitioning_bu_id"    />
+                    <result property="requisitioningNumber"    column="requisitioning_number"    />
+                    <result property="requisitioningId"    column="requisitioning_id"    />
+                    <result property="requisitioningBuyer"    column="requisitioning_buyer"    />
+                    <result property="status"    column="status"    />
+                    <result property="supplierId"    column="supplier_id"    />
+                    <result property="requisitioningDescription"    column="requisitioning_description"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="supplierNumber"    column="supplier_number"    />
+                    <result property="supplierName"    column="supplier_name"    />
+        <result property="requisitioningBuName"    column="requisitioning_bu_name"    />
+        <result property="statusCode"    column="status_code"    />
+        <result property="currencyCode"    column="currency_code"    />
+            </resultMap>
+
+    <sql id="selectCuxPorRequisitionHeaderAllVo">
+        SELECT
+            porh.requisitioning_bu_id,
+            porh.requisitioning_number,
+            porh.requisitioning_id,
+            porh.requisitioning_buyer,
+            porh.status,
+            porh.supplier_id,
+            shl.supplier_number,
+            shl.supplier_name,
+            porh.requisitioning_description,
+            porh.currency_code,
+            porh.create_by,
+            porh.create_date,
+            porh.last_update_by,
+            porh.last_update_date
+        FROM
+            cux_por_requisition_header_all porh
+        LEFT JOIN pes_supplier_header_list shl
+        ON (porh.supplier_id = shl.supplier_id)
+    </sql>
+
+    <select id="selectCuxPorRequisitionHeaderAllList" parameterType="CuxPorRequisitionHeaderAll" resultMap="CuxPorRequisitionHeaderAllResult">
+        <include refid="selectCuxPorRequisitionHeaderAllVo"/>
+        <where>
+            <if test="requisitioningNumber != null  and requisitioningNumber != ''"> and porh.requisitioning_number = #{requisitioningNumber}</if>
+            <if test="supplierName != null and supplierName != ''"> and shl.supplier_name like ('%' + #{supplierName} + '%')</if>
+        </where>
+    </select>
+
+    <select id="selectCuxPorRequisitionHeaderAllById" parameterType="Long" resultMap="CuxPorRequisitionHeaderAllResult">
+        SELECT
+            (select dict_label from sys_dict_data where dict_type = 'erp_bu_code' and dict_value = porh.requisitioning_bu_id) as requisitioning_bu_name,
+            porh.requisitioning_number,
+            porh.requisitioning_buyer,
+            (select dict_label from sys_dict_data where dict_type = 'oa_approval_code' and dict_value = porh.status) as status_code,
+            porh.status,
+            shl.supplier_number,
+            shl.supplier_name,
+            porh.requisitioning_description,
+            porh.currency_code,
+            porh.create_by,
+            porh.create_date
+        FROM
+            cux_por_requisition_header_all porh
+        LEFT JOIN pes_supplier_header_list shl
+        ON (porh.supplier_id = shl.supplier_id)
+        where porh.requisitioning_id = #{requisitioningId}
+    </select>
+
+    <insert id="insertCuxPorRequisitionHeaderAll" parameterType="CuxPorRequisitionHeaderAll">
+        insert into cux_por_requisition_header_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requisitioningBuId != null">requisitioning_bu_id,</if>
+            <if test="requisitioningNumber != null">requisitioning_number,</if>
+            <if test="requisitioningBuyer != null">requisitioning_buyer,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="requisitioningDescription != null">requisitioning_description,</if>
+            <if test="currencyCode != null and currencyCode != ''">currency_code,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requisitioningBuId != null">#{requisitioningBuId},</if>
+            <if test="requisitioningNumber != null">#{requisitioningNumber},</if>
+            <if test="requisitioningBuyer != null">#{requisitioningBuyer},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="requisitioningDescription != null">#{requisitioningDescription},</if>
+            <if test="currencyCode != null and currencyCode != ''">#{currencyCode},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCuxPorRequisitionHeaderAll" parameterType="CuxPorRequisitionHeaderAll">
+        update cux_por_requisition_header_all
+        set status = #{status},
+        last_update_by = #{lastUpdateBy},
+        last_update_date = GETDATE()
+        where requisitioning_id = #{requisitioningId}
+    </update>
+
+    <select id="getLastPorNum" resultMap="CuxPorRequisitionHeaderAllResult">
+       SELECT
+            LEFT(requisitioning_number,2) + CAST((RIGHT(requisitioning_number,9) + 1) as VARCHAR) AS requisitioning_number
+        FROM
+            cux_por_requisition_header_all
+        order by requisitioning_id desc
+        OFFSET 0 ROWS FETCH next 1 rows only
+    </select>
+
+</mapper>

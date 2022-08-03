@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxPoStrategicStockListMapper">
+
+    <resultMap type="CuxPoStrategicStockList" id="CuxPoStrategicStockListResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="newInventoryItemId"    column="new_inventory_item_id"    />
+                    <result property="newItemNumber"    column="new_item_number"    />
+                    <result property="newItemDescription"    column="new_item_description"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+                    <result property="wieLQuantity"    column="wie_l_quantity"    />
+                    <result property="soQuantity"    column="so_quantity"    />
+                    <result property="poQuantity"    column="po_quantity"    />
+                    <result property="prQuantity"    column="pr_quantity"    />
+                    <result property="parentPlanPoQuantity"    column="parent_plan_po_quantity"    />
+                    <result property="newItemNumber"    column="new_item_number"    />
+                    <result property="newItemDescription"    column="new_item_description"    />
+            </resultMap>
+
+    <sql id="selectCuxPoStrategicStockListVo">
+        SELECT
+            list.organization_id,
+            list.item_number,
+            list.item_description,
+            wsm.new_item_number,
+            wsm.new_item_description,
+            isnull(ioq.quantity, 0) AS onhand_quantity,
+            isnull(abs(isq.wie_d), 0) AS wie_l_quantity,
+            isnull(isq.pr_s, 0) AS pr_quantity,
+            isnull(isq.po_s, 0) AS po_quantity,
+            isnull(abs(isq.doo_d), 0) AS so_quantity,
+            0 AS parent_plan_po_quantity
+        FROM
+            cux_po_lead_time_list list
+        LEFT JOIN pes_item_supply_demand_quantity isq ON (
+            list.organization_id = isq.organization_id
+            AND list.inventory_item_id = isq.inventory_item_id
+        )
+        LEFT JOIN sync_inv_onhand_quantity_new ioq ON (
+            list.organization_id = ioq.organization_id
+            AND list.inventory_item_id = ioq.inventory_item_id
+        )
+        LEFT JOIN cux_work_substituted_material wsm ON (
+            list.organization_id = wsm.organization_id
+            AND list.inventory_item_id = wsm.inventory_item_id
+            AND GETDATE() BETWEEN wsm.effective_start_date
+            AND wsm.effective_end_date
+        )
+    </sql>
+
+    <select id="selectCuxPoStrategicStockListList" parameterType="CuxPoStrategicStockList" resultMap="CuxPoStrategicStockListResult">
+        <include refid="selectCuxPoStrategicStockListVo"/>
+        <where>
+            and list.stock_method = '战略备货'
+            <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.item_number like (#{itemNumber} + '%')</if>
+            <if test="newItemNumber != null  and newItemNumber != ''"> and wsm.new_item_number like (#{newItemNumber} + '%')</if>
+        </where>
+    </select>
+
+</mapper>

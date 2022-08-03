@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.CuxWorkOrdersBCheckWMapper">
+
+    <resultMap type="CuxWorkOrdersBCheckW" id="CuxWorkOrdersBCheckWResult">
+                    <result property="ckId"    column="ck_id"    />
+                    <result property="organizationCode"    column="organization_code"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="plannedStartDate"    column="planned_start_date"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="description"    column="description"    />
+                    <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+                    <result property="completedQuantity"    column="completed_quantity"    />
+                    <result property="orderNum"    column="order_num"    />
+                    <result property="prodLine"    column="prod_line"    />
+                    <result property="customerName"    column="customer_name"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="workDef"    column="work_def"    />
+                    <result property="des"    column="des"    />
+                    <result property="prop"    column="prop"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="flag"    column="flag"    />
+            </resultMap>
+
+    <sql id="selectCuxWorkOrdersBCheckWVo">
+        SELECT
+            wwob.ck_id,
+            wwob.organization_code,
+            wwob.work_order_number,
+            wwob.prod_line,
+            wwob.order_num,
+            wwob.customer_name,
+            wwob.planned_start_date,
+            wwob.item_number,
+            wwob.description,
+            wwob.planned_start_quantity,
+            wwob.completed_quantity,
+            wwob.work_def,
+            wwob.prop,
+            wwob.des,
+            wwob.lot_num,
+            wwob.flag
+        FROM
+            cux_wie_work_orders_b_check_w wwob,
+            sys_user u
+    </sql>
+
+    <select id="selectCuxWorkOrdersBCheckWList" parameterType="CuxWorkOrdersBCheckW" resultMap="CuxWorkOrdersBCheckWResult">
+        <include refid="selectCuxWorkOrdersBCheckWVo"/>
+        where wwob.create_by = u.user_name
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number = #{workOrderNumber}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwob.item_number = #{itemNumber}</if>
+            <if test="lotNum != null  and lotNum != ''"> and wwob.lot_num = #{lotNum}</if>
+            <!-- 数据范围过滤 -->
+            ${params.dataScope}
+        order by wwob.lot_num desc,wwob.ck_id asc
+    </select>
+
+    <select id="selectCount" parameterType="CuxWorkOrdersBCheckW" resultMap="CuxWorkOrdersBCheckWResult">
+        <include refid="selectCuxWorkOrdersBCheckWVo"/>
+        <where>
+            <if test="organizationCode != null  and organizationCode != ''"> and organization_code = #{organizationCode}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number = #{workOrderNumber}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+            <if test="lotNum != null  and lotNum != ''"> and lot_num = #{lotNum}</if>
+        </where>
+    </select>
+
+    <insert id="insertCuxWorkOrdersBCheckW">
+        insert into cux_wie_work_orders_b_check_w(organization_code, work_order_number, planned_start_date, item_number, description, planned_start_quantity, completed_quantity, order_num, prod_line, customer_name, work_def, des, prop, lot_num, create_by, last_update_by) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.organizationCode,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.plannedStartDate,jdbcType=TIMESTAMP}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.plannedStartQuantity,jdbcType=DECIMAL}, #{item.completedQuantity,jdbcType=DECIMAL}, #{item.orderNum,jdbcType=VARCHAR}, #{item.prodLine,jdbcType=VARCHAR}, #{item.customerName,jdbcType=VARCHAR}, #{item.workDef,jdbcType=VARCHAR}, #{item.des,jdbcType=VARCHAR}, #{item.prop,jdbcType=VARCHAR}, #{item.lotNum,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR},#{item.createBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

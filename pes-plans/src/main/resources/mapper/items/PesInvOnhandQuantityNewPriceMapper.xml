@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesInvOnhandQuantityNewPriceMapper">
+
+    <resultMap type="PesInvOnhandQuantityNewPrice" id="PesInvOnhandQuantityNewPriceResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="maxTransactionDate"    column="max_transaction_date"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="subQuantity"    column="sub_quantity"    />
+        <result property="subinventoryDescription"    column="subinventory_description"    />
+        <result property="avaliableQuantity"    column="avaliable_quantity"    />
+        <result property="sumUnitCost"    column="sum_unit_cost"    />
+        <result property="snapshotDate"    column="snapshot_date"    />
+        <result property="productCatalog"    column="Product_Catalog"    />
+        <result property="itemCatalog"    column="Item_Catalog"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="dateDiffDays"    column="date_diff_days"    />
+        <result property="inboundQuantity"    column="inbound_quantity"    />
+        <result property="receiveQuantity"    column="receive_quantity"    />
+        <result property="monthDiffDays"    column="month_diff_days"    />
+        <result property="sumUnitCostAmount"    column="sum_unit_cost_amount"    />
+        <result property="minTransactionDate"    column="min_transaction_date"    />
+    </resultMap>
+
+    <sql id="selectSyncInvOnhandQuantityNewVo">
+        SELECT
+            list.ITEM_NUMBER,
+            list.description as ITEM_DESCRIPTION,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+            and eic.inventory_item_id = list.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+            and eic.inventory_item_id = list.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog,
+            ioqn.organization_id,
+            ioqn.inventory_item_id,
+            ioqn.sum_onhand_quantity as quantity,
+            (SELECT
+            isnull(SUM (newcode.quantity),0)
+            FROM
+            sync_inv_onhand_quantity_new_code newcode
+            WHERE
+            ioqn.inventory_item_id = newcode.INVENTORY_ITEM_ID
+            AND ioqn.organization_id = newcode.organization_id
+            and newcode.subinventory_code &lt;&gt; 'XBC'
+            and newcode.subinventory_code &lt;&gt; 'DLC'
+            AND newcode.subinventory_code NOT LIKE '3%'
+            and newcode.status_id = 1) as avaliable_quantity,
+            list.BUYER_NAME,
+            ioqn.max_transaction_date,
+            ioqn.min_transaction_date,
+            datediff(day,ioqn.min_transaction_date,GETDATE()) as date_diff_days,
+            isnull(spirq.RECEIVE_QUANTITY,0) as RECEIVE_QUANTITY,
+            isnull(spirq.inbound_quantity,0) as inbound_quantity,
+            datediff(DAY,ioqn.min_transaction_date,GETDATE())/30 as month_diff_days,
+            isnull(price.sum_unit_cost,0) as sum_unit_cost,
+            price.snapshot_date,
+            isnull(price.sum_unit_cost,0) * ioqn.sum_onhand_quantity as sum_unit_cost_amount,
+            null as subinventory_code
+        FROM
+            sync_egp_system_items_b_w list,
+            sync_inv_onhand_quantity_new_code_v ioqn
+            LEFT JOIN sync_po_inbound_rcv_qty spirq
+            on (ioqn.organization_id = spirq.SHIP_TO_ORGANIZATION_ID
+            and ioqn.inventory_item_id = spirq.ITEM_ID)
+            LEFT JOIN sync_cst_costed_vu_costs_v_unit_price price
+            on (ioqn.organization_id = price.organization_id
+            and ioqn.inventory_item_id = price.inventory_item_id)
+    </sql>
+
+    <sql id="selectSyncInvOnhandQuantityNewSubCodeVo">
+        SELECT
+        list.ITEM_NUMBER,
+        list.description as ITEM_DESCRIPTION,
+        (SELECT
+        top 1
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+        and eic.inventory_item_id = list.inventory_item_id
+        and ecb.CATEGORY_ID = eic.CATEGORY_ID
+        and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+        (SELECT
+        top 1
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        eic.ORGANIZATION_ID = list.ORGANIZATION_ID
+        and eic.inventory_item_id = list.inventory_item_id
+        and ecb.CATEGORY_ID = eic.CATEGORY_ID
+        and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog,
+        ioqn.organization_id,
+        ioqn.inventory_item_id,
+        ioqn.sum_onhand_quantity as quantity,
+        ioqn.subinventory_code,
+        (case when ioqn.subinventory_code in ('XBC','DLC') OR ioqn.subinventory_code LIKE '3%' then 0 else ioqn.sum_onhand_quantity end) as avaliable_quantity,
+        list.BUYER_NAME,
+        ioqn.max_transaction_date,
+        ioqn.min_transaction_date,
+        datediff(day,ioqn.min_transaction_date,GETDATE()) as date_diff_days,
+        isnull(spirq.RECEIVE_QUANTITY,0) as RECEIVE_QUANTITY,
+        isnull(spirq.inbound_quantity,0) as inbound_quantity,
+        datediff(DAY,ioqn.min_transaction_date,GETDATE())/30 as month_diff_days,
+        isnull(price.sum_unit_cost,0) as sum_unit_cost,
+        price.snapshot_date,
+        isnull(price.sum_unit_cost,0) * ioqn.sum_onhand_quantity as sum_unit_cost_amount
+        FROM
+        sync_egp_system_items_b_w list,
+        sync_inv_onhand_quantity_new_subinventory_code_v ioqn
+        LEFT JOIN sync_po_inbound_rcv_qty spirq
+        on (ioqn.organization_id = spirq.SHIP_TO_ORGANIZATION_ID
+        and ioqn.inventory_item_id = spirq.ITEM_ID)
+        LEFT JOIN sync_cst_costed_vu_costs_v_unit_price price
+        on (ioqn.organization_id = price.organization_id
+        and ioqn.inventory_item_id = price.inventory_item_id)
+    </sql>
+
+    <select id="selectSyncInvOnhandQuantityNewListPrice" parameterType="PesInvOnhandQuantityNewPrice" resultMap="PesInvOnhandQuantityNewPriceResult">
+        <include refid="selectSyncInvOnhandQuantityNewVo"/>
+        <where>
+            and ioqn.inventory_item_id = list.INVENTORY_ITEM_ID
+            AND ioqn.organization_id = list.organization_id
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+        </where>
+    </select>
+
+    <select id="selectSyncInvOnhandQuantityNewSubCodeListPrice" parameterType="PesInvOnhandQuantityNewPrice" resultMap="PesInvOnhandQuantityNewPriceResult">
+        <include refid="selectSyncInvOnhandQuantityNewSubCodeVo"/>
+        <where>
+            and ioqn.inventory_item_id = list.INVENTORY_ITEM_ID
+            AND ioqn.organization_id = list.organization_id
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+        </where>
+    </select>
+
+</mapper>

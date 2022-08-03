@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.lotNums.mapper.PesWieOrdersHeaderListMapper">
+
+    <resultMap type="PesWieOrdersHeaderList" id="PesWieOrdersHeaderListResult">
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="activeCode"    column="active_code"    />
+            </resultMap>
+
+    <sql id="selectPesWieOrdersHeaderListVo">
+        select plan_lot_num, plan_type, active_code from pes_wie_orders_header_list
+    </sql>
+
+    <select id="selectPesWieOrdersHeaderListList" parameterType="PesWieOrdersHeaderList" resultMap="PesWieOrdersHeaderListResult">
+        <include refid="selectPesWieOrdersHeaderListVo"/>
+        <where>
+            <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>
+        </where>
+        order by plan_lot_num desc
+    </select>
+
+    <select id="workOrdersHeader" parameterType="Long" resultMap="PesWieOrdersHeaderListResult">
+        SELECT
+        plan_lot_num,
+        plan_type,
+        active_code
+        FROM
+        pes_wie_orders_header_list
+        WHERE
+        plan_lot_num = #{planLotNum}
+    </select>
+
+    <insert id="insertPesWorkOrdersHeaderList" parameterType="PesWieOrdersHeaderList">
+        insert into pes_work_plan_header_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="planLotNum != null">plan_lot_num,</if>
+            <if test="planType != null">plan_type,</if>
+            <if test="activeCode != null">active_code,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="planLotNum != null">#{planLotNum},</if>
+            <if test="planType != null">#{planType},</if>
+            <if test="activeCode != null">#{activeCode},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <insert id="insertPesWorkOrderLineList" parameterType="PesWieOrdersHeaderList">
+        INSERT INTO pes_work_plan_line_list (
+        organization_id,
+        line_num,
+        level,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        uom,
+        plan_wie_quantity,
+        plan_start_date,
+        plan_end_date,
+        gross_quantity,
+        gross_date,
+        level_tree_code,
+        parent_level_tree_code,
+        plan_lot_num,
+        DOCUMENT_NUMBER,
+        DOCUMENT_LINE_NUM,
+	    CUST_PO_NUMBER,
+	    customer_name,
+        create_date,
+        create_by,
+        last_update_date,
+        last_update_by,
+        prod_line)
+        (SELECT
+        organization_id,
+        line_num,
+        level,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        uom,
+        plan_wie_quantity,
+        plan_start_date,
+        DATEADD(DAY ,- 1, plan_date) AS plan_end_date,
+        gross_quantity,
+        gross_date,
+        level_tree_code,
+        parent_level_tree_code,
+        plan_lot_num,
+        DOCUMENT_NUMBER,
+        DOCUMENT_LINE_NUM,
+	    CUST_PO_NUMBER,
+	    customer_name,
+        getdate(),
+        #{createBy},
+        getdate(),
+        #{createBy},
+        '0'
+        FROM
+        pes_wie_orders_line_list
+        WHERE
+        plan_lot_num = #{planLotNum}
+        AND plan_wie_quantity &gt; 0
+        and ITEM_TYPE in ('WWBCP','BCP','P','FG'))
+    </insert>
+
+    <delete id="updateActiveCode" parameterType="Long">
+        UPDATE pes_wie_orders_header_list set active_code = 'N' WHERE plan_lot_num = #{planLotNum}
+    </delete>
+
+</mapper>

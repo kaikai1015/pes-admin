@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWorkMaterialsLinesMapper">
+
+    <resultMap type="SyncWieWorkMaterialsLinesEO" id="SyncWieWorkMaterialsLinesEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="woOperationId"    column="WO_OPERATION_ID"    />
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+        <result property="materialSeqNumber"    column="MATERIAL_SEQ_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="requiredDate"    column="REQUIRED_DATE"    />
+        <result property="quantityPerProduct"    column="QUANTITY_PER_PRODUCT"    />
+        <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncWieWorkMaterialsLinesEO">
+        TRUNCATE TABLE sync_wie_work_materials_lines
+    </delete>
+
+    <insert id="batchSyncWieWorkMaterialsLinesEO">
+        insert into sync_wie_work_materials_lines( ORGANIZATION_ID, WORK_ORDER_ID, WO_OPERATION_MATERIAL_ID, WO_OPERATION_ID, MATERIAL_SEQ_NUMBER, INVENTORY_ITEM_ID, REQUIRED_DATE, QUANTITY_PER_PRODUCT, REQUIRED_QUANTITY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderId,jdbcType=BIGINT}, #{item.woOperationMaterialId,jdbcType=BIGINT}, #{item.woOperationId,jdbcType=BIGINT}, #{item.materialSeqNumber,jdbcType=INTEGER}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.requiredDate,jdbcType=TIMESTAMP}, cast(#{item.quantityPerProduct,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.requiredQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="batchPesWieWorkMaterialsLines">
+        TRUNCATE TABLE pes_work_substitued_material_lists;
+        INSERT INTO pes_work_substitued_material_lists (
+        WORK_ORDER_NUMBER,
+        PLANNED_START_QUANTITY,
+        P_ITEM_NUMBER,
+        P_ITEM_DESCRIPTION,
+        WORK_ORDER_ID,
+        ORGANIZATION_ID,
+        WO_OPERATION_ID,
+        WO_OPERATION_MATERIAL_ID,
+        MATERIAL_SEQ_NUMBER,
+        NEW_MATERIAL_SEQ_NUMBER,
+        ITEM_NUMBER,
+        ITEM_DESCRIPTION,
+        QUANTITY_PER_PRODUCT,
+        REQUIRED_DATE,
+        REQUIRED_QUANTITY,
+        NEW_REQUIRED_QUANTITY,
+        new_item_number,
+        new_item_description,
+        onhand_quantity,
+        new_inventory_item_id,
+        new_percent_quantity)
+        (SELECT
+        wwob.WORK_ORDER_NUMBER,
+        wwob.PLANNED_START_QUANTITY,
+        list.ITEM_NUMBER AS P_ITEM_NUMBER,
+        list.ITEM_DESCRIPTION AS P_ITEM_DESCRIPTION,
+        wwml.WORK_ORDER_ID,
+        wwml.ORGANIZATION_ID,
+        wwml.WO_OPERATION_ID,
+        wwml.WO_OPERATION_MATERIAL_ID,
+        wwml.MATERIAL_SEQ_NUMBER,
+        CONVERT (VARCHAR(100), GETDATE(), 112) + wwml.MATERIAL_SEQ_NUMBER AS NEW_MATERIAL_SEQ_NUMBER,
+        listsub.ITEM_NUMBER,
+        listsub.ITEM_DESCRIPTION,
+        wwml.QUANTITY_PER_PRODUCT,
+        wwml.REQUIRED_DATE,
+        wwml.REQUIRED_QUANTITY,
+        (wsm.new_percent_quantity * wwml.REQUIRED_QUANTITY) AS NEW_REQUIRED_QUANTITY,
+        wsm.new_item_number,
+        wsm.new_item_description,
+        isnull(ioq.quantity, 0) AS onhand_quantity,
+        wsm.new_inventory_item_id,
+        (wwml.QUANTITY_PER_PRODUCT * wsm.new_percent_quantity) AS new_percent_quantity
+        FROM
+        sync_wie_work_materials_lines wwml,
+        sync_wie_work_orders_b wwob,
+        sync_items_num_des_list list,
+        sync_items_num_des_list listsub,
+        cux_work_substituted_material wsm
+        LEFT JOIN sync_inv_onhand_quantity_new ioq
+        ON (wsm.new_inventory_item_id = ioq.inventory_item_id
+        AND wsm.organization_id = ioq.organization_id)
+        WHERE
+        1 = 1
+        AND wwml.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+        AND wwml.WORK_ORDER_ID = wwob.WORK_ORDER_ID
+        AND list.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+        AND list.INVENTORY_ITEM_ID = wwob.INVENTORY_ITEM_ID
+        AND wwml.ORGANIZATION_ID = listsub.ORGANIZATION_ID
+        AND wwml.INVENTORY_ITEM_ID = listsub.INVENTORY_ITEM_ID
+        AND wwob.INVENTORY_ITEM_ID = wsm.p_inventory_item_id
+        AND wwml.organization_id = wsm.organization_id
+        AND wwml.INVENTORY_ITEM_ID = wsm.inventory_item_id
+        AND wsm.delete_flag = 'N'
+        AND GETDATE() BETWEEN wsm.effective_start_date AND wsm.effective_end_date)
+    </delete>
+
+</mapper>

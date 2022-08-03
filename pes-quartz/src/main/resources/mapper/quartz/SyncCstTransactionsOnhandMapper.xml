@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncCstTransactionsOnhandMapper">
+
+    <resultMap type="SyncCstTransactionsOnhandEO" id="SyncCstTransactionsOnhandEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="costDate"    column="cost_date"    />
+        <result property="quantityOnhand"    column="quantity_onhand"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncCstTransactionsOnhandEO">
+        TRUNCATE TABLE sync_cst_transactions_onhand_v
+    </delete>
+
+    <insert id="batchSyncCstTransactionsOnhandEO">
+        insert into sync_cst_transactions_onhand_v( inventory_item_id, organization_id, cost_date, quantity_onhand,subinventory_code) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.costDate,jdbcType=TIMESTAMP},cast(#{item.quantityOnhand,jdbcType=DECIMAL} as decimal(15,5)),#{item.subinventoryCode,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

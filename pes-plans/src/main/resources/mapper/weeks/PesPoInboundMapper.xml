@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.PesPoInboundMapper">
+
+    <resultMap type="PesPoInbound" id="PesPoInboundResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="documentNumber"    column="document_number"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="displayName"    column="display_name"    />
+                    <result property="date"    column="date"    />
+                    <result property="segment1"    column="segment1"    />
+                    <result property="partyName"    column="party_name"    />
+                    <result property="poQuantity"    column="po_quantity"    />
+                    <result property="quantity"    column="quantity"    />
+        <result property="creationDate"    column="creation_date"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="itemDescription"    column="item_description"    />
+            </resultMap>
+
+
+    <select id="selectPesPoInboundList" parameterType="PesPoInbound" resultMap="PesPoInboundResult">
+        SELECT
+        list.ORGANIZATION_ID,
+        list.INVENTORY_ITEM_ID,
+        list.DOCUMENT_NUMBER,
+        pla.LINE_NUM,
+        item.ITEM_NUMBER,
+        item.ITEM_DESCRIPTION,
+        ppnf.DISPLAY_NAME,
+        list.[DATE],
+        ps.SEGMENT1,
+        hz.PARTY_NAME,
+        pla.QUANTITY AS po_quantity,
+        list.QUANTITY,
+        pha.creation_date
+        FROM
+        pes_item_supply_demand_list list,
+        sync_po_lines_all pla,
+        sync_po_headers_all pha,
+        sync_poz_suppliers ps,
+        sync_hz_parties hz,
+        sync_per_person_names_f ppnf,
+        sync_items_num_des_list item
+        WHERE
+        list.TYPE = 'PO_S'
+        AND list.DOCUMENT_ID = pla.PO_HEADER_ID
+        AND list.DOCUMENT_LINE_ID = pla.PO_LINE_ID
+        AND list.DOCUMENT_ID = pha.PO_HEADER_ID
+        AND pha.vendor_id = ps.VENDOR_ID
+        AND ps.PARTY_ID = hz.PARTY_ID
+        AND pha.agent_id = ppnf.PERSON_ID
+        AND getdate() BETWEEN ppnf.EFFECTIVE_START_DATE
+        AND ppnf.EFFECTIVE_END_DATE
+        AND list.ORGANIZATION_ID = item.ORGANIZATION_ID
+        AND list.INVENTORY_ITEM_ID = item.INVENTORY_ITEM_ID
+        AND list.ORGANIZATION_ID = #{organizationId}
+        AND list.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+</mapper>

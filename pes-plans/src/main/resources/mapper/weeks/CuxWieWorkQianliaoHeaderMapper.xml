@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.CuxWieWorkQianliaoHeaderMapper">
+
+    <resultMap type="CuxWieWorkQianliaoHeader" id="CuxWieWorkQianliaoHeaderResult">
+                    <result property="lotNumber"    column="lot_number"    />
+                    <result property="srmFlag"    column="srm_flag"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="remark"    column="remark"    />
+            </resultMap>
+
+    <sql id="selectCuxWieWorkQianliaoHeaderVo">
+        select lot_number, srm_flag, create_by, create_date, last_update_by, last_update_date, remark from cux_wie_work_qianliao_header
+    </sql>
+
+    <select id="selectCuxWieWorkQianliaoHeaderList" parameterType="CuxWieWorkQianliaoHeader" resultMap="CuxWieWorkQianliaoHeaderResult">
+        <include refid="selectCuxWieWorkQianliaoHeaderVo"/>
+        <where>
+            <if test="lotNumber != null "> and lot_number = #{lotNumber}</if>
+            <if test="createBy != null  and createBy != ''"> and create_by = #{createBy}</if>
+        </where>
+        order by lot_number desc
+    </select>
+
+    <insert id="insertCuxWieWorkQianliaoHeader" parameterType="CuxWieWorkQianliaoHeader">
+        insert into cux_wie_work_qianliao_header
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            lot_number,
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            <if test="createBy != null">last_update_by,</if>
+           last_update_date,
+            <if test="remark != null">remark,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            (CAST(CONVERT (VARCHAR(100), GETDATE(), 112) as VARCHAR) + '00' + (select count(*) from cux_wie_work_qianliao_header where CONVERT(varchar(100), create_date, 23) = CONVERT(varchar(100), GETDATE(), 23))),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="remark != null">#{remark},</if>
+        </trim>
+    </insert>
+
+    <update id="deleteCuxWieWorkQianliaoHeaderById" parameterType="Long">
+        update cux_wie_work_qianliao_header set srm_flag = 1 where lot_number = #{lotNumber}
+    </update>
+
+    <insert id="insertCuxWieWorkQianliaoHeaderById" parameterType="Long">
+        INSERT INTO srm_scheduling_owed_tb (
+            item_id,
+            organization_id,
+            work_order_id,
+            plan_type,
+            scheduling_order_by,
+            schedule_start_date,
+            need_quantity,
+            repair_order_to_owe,
+            schedule_start_qty,
+            confrim_qty,
+            seq_num,
+            sum_need_qty,
+            bom_item_id,
+            product_line,
+            planer,
+            batch_id)
+        SELECT
+            ql.INVENTORY_ITEM_ID,
+            ql.ORGANIZATION_ID,
+            ql.WORK_ORDER_ID,
+            (case when ql.work_type = '0' then '未排产' ELSE '已排产' end) as plan_type,
+            ql.NUM,
+            ql.import_start_date,
+            ql.REQUIRED_QUANTITY,
+            (case when (ql.remain_quantity + ql.required_quantity) &lt; 0 then (-1)*ql.required_quantity else ql.remain_quantity end) as over_remain_quantity,
+            ql.PLANNED_START_QUANTITY,
+            ql.COMPLETED_QUANTITY,
+            ql.LINE_NUM,
+            ql.SUM_REQUIRED_QUANTITY,
+            ql.P_INVENTORY_ITEM_ID,
+            ql.prod_lines,
+            wwob.plan_name,
+            #{lotNumber} as lot_number
+        FROM
+            cux_wie_work_import_data_ql ql,
+            pes_wie_work_orders_b_erp wwob
+        WHERE
+            ql.WORK_ORDER_ID = wwob.work_order_id
+        AND ql.ORGANIZATION_ID = wwob.organization_id
+        and (case when (ql.remain_quantity + ql.required_quantity) &lt; 0 then (-1)*ql.required_quantity else ql.remain_quantity end) &lt; 0
+        and (ql.ITEM_NUMBER like 'A16%'
+        or ql.ITEM_NUMBER like 'A27%'
+        or ql.ITEM_NUMBER like 'A30%'
+        or ql.ITEM_NUMBER like 'A36%'
+        or ql.ITEM_NUMBER like 'A37%'
+        or ql.ITEM_NUMBER like 'A38%'
+        or ql.ITEM_NUMBER like 'A40%'
+        or ql.ITEM_NUMBER like 'A42%'
+        or ql.ITEM_NUMBER like 'A43%'
+        or ql.ITEM_NUMBER like 'A44%'
+        or ql.ITEM_NUMBER like 'A45%'
+        or ql.ITEM_NUMBER like 'A46%'
+        or ql.ITEM_NUMBER like 'A51%'
+        or ql.ITEM_NUMBER like 'A60%'
+        or ql.ITEM_NUMBER like 'W%')
+        and ql.lot_number = #{lotNumber}
+    </insert>
+
+</mapper>

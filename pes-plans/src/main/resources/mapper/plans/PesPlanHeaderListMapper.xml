@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.plans.mapper.PesPlanHeaderListMapper">
+
+    <resultMap type="PesPlanHeaderList" id="PesPlanHeaderListResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="prodLine"    column="prod_line"    />
+        <result property="planLotNum"    column="plan_lot_num"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="id"    column="id"    />
+        <result property="activeCode"    column="active_code"    />
+    </resultMap>
+
+    <sql id="selectPesPlanHeaderListVo">
+        select organization_id, organization_code, prod_line, plan_lot_num, create_date, create_by, last_update_date, last_update_by, id, active_code from pes_plan_header_list
+    </sql>
+
+    <select id="selectPesPlanHeaderListList" parameterType="PesPlanHeaderList" resultMap="PesPlanHeaderListResult">
+        <include refid="selectPesPlanHeaderListVo"/>
+        <where>
+            <if test="prodLine != null  and prodLine != ''"> and prod_line like ('%' + #{prodLine} + '%')</if>
+            <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>
+            <if test="activeCode != null  and activeCode != ''"> and active_code = #{activeCode}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectPesPlanHeaderListById" parameterType="Integer" resultMap="PesPlanHeaderListResult">
+        <include refid="selectPesPlanHeaderListVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPesPlanHeaderList" parameterType="PesPlanHeaderList">
+        insert into pes_plan_header_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationCode != null">organization_id,</if>
+            <if test="organizationCode != null and organizationCode != ''">organization_code,</if>
+            <if test="prodLine != null and prodLine != ''">prod_line,</if>
+            <if test="planLotNum != null">plan_lot_num,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="lastUpdateBy != null">last_update_by,</if>
+            <if test="id != null">id,</if>
+            <if test="activeCode != null and activeCode != ''">active_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationCode != null">(select ORGANIZATION_ID FROM sync_inv_org_parameters WHERE ORGANIZATION_CODE = #{organizationCode}),</if>
+            <if test="organizationCode != null and organizationCode != ''">#{organizationCode},</if>
+            <if test="prodLine != null and prodLine != ''">#{prodLine},</if>
+            <if test="planLotNum != null">#{planLotNum},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+            <if test="id != null">#{id},</if>
+            <if test="activeCode != null and activeCode != ''">#{activeCode},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesPlanHeaderList" parameterType="PesPlanHeaderList">
+        update pes_plan_header_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="organizationCode != null and organizationCode != ''">organization_code = #{organizationCode},</if>
+            <if test="prodLine != null and prodLine != ''">prod_line = #{prodLine},</if>
+            <if test="planLotNum != null">plan_lot_num = #{planLotNum},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            last_update_date = getdate(),
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="activeCode != null and activeCode != ''">active_code = #{activeCode},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+    <delete id="deletePesPlanHeaderListByIds" parameterType="String">
+        delete from pes_plan_header_list where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="checkDeleteAllowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_plan_header_list list,
+        pes_plan_line_list bom
+        WHERE
+        1 = 1
+        AND list.plan_lot_num = bom.plan_lot_num
+        AND list.id = #{id}
+    </select>
+
+    <select id="checkAddActiveAllowed" parameterType="PesPlanHeaderList" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_plan_header_list
+        WHERE
+        1 = 1
+        and active_code = 'Y'
+        and prod_line = #{prodLine}
+    </select>
+
+    <select id="checkAddAllowed" parameterType="PesPlanHeaderList" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_plan_header_list
+        WHERE
+        1 = 1
+        AND plan_lot_num = #{planLotNum}
+    </select>
+
+</mapper>

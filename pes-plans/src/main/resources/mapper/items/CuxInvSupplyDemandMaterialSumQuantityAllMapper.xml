@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxInvSupplyDemandMaterialSumQuantityAllMapper">
+
+    <resultMap type="CuxInvSupplyDemandMaterialSumQuantityAllEO" id="CuxInvSupplyDemandMaterialSumQuantityAllEOResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="transactionYear"    column="transaction_year"    />
+
+        <result property="augYears"    column="aug_years"    />
+        <result property="segYears"    column="seg_years"    />
+        <result property="zeroYears"    column="zero_years"    />
+        <result property="janYears"    column="jan_years"    />
+        <result property="febYears"    column="feb_years"    />
+
+        <result property="janOrderDemandQuantity"    column="jan_order_demand_quantity"    />
+        <result property="febOrderDemandQuantity"    column="feb_order_demand_quantity"    />
+        <result property="marOrderDemandQuantity"    column="mar_order_demand_quantity"    />
+        <result property="aprOrderDemandQuantity"    column="apr_order_demand_quantity"    />
+        <result property="mayOrderDemandQuantity"    column="may_order_demand_quantity"    />
+        <result property="junOrderDemandQuantity"    column="jun_order_demand_quantity"    />
+        <result property="julOrderDemandQuantity"    column="jul_order_demand_quantity"    />
+        <result property="augOrderDemandQuantity"    column="aug_order_demand_quantity"    />
+        <result property="sepOrderDemandQuantity"    column="sep_order_demand_quantity"    />
+        <result property="octOrderDemandQuantity"    column="oct_order_demand_quantity"    />
+        <result property="novOrderDemandQuantity"    column="nov_order_demand_quantity"    />
+        <result property="decOrderDemandQuantity"    column="dec_order_demand_quantity"    />
+
+        <result property="janWieSupplyQuantity"    column="jan_wie_supply_quantity"    />
+        <result property="febWieSupplyQuantity"    column="feb_wie_supply_quantity"    />
+        <result property="marWieSupplyQuantity"    column="mar_wie_supply_quantity"    />
+        <result property="aprWieSupplyQuantity"    column="apr_wie_supply_quantity"    />
+        <result property="mayWieSupplyQuantity"    column="may_wie_supply_quantity"    />
+        <result property="junWieSupplyQuantity"    column="jun_wie_supply_quantity"    />
+        <result property="julWieSupplyQuantity"    column="jul_wie_supply_quantity"    />
+        <result property="augWieSupplyQuantity"    column="aug_wie_supply_quantity"    />
+        <result property="sepWieSupplyQuantity"    column="sep_wie_supply_quantity"    />
+        <result property="octWieSupplyQuantity"    column="oct_wie_supply_quantity"    />
+        <result property="novWieSupplyQuantity"    column="nov_wie_supply_quantity"    />
+        <result property="decWieSupplyQuantity"    column="dec_wie_supply_quantity"    />
+
+        <result property="janWieDemandQuantity"    column="jan_wie_demand_quantity"    />
+        <result property="febWieDemandQuantity"    column="feb_wie_demand_quantity"    />
+        <result property="marWieDemandQuantity"    column="mar_wie_demand_quantity"    />
+        <result property="aprWieDemandQuantity"    column="apr_wie_demand_quantity"    />
+        <result property="mayWieDemandQuantity"    column="may_wie_demand_quantity"    />
+        <result property="junWieDemandQuantity"    column="jun_wie_demand_quantity"    />
+        <result property="julWieDemandQuantity"    column="jul_wie_demand_quantity"    />
+        <result property="augWieDemandQuantity"    column="aug_wie_demand_quantity"    />
+        <result property="sepWieDemandQuantity"    column="sep_wie_demand_quantity"    />
+        <result property="octWieDemandQuantity"    column="oct_wie_demand_quantity"    />
+        <result property="novWieDemandQuantity"    column="nov_wie_demand_quantity"    />
+        <result property="decWieDemandQuantity"    column="dec_wie_demand_quantity"    />
+
+        <result property="janPoSupplyQuantity"    column="jan_po_supply_quantity"    />
+        <result property="febPoSupplyQuantity"    column="feb_po_supply_quantity"    />
+        <result property="marPoSupplyQuantity"    column="mar_po_supply_quantity"    />
+        <result property="aprPoSupplyQuantity"    column="apr_po_supply_quantity"    />
+        <result property="mayPoSupplyQuantity"    column="may_po_supply_quantity"    />
+        <result property="junPoSupplyQuantity"    column="jun_po_supply_quantity"    />
+        <result property="julPoSupplyQuantity"    column="jul_po_supply_quantity"    />
+        <result property="augPoSupplyQuantity"    column="aug_po_supply_quantity"    />
+        <result property="sepPoSupplyQuantity"    column="sep_po_supply_quantity"    />
+        <result property="octPoSupplyQuantity"    column="oct_po_supply_quantity"    />
+        <result property="novPoSupplyQuantity"    column="nov_po_supply_quantity"    />
+        <result property="decPoSupplyQuantity"    column="dec_po_supply_quantity"    />
+
+        <result property="janOtherQuantity"    column="jan_other_quantity"    />
+        <result property="febOtherQuantity"    column="feb_other_quantity"    />
+        <result property="marOtherQuantity"    column="mar_other_quantity"    />
+        <result property="aprOtherQuantity"    column="apr_other_quantity"    />
+        <result property="mayOtherQuantity"    column="may_other_quantity"    />
+        <result property="junOtherQuantity"    column="jun_other_quantity"    />
+        <result property="julOtherQuantity"    column="jul_other_quantity"    />
+        <result property="augOtherQuantity"    column="aug_other_quantity"    />
+        <result property="sepOtherQuantity"    column="sep_other_quantity"    />
+        <result property="octOtherQuantity"    column="oct_other_quantity"    />
+        <result property="novOtherQuantity"    column="nov_other_quantity"    />
+        <result property="decOtherQuantity"    column="dec_other_quantity"    />
+        <result property="maxTransactionDate"    column="max_transaction_date"    />
+        <result property="minTransactionDate"    column="min_transaction_date"    />
+
+            </resultMap>
+
+    <select id="selectCuxInvSupplyDemandMaterialSumQuantityAllList" parameterType="CuxInvSupplyDemandMaterialSumQuantityAllEO" resultMap="CuxInvSupplyDemandMaterialSumQuantityAllEOResult">
+        SELECT
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.ORGANIZATION_ID,
+
+            #{transactionYear} as transaction_year,
+            isnull(invonhand.aug_years,0) as aug_years,
+            isnull(invonhand.seg_years,0) as seg_years,
+            isnull(invonhand.zero_years,0) as zero_years,
+            isnull(invonhand.jan_years,0) as jan_years,
+            isnull(invonhand.feb_years,0) as feb_years,
+
+            isnull(iop.sum_onhand_quantity,0) as quantity,
+            iop.max_transaction_date,
+            iop.min_transaction_date,
+
+            isnull(orderd.jan_quantity,0) as jan_order_demand_quantity,
+            isnull(wies.jan_quantity,0) as jan_wie_supply_quantity,
+            isnull(wied.jan_quantity,0) as jan_wie_demand_quantity,
+            isnull(pos.jan_quantity,0) as jan_po_supply_quantity,
+            isnull(others.jan_quantity,0) as jan_other_quantity,
+
+
+            isnull(orderd.feb_quantity,0) as feb_order_demand_quantity,
+            isnull(wies.feb_quantity,0) as feb_wie_supply_quantity,
+            isnull(wied.feb_quantity,0) as feb_wie_demand_quantity,
+            isnull(pos.feb_quantity,0) as feb_po_supply_quantity,
+            isnull(others.feb_quantity,0) as feb_other_quantity,
+
+            isnull(orderd.mar_quantity,0) as mar_order_demand_quantity,
+            isnull(wies.mar_quantity,0) as mar_wie_supply_quantity,
+            isnull(wied.mar_quantity,0) as mar_wie_demand_quantity,
+            isnull(pos.mar_quantity,0) as mar_po_supply_quantity,
+            isnull(others.mar_quantity,0) as mar_other_quantity,
+
+            isnull(orderd.apr_quantity,0) as apr_order_demand_quantity,
+            isnull(wies.apr_quantity,0) as apr_wie_supply_quantity,
+            isnull(wied.apr_quantity,0) as apr_wie_demand_quantity,
+            isnull(pos.apr_quantity,0) as apr_po_supply_quantity,
+            isnull(others.apr_quantity,0) as apr_other_quantity,
+
+            isnull(orderd.may_quantity,0) as may_order_demand_quantity,
+            isnull(wies.may_quantity,0) as may_wie_supply_quantity,
+            isnull(wied.may_quantity,0) as may_wie_demand_quantity,
+            isnull(pos.may_quantity,0) as may_po_supply_quantity,
+            isnull(others.may_quantity,0) as may_other_quantity,
+
+            isnull(orderd.jun_quantity,0) as jun_order_demand_quantity,
+            isnull(wies.jun_quantity,0) as jun_wie_supply_quantity,
+            isnull(wied.jun_quantity,0) as jun_wie_demand_quantity,
+            isnull(pos.jun_quantity,0) as jun_po_supply_quantity,
+            isnull(others.jun_quantity,0) as jun_other_quantity,
+
+            isnull(orderd.jul_quantity,0) as jul_order_demand_quantity,
+            isnull(wies.jul_quantity,0) as jul_wie_supply_quantity,
+            isnull(wied.jul_quantity,0) as jul_wie_demand_quantity,
+            isnull(pos.jul_quantity,0) as jul_po_supply_quantity,
+            isnull(others.jul_quantity,0) as jul_other_quantity,
+
+            isnull(orderd.aug_quantity,0) as aug_order_demand_quantity,
+            isnull(wies.aug_quantity,0) as aug_wie_supply_quantity,
+            isnull(wied.aug_quantity,0) as aug_wie_demand_quantity,
+            isnull(pos.aug_quantity,0) as aug_po_supply_quantity,
+            isnull(others.aug_quantity,0) as aug_other_quantity,
+
+            isnull(orderd.sep_quantity,0) as sep_order_demand_quantity,
+            isnull(wies.sep_quantity,0) as sep_wie_supply_quantity,
+            isnull(wied.sep_quantity,0) as sep_wie_demand_quantity,
+            isnull(pos.sep_quantity,0) as sep_po_supply_quantity,
+            isnull(others.sep_quantity,0) as sep_other_quantity,
+
+            isnull(orderd.oct_quantity,0) as oct_order_demand_quantity,
+            isnull(wies.oct_quantity,0) as oct_wie_supply_quantity,
+            isnull(wied.oct_quantity,0) as oct_wie_demand_quantity,
+            isnull(pos.oct_quantity,0) as oct_po_supply_quantity,
+            isnull(others.oct_quantity,0) as oct_other_quantity,
+
+            isnull(orderd.nov_quantity,0) as nov_order_demand_quantity,
+            isnull(wies.nov_quantity,0) as nov_wie_supply_quantity,
+            isnull(wied.nov_quantity,0) as nov_wie_demand_quantity,
+            isnull(pos.nov_quantity,0) as nov_po_supply_quantity,
+            isnull(others.nov_quantity,0) as nov_other_quantity,
+
+            isnull(orderd.dec_quantity,0) as dec_order_demand_quantity,
+            isnull(wies.dec_quantity,0) as dec_wie_supply_quantity,
+            isnull(wied.dec_quantity,0) as dec_wie_demand_quantity,
+            isnull(pos.dec_quantity,0) as dec_po_supply_quantity,
+            isnull(others.dec_quantity,0) as dec_other_quantity
+        FROM
+            sync_items_num_des_list list
+            left join sync_inv_onhand_quantity_new_code_v iop
+            on (list.organization_id = iop.organization_id
+            AND list.inventory_item_id = iop.inventory_item_id)
+            LEFT JOIN cux_wie_supply_material_sum_quantity_all wies
+            ON (list.organization_id = wies.organization_id
+            AND list.inventory_item_id = wies.inventory_item_id
+            and wies.transaction_year = #{transactionYear})
+            LEFT JOIN cux_wie_demand_material_sum_quantity_all wied
+            ON (list.organization_id = wied.organization_id
+            AND list.inventory_item_id = wied.inventory_item_id
+            and wied.transaction_year = #{transactionYear})
+            LEFT JOIN cux_order_demand_material_sum_quantity_all orderd
+            ON (list.organization_id = orderd.organization_id
+            AND list.inventory_item_id = orderd.inventory_item_id
+            and orderd.transaction_year = #{transactionYear})
+            LEFT JOIN cux_po_supply_material_sum_quantity_all pos
+            ON (list.organization_id = pos.organization_id
+            AND list.inventory_item_id = pos.inventory_item_id
+            and pos.transaction_year = #{transactionYear})
+            LEFT JOIN cux_other_supply_material_sum_quantity_all others
+            ON (list.organization_id = others.organization_id
+            AND list.inventory_item_id = others.inventory_item_id
+            and others.transaction_year = #{transactionYear})
+            LEFT JOIN cux_inv_onhand_material_sum_quantity_years invonhand
+            ON (list.organization_id = invonhand.organization_id
+            AND list.inventory_item_id = invonhand.inventory_item_id)
+        where 1=1
+        <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        <if test="organizationId != null "> and list.organization_id = #{organizationId}</if>
+    </select>
+
+</mapper>

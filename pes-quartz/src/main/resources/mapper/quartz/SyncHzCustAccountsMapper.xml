@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncHzCustAccountsMapper">
+
+    <resultMap type="SyncHzCustAccountsEO" id="SyncHzCustAccountsEOResult">
+        <result property="custAccountId"    column="CUST_ACCOUNT_ID"    />
+        <result property="partyId"    column="PARTY_ID"    />
+        <result property="accountNumber"    column="ACCOUNT_NUMBER"    />
+        <result property="status"    column="STATUS"    />
+        <result property="accountName"    column="ACCOUNT_NAME"    />
+        <result property="accountEstablishedDate"    column="ACCOUNT_ESTABLISHED_DATE"    />
+        <result property="accountTerminationDate"    column="ACCOUNT_TERMINATION_DATE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+    </resultMap>
+
+    <sql id="selectSyncHzCustAccountsVo">
+        select CUST_ACCOUNT_ID, PARTY_ID, ACCOUNT_NUMBER, STATUS, ACCOUNT_NAME, ACCOUNT_ESTABLISHED_DATE, ACCOUNT_TERMINATION_DATE, LAST_UPDATE_DATE, LAST_UPDATED_BY from sync_hz_cust_accounts
+    </sql>
+
+    <delete id="deleteSyncHzCustAccountsEO">
+        delete from sync_hz_cust_accounts where CUST_ACCOUNT_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.custAccountId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncHzCustAccountsEO">
+        insert into sync_hz_cust_accounts( CUST_ACCOUNT_ID, PARTY_ID, ACCOUNT_NUMBER, STATUS, ACCOUNT_NAME, ACCOUNT_ESTABLISHED_DATE, ACCOUNT_TERMINATION_DATE, LAST_UPDATE_DATE, LAST_UPDATED_BY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.custAccountId,jdbcType=BIGINT}, #{item.partyId,jdbcType=BIGINT}, #{item.accountNumber,jdbcType=VARCHAR}, #{item.status,jdbcType=VARCHAR}, #{item.accountName,jdbcType=VARCHAR}, #{item.accountEstablishedDate,jdbcType=TIMESTAMP}, #{item.accountTerminationDate,jdbcType=TIMESTAMP}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <select id="selectSyncHzCustAccountsList" parameterType="SyncHzCustAccountsEO" resultMap="SyncHzCustAccountsEOResult">
+        <include refid="selectSyncHzCustAccountsVo"/>
+        <where>
+            <if test="custAccountId != null "> and CUST_ACCOUNT_ID = #{custAccountId}</if>
+            <if test="partyId != null "> and PARTY_ID = #{partyId}</if>
+            <if test="accountNumber != null  and accountNumber != ''"> and ACCOUNT_NUMBER = #{accountNumber}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+</mapper>

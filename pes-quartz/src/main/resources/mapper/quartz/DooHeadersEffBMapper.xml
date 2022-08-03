@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.DooHeadersEffBMapper">
+
+    <resultMap type="DooHeadersEffBEO" id="DooHeadersEffBEOResult">
+        <result property="headerId"    column="HEADER_ID"    />
+        <result property="orderNumber"    column="ORDER_NUMBER"    />
+        <result property="chanPingXian"    column="CHAN_PING_XIAN"    />
+    </resultMap>
+
+    <delete id="deleteDooHeadersEffBEO">
+        delete from sync_doo_headers_eff_b where HEADER_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.headerId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchDooHeadersEffBEO">
+        insert into sync_doo_headers_eff_b( HEADER_ID,ORDER_NUMBER, CHAN_PING_XIAN) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.headerId,jdbcType=BIGINT},#{item.orderNumber,jdbcType=VARCHAR},#{item.chanPingXian,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

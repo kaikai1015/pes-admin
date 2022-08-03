@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncOrdersDemandListMapper">
+
+    <resultMap type="SyncOrdersDemandListEO" id="SyncOrdersDemandListEOResult">
+        <result property="planLotNum"    column="plan_lot_num"    />
+        <result property="planItemNumber"    column="plan_item_number"    />
+        <result property="planItemType"    column="plan_item_type"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="planItemQuantity"    column="plan_item_quantity"    />
+        <result property="planDate"    column="plan_date"    />
+        <result property="custPoNumber"    column="CUST_PO_NUMBER"    />
+        <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+        <result property="demandId"    column="demand_id"    />
+        <result property="documentLineNum"    column="DOCUMENT_LINE_NUM"    />
+        <result property="planLotLineNum"    column="plan_lot_line_num"    />
+    </resultMap>
+
+    <!--<update id="deleteSyncOrdersDemandList">-->
+    <!--truncate table sync_orders_demand_list-->
+    <!--</update>-->
+
+    <insert id="batchSyncOrdersDemandList">
+        insert into sync_orders_demand_list( plan_lot_num,customer_id,customer_name, plan_lot_line_num,plan_item_number, plan_item_type, ORGANIZATION_ID, INVENTORY_ITEM_ID, plan_item_quantity, plan_date, CUST_PO_NUMBER, DOCUMENT_NUMBER,DOCUMENT_LINE_NUM) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.planLotNum,jdbcType=BIGINT},#{item.customerId,jdbcType=BIGINT}, #{item.customerName,jdbcType=VARCHAR},#{item.planLotLineNum,jdbcType=BIGINT}, #{item.planItemNumber,jdbcType=VARCHAR}, #{item.planItemType,jdbcType=VARCHAR}, #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, cast(#{item.planItemQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.planDate,jdbcType=TIMESTAMP}, #{item.custPoNumber,jdbcType=VARCHAR}, #{item.documentNumber,jdbcType=VARCHAR}, #{item.documentLineNum,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+    <insert id="addOrdersDemandsList" parameterType="Long">
+        insert into pes_orders_header_list (plan_lot_num) values (#{planLotNum,jdbcType=BIGINT})
+    </insert>
+
+    <insert id="addOrdersDemandsMpsList" parameterType="Long">
+        insert into pes_wie_orders_header_list (plan_lot_num) values (#{planLotNum,jdbcType=BIGINT})
+    </insert>
+
+    <insert id="addOrdersDemandsMrpList" parameterType="Long">
+        insert into pes_po_orders_header_list (plan_lot_num) values (#{planLotNum,jdbcType=BIGINT})
+    </insert>
+
+</mapper>

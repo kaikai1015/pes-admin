@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdLineDaysHeaderAllWWMapper">
+
+    <resultMap type="PesProdLineDaysHeaderAllWW" id="PesProdLineDaysHeaderAllWWResult">
+        <result property="prodLineFlag"    column="prod_line_flag"    />
+        <result property="lotNum"    column="lot_num"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="remark"    column="remark"    />
+        <result property="id"    column="id"    />
+        <result property="lotNumDate"    column="lot_num_date"    />
+        <result property="prodLineFlagName"    column="prod_line_flag_name"    />
+        <result property="resetDataFlag"    column="reset_data_flag"    />
+        <result property="transferFlag"    column="transfer_flag"    />
+        <result property="daysProdFlag"    column="days_prod_flag"    />
+    </resultMap>
+
+    <sql id="selectPesProdLineDaysHeaderAllVo">
+        SELECT
+        ppldh.id,
+        ppldh.prod_line_flag,
+        (select sdd.dict_label from sys_dict_data sdd where sdd.dict_type = 'erp_prod_lines' and sdd.dict_value = ppldh.prod_line_flag) as prod_line_flag_name,
+        ppldh.lot_num,
+        ppldh.lot_num_date,
+        ppldh.create_by,
+        ppldh.create_date,
+        ppldh.remark,
+        ppldh.reset_data_flag,
+        ppldh.transfer_flag,
+        ppldh.days_prod_flag,
+        ppldh.last_update_date
+        FROM
+        pes_prod_line_days_header_all_ww ppldh,
+        sys_dept d
+    </sql>
+
+    <select id="selectPesProdLineDaysHeaderAllById" parameterType="Long" resultMap="PesProdLineDaysHeaderAllWWResult">
+        <include refid="selectPesProdLineDaysHeaderAllVo"/>
+        where ppldh.id = #{id}
+        and ppldh.prod_line_flag = d.dept_id
+    </select>
+
+    <select id="selectPesProdLineDaysHeaderAllList" parameterType="PesProdLineDaysHeaderAllWW" resultMap="PesProdLineDaysHeaderAllWWResult">
+        <include refid="selectPesProdLineDaysHeaderAllVo"/>
+        where ppldh.prod_line_flag = d.dept_id
+        and ppldh.is_ww_flag = 'Y'
+            <if test="prodLineFlag != null "> and ppldh.prod_line_flag = #{prodLineFlag}</if>
+            <if test="lotNum != null "> and ppldh.lot_num = #{lotNum}</if>
+        ${params.dataScope}
+        order by ppldh.id desc
+    </select>
+
+    <insert id="insertPesProdLineDaysHeaderAll" parameterType="PesProdLineDaysHeaderAllWW">
+        insert into pes_prod_line_days_header_all_ww
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="prodLineFlag != null">prod_line_flag,</if>
+            lot_num,
+            <if test="lotNumDate != null">lot_num_date,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            <if test="createBy != null">last_update_by,</if>
+            last_update_date,
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="isWwFlag != null and isWwFlag != ''">is_ww_flag,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="prodLineFlag != null">#{prodLineFlag},</if>
+            (CAST(CONVERT (VARCHAR(100), #{lotNumDate}, 112) as VARCHAR) + '00' + (select count(*) from pes_prod_line_days_header_all_ww where is_ww_flag = #{isWwFlag} AND CONVERT(varchar(100), lot_num_date, 23) = CONVERT(varchar(100), #{lotNumDate}, 23))),
+            <if test="lotNumDate != null">#{lotNumDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="isWwFlag != null and isWwFlag != ''">#{isWwFlag},</if>
+        </trim>
+    </insert>
+
+    <delete id="deletePesProdLineDaysHeaderAllById" parameterType="Long">
+        delete from pes_prod_line_days_header_all_ww where id = #{id}
+    </delete>
+
+    <select id="checkDeleteAllowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_prod_line_days_line_all_ww
+        WHERE
+        1 = 1
+        AND id = #{id}
+    </select>
+
+</mapper>

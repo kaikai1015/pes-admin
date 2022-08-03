@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.wms.mapper.CuxWmsWorkKouZhangListMapper">
+
+    <resultMap type="CuxWmsWorkKouZhangList" id="CuxWmsWorkKouZhangListResult">
+                    <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="organizationId"    column="organization_id"    />
+                    <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+                    <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+                    <result property="kouZhnagQuantity"    column="KOU_ZHNAG_QUANTITY"    />
+                    <result property="remark"    column="REMARK"    />
+                    <result property="type"    column="TYPE"    />
+                    <result property="isWwFlag"    column="is_ww_flag"    />
+        <result property="lotNumber"    column="LOT_NUMBER"    />
+        <result property="kouZhangId"    column="kou_zhang_id"    />
+        <result property="xianBianQuantity"    column="xian_bian_quantity"    />
+        <result property="uom"    column="uom"    />
+        <result property="overReceiveQuantity"    column="over_receive_quantity"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="workOrderLineId"    column="work_order_line_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="transactionDate"    column="TRANSACTION_DATE"    />
+        <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="requiredQuantity"    column="required_quantity"    />
+        <result property="overIssueQuantity"    column="over_issue_quantity"    />
+        <result property="issuedQuantity"    column="issued_quantity"    />
+            </resultMap>
+
+    <sql id="selectCuxWmsWorkKouZhangListVo">
+        SELECT
+        kou_zhang_id,
+        work_order_id,
+        organization_id,
+        work_order_number,
+        PLANNED_START_QUANTITY,
+        inventory_item_id,
+        item_number,
+        item_description,
+        LOT_NUMBER,
+        KOU_ZHNAG_QUANTITY,
+        REMARK,
+        TYPE,
+        is_ww_flag
+        FROM
+            cux_wms_work_kou_zhang_list
+    </sql>
+
+    <select id="selectCuxWmsWorkKouZhangListList" parameterType="CuxWmsWorkKouZhangList" resultMap="CuxWmsWorkKouZhangListResult">
+        <include refid="selectCuxWmsWorkKouZhangListVo"/>
+        <where>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER like ('%' + #{workOrderNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and ITEM_NUMBER like ('%' + #{itemNumber} + '%')</if>
+            <if test="lotNumber != null "> and LOT_NUMBER = #{lotNumber}</if>
+            <if test="isWwFlag != null "> and is_ww_flag = #{isWwFlag}</if>
+        </where>
+    </select>
+
+    <delete id="deleteCuxWmsWorkKouZhangListByLotNum"  >
+        DELETE FROM cux_wms_work_kou_zhang_list where LOT_NUMBER = #{lotNumber}  AND is_ww_flag = #{isWwFlag}
+    </delete>
+
+    <insert id="insertCuxWmsWorkKouZhangList" parameterType="CuxWmsWorkKouZhangList">
+        INSERT INTO cux_wms_work_kou_zhang_list (
+                        work_order_id,
+                        organization_id,
+                        inventory_item_id,
+                        work_order_number,
+                        PLANNED_START_QUANTITY,
+                        item_number,
+                        item_description,
+                        LOT_NUMBER,
+                        CREATE_BY,
+                        CREATE_DATE,
+                        LAST_UPDATE_BY,
+                        LAST_UPDATE_DATE,
+                        is_ww_flag
+                        )
+                        (SELECT
+                            ppldl.work_order_id,
+                            ppldl.organization_id,
+                            ppldl.inventory_item_id,
+                            ppldl.work_order_number,
+                            ppldl.plan_start_quantity,
+                            ppldl.item_number,
+                            ppldl.item_description,
+                            ppldhl.lot_num,
+                            #{createBy},
+                            getdate(),
+                            #{createBy},
+                            getdate(),
+                            #{isWwFlag}
+                        FROM
+                        <if test= 'isWwFlag == "N"'>
+                            pes_prod_line_days_header_all ppldhl,
+                            pes_prod_line_days_line_all ppldl
+                        </if>
+                        <if test= 'isWwFlag == "Y"'>
+                            pes_prod_line_days_header_all_ww ppldhl,
+                            pes_prod_line_days_line_all_ww ppldl
+                        </if>
+                        WHERE
+                            ppldl.id = ppldhl.id
+                        AND ppldhl.is_ww_flag = #{isWwFlag}
+                        AND ppldhl.lot_num = #{lotNumber}
+                        AND ppldhl.lot_num_date &gt;= '2021-09-14'
+                        )
+    </insert>
+
+
+    <delete id="deleteCuxWmsWorkKouZhangListByIds" parameterType="String">
+        delete from cux_wms_work_kou_zhang_list where kou_zhang_id in
+        <foreach item="kouZhangId" collection="array" open="(" separator="," close=")">
+            #{kouZhangId}
+        </foreach>
+    </delete>
+
+    <select id="selectCuxWmsWorkKouZhangDetailsListList" parameterType="CuxWmsWorkKouZhangList" resultMap="CuxWmsWorkKouZhangListResult">
+        SELECT
+            pppv.work_order_id,
+            pppv.organization_id,
+            (SELECT
+                org.ORGANIZATION_CODE
+            FROM
+                sync_inv_org_parameters org
+            WHERE
+                org.ORGANIZATION_ID = pppv.organization_id) AS ORGANIZATION_CODE,
+            pppv.work_order_number,
+            pppv.inventory_item_id,
+            pppv.ITEM_NUMBER,
+            pppv.ITEM_DESCRIPTION,
+            pppv.required_quantity,
+            pppv.PRIMARY_UOM_CODE AS uom,
+
+        <if test= 'isWwFlag == "N"'>
+            ( CASE WHEN pppv.item_work_name_flag = '4' THEN (CASE WHEN  ISNULL( ioqc.quantity, 0 ) >(pppv.required_quantity - pppv.issued_quantity)THEN (pppv.required_quantity - pppv.issued_quantity) ELSE ISNULL( ioqc.quantity, 0 )  END ) ELSE pppv.onhand_quantity END ) AS xian_bian_quantity,
+        </if>
+        <if test= 'isWwFlag == "Y"'>
+
+            CASE WHEN sd.supplier_type = '0' THEN ISNULL(pppv.onhand_quantity,0)
+            WHEN sd.supplier_type = '1' THEN ISNULL((pppv.required_quantity - pppv.issued_quantity),0)
+            ELSE 0
+            END
+            AS xian_bian_quantity,
+        </if>
+       pppv.over_receive_quantity - pppv.over_issue_quantity as over_receive_quantity,
+            pppv.work_order_line_id,
+            (SELECT
+                esb.LOT_CONTROL_CODE
+            FROM
+                sync_egp_system_items_b esb
+            WHERE
+                esb.ORGANIZATION_ID = pppv.organization_id
+            AND esb.INVENTORY_ITEM_ID = pppv.INVENTORY_ITEM_ID) AS lot_control_code,
+            pppv.item_work_name_flag,
+            pppv.over_issue_quantity,
+	        pppv.issued_quantity
+            FROM
+              pes_prod_processing_v pppv
+        LEFT JOIN sys_dept sd on sd.dept_id = pppv.prod_line_flag
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqc ON (pppv.inventory_item_id = ioqc.inventory_item_id and pppv.organization_id = ioqc.organization_id
+	         AND ioqc.subinventory_code = '3FCKL001')
+
+            WHERE
+              pppv.lot_num = #{lotNumber}
+            AND pppv.work_order_id = #{workOrderId}
+            AND pppv.organization_id = #{organizationId}
+            AND pppv.is_ww_flag = #{isWwFlag}
+
+    </select>
+
+
+    <select id="erpCuxWmsWorkKouZhangListByIds"  resultMap="CuxWmsWorkKouZhangListResult">
+        SELECT
+        pppv.work_order_id,
+        pppv.organization_id,
+        (SELECT
+        org.ORGANIZATION_CODE
+        FROM
+        sync_inv_org_parameters org
+        WHERE
+        org.ORGANIZATION_ID = pppv.organization_id) AS ORGANIZATION_CODE,
+        pppv.work_order_number,
+        pppv.inventory_item_id,
+        pppv.ITEM_NUMBER,
+        pppv.ITEM_DESCRIPTION,
+        pppv.PRIMARY_UOM_CODE AS uom,
+            pppv.over_receive_quantity - pppv.over_issue_quantity as over_receive_quantity,
+        pppv.work_order_line_id,
+        (SELECT
+        esb.LOT_CONTROL_CODE
+        FROM
+        sync_egp_system_items_b esb
+        WHERE
+        esb.ORGANIZATION_ID = pppv.organization_id
+        AND esb.INVENTORY_ITEM_ID = pppv.INVENTORY_ITEM_ID) AS lot_control_code,
+        getdate() as TRANSACTION_DATE,
+        isnull(pppv.item_work_name_flag,0) as item_work_name_flag,
+        <if test= 'isWwFlag == "N"'>
+            'XBC' as subinventory_code,
+            ( CASE WHEN pppv.item_work_name_flag = '4' THEN (CASE WHEN  ISNULL( ioqc.quantity, 0 ) >(pppv.required_quantity - pppv.issued_quantity)THEN (pppv.required_quantity - pppv.issued_quantity) ELSE ISNULL( ioqc.quantity, 0 )  END ) ELSE pppv.onhand_quantity END ) AS xian_bian_quantity,
+        </if>
+        <if test= 'isWwFlag == "Y"'>
+            ISNULL(pppv.onhand_quantity,0)  AS xian_bian_quantity,
+            sdd.dict_label as subinventory_code,
+        </if>
+        cwwl.kou_zhang_id
+        FROM
+        cux_wms_work_kou_zhang_list cwwl,
+        pes_prod_processing_v pppv
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqc ON (pppv.inventory_item_id = ioqc.inventory_item_id and pppv.organization_id = ioqc.organization_id
+        AND ioqc.subinventory_code = '3FCKL001')
+        LEFT JOIN sys_dict_data sdd on sdd.dict_value = pppv.prod_line_flag AND  sdd.dict_type = 'ww_xian_bian_warehouse'
+        where pppv.lot_num = cwwl.LOT_NUMBER
+        AND pppv.work_order_id = cwwl.work_order_id
+        AND pppv.organization_id = cwwl.organization_id
+
+        AND pppv.work_order_line_id in
+        <foreach item="lineId" collection="kouZhangId" open="(" separator="," close=")">
+            #{lineId}
+        </foreach>
+        AND pppv.is_ww_flag = #{isWwFlag}
+    </select>
+    <select id="autoErpCuxWmsWorkKouZhangListByIds"  resultMap="CuxWmsWorkKouZhangListResult">
+        SELECT * from (
+        SELECT
+        pppv.lot_num,
+        pppv.work_order_id,
+        pppv.organization_id,
+        (SELECT
+        org.ORGANIZATION_CODE
+        FROM
+        sync_inv_org_parameters org
+        WHERE
+        org.ORGANIZATION_ID = pppv.organization_id) AS ORGANIZATION_CODE,
+        pppv.work_order_number,
+        pppv.inventory_item_id,
+        pppv.ITEM_NUMBER,
+        pppv.ITEM_DESCRIPTION,
+        pppv.PRIMARY_UOM_CODE AS uom,
+        pppv.over_receive_quantity - pppv.over_issue_quantity as over_receive_quantity,
+        pppv.work_order_line_id,
+        (SELECT
+        esb.LOT_CONTROL_CODE
+        FROM
+        sync_egp_system_items_b esb
+        WHERE
+        esb.ORGANIZATION_ID = pppv.organization_id
+        AND esb.INVENTORY_ITEM_ID = pppv.INVENTORY_ITEM_ID) AS lot_control_code,
+        getdate() as TRANSACTION_DATE,
+        isnull(pppv.item_work_name_flag,0) as item_work_name_flag,
+        <if test= 'isWwFlag == "N"'>
+            'XBC' as subinventory_code,
+            ( CASE WHEN pppv.item_work_name_flag = '4' THEN (CASE WHEN  ISNULL( ioqc.quantity, 0 ) >(pppv.required_quantity - pppv.issued_quantity)THEN (pppv.required_quantity - pppv.issued_quantity) ELSE ISNULL( ioqc.quantity, 0 )  END ) ELSE pppv.onhand_quantity END ) AS xian_bian_quantity,
+
+        </if>
+        <if test= 'isWwFlag == "Y"'>
+            sdd.dict_label as subinventory_code,
+            CASE WHEN sd.supplier_type = '0' THEN ISNULL(pppv.onhand_quantity,0)
+            WHEN sd.supplier_type = '1' THEN ISNULL((pppv.required_quantity - pppv.issued_quantity),0)
+            ELSE 0
+            END
+            AS xian_bian_quantity,
+        </if>
+        cwwl.kou_zhang_id
+        FROM
+        cux_wms_work_kou_zhang_list cwwl,
+        pes_prod_processing_v pppv
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqc ON (pppv.inventory_item_id = ioqc.inventory_item_id and pppv.organization_id = ioqc.organization_id
+        AND ioqc.subinventory_code = '3FCKL001')
+        LEFT JOIN sys_dict_data sdd on sdd.dict_value = pppv.prod_line_flag AND  sdd.dict_type = 'ww_xian_bian_warehouse'
+        LEFT JOIN sys_dept sd on sd.dept_id = pppv.prod_line_flag
+        where pppv.lot_num = cwwl.LOT_NUMBER
+        AND pppv.work_order_id = cwwl.work_order_id
+        AND pppv.organization_id = cwwl.organization_id
+        AND pppv.is_ww_flag = #{isWwFlag}
+        ) a
+        WHERE a.xian_bian_quantity>0
+        order by a.lot_num,
+        a.organization_id,
+        a.work_order_id
+    </select>
+
+    <insert id="insertTrancsationList" parameterType="Long">
+        INSERT INTO pes_inv_material_txns (
+            last_update_date,
+            last_updated_by,
+            inventory_item_id,
+            organization_id,
+            subinventory_code,
+            transaction_type,
+            transaction_source_category,
+            transaction_source_type,
+            transaction_source_code,
+            transaction_source_name,
+            transaction_quantity,
+            transaction_uom,
+            primary_quantity,
+            transaction_date,
+            transaction_source_reference_i,
+            source_code,
+            source_line_id,
+            transaction_source_id,
+            create_by,
+            create_date,
+            check_result,
+            inventory_item_code,
+            inventory_item_describe,
+            batch_num
+        )
+        (SELECT
+            getdate(),
+            'admin',
+            pppv.inventory_item_id,
+            pppv.organization_id,
+            (case when pppv.item_work_name_flag = '4' then '3FCKL001' ELSE 'XBC' end),
+            'OUT',
+            'WIP Backflush',
+            'WIP Backflush',
+            'WORK',
+            pppv.work_order_number,
+            - pppv.onhand_quantity,
+            pppv.PRIMARY_UOM_CODE,
+            - pppv.onhand_quantity,
+            getdate(),
+            pppv.work_order_id,
+            'PES',
+            pppv.work_order_line_id,
+            pppv.line_id,
+            'admin',
+            getdate(),
+            '1',
+            pppv.ITEM_NUMBER,
+            pppv.ITEM_DESCRIPTION,
+            pppv.lot_num
+        FROM
+            cux_wms_work_kou_zhang_list cwwl,
+            pes_prod_processing_v pppv
+        WHERE
+            pppv.lot_num = cwwl.LOT_NUMBER
+        AND pppv.work_order_id = cwwl.work_order_id
+        AND pppv.organization_id = cwwl.organization_id
+        AND cwwl.kou_zhang_id = #{kouZhangId})
+        AND pppv.is_ww_flag = #{isWwFlag}
+
+    </insert>
+    <select id="getInsertTrancsationList" resultType="sinexcel.daysPlan.domain.PesInvMaterialTxns" >
+        SELECT
+        getdate() as lastUpdateDate,
+        'admin' AS lastUpdatedBy,
+        pppv.inventory_item_id AS inventoryItemId,
+        pppv.organization_id AS organizationId,
+        <if test= 'isWwFlag == "N"'>
+            (case when pppv.item_work_name_flag = '4' then '3FCKL001' ELSE 'XBC' end) AS subinventoryCode,
+            'WIP Backflush' AS transactionSourceCategory,
+            (case when #{kouZhangType} = '1' then -  (case when pppv.item_work_name_flag = '4' then (CASE WHEN  ISNULL( ioqc.quantity, 0 ) >(pppv.required_quantity - pppv.issued_quantity)THEN (pppv.required_quantity - pppv.issued_quantity) ELSE ISNULL( ioqc.quantity, 0 )  END ) ELSE  pppv.onhand_quantity  end)
+            else - (pppv.over_receive_quantity - pppv.over_issue_quantity) end)   AS transactionQuantity,
+            (case when #{kouZhangType} = '1' then -  (case when pppv.item_work_name_flag = '4' then (CASE WHEN  ISNULL( ioqc.quantity, 0 ) >(pppv.required_quantity - pppv.issued_quantity)THEN (pppv.required_quantity - pppv.issued_quantity) ELSE ISNULL( ioqc.quantity, 0 )  END ) ELSE  pppv.onhand_quantity  end)
+            else - (pppv.over_receive_quantity - pppv.over_issue_quantity) end)  AS primaryQuantity,
+        </if>
+        <if test= 'isWwFlag == "Y"'>
+            sdd.dict_label  AS subinventoryCode,
+            'OUTSIDE WIP Backflush' AS transactionSourceCategory,
+            (case when #{kouZhangType} = '1' then -  ( CASE WHEN sd.supplier_type = '0' THEN ISNULL(pppv.onhand_quantity,0)
+            WHEN sd.supplier_type = '1' THEN ISNULL((pppv.required_quantity - pppv.issued_quantity),0)
+            ELSE 0
+            END)
+            else - (pppv.over_receive_quantity - pppv.over_issue_quantity) end)   AS transactionQuantity,
+            (case when #{kouZhangType} = '1' then -  ( CASE WHEN sd.supplier_type = '0' THEN ISNULL(pppv.onhand_quantity,0)
+            WHEN sd.supplier_type = '1' THEN ISNULL((pppv.required_quantity - pppv.issued_quantity),0)
+            ELSE 0
+            END )
+            else - (pppv.over_receive_quantity - pppv.over_issue_quantity) end)  AS primaryQuantity,
+        </if>
+
+        'OUT' AS transactionType,
+        (case when #{kouZhangType} = '1' then 'WIP Backflush' else 'WIP Backflush EXCEED' end) AS transactionSourceType,
+        'WORK' AS transactionSourceCode,
+        pppv.work_order_number AS transactionSourceName,
+
+        pppv.PRIMARY_UOM_CODE AS transactionUom,
+
+        getdate() AS transactionDate,
+        pppv.work_order_id AS transactionSourceReferenceId,
+        'PES' AS sourceCode,
+        pppv.work_order_line_id AS sourceLineId,
+        pppv.line_id AS transactionSourceId,
+        'admin' AS createBy,
+        getdate() AS createDate,
+        '1' AS checkResult,
+        pppv.ITEM_NUMBER AS inventoryItemCode,
+        pppv.ITEM_DESCRIPTION AS inventoryItemDescribe,
+        pppv.lot_num AS batchNum
+        FROM
+        cux_wms_work_kou_zhang_list cwwl,
+        pes_prod_processing_v pppv
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqc ON (pppv.inventory_item_id = ioqc.inventory_item_id and pppv.organization_id = ioqc.organization_id
+        AND ioqc.subinventory_code = '3FCKL001')
+        LEFT JOIN sys_dict_data sdd on sdd.dict_value = pppv.prod_line_flag AND  sdd.dict_type = 'ww_xian_bian_warehouse'
+        LEFT JOIN sys_dept sd on sd.dept_id = pppv.prod_line_flag
+        WHERE
+        pppv.lot_num = cwwl.LOT_NUMBER
+        AND pppv.work_order_id = cwwl.work_order_id
+        AND pppv.organization_id = cwwl.organization_id
+        AND cwwl.kou_zhang_id = #{ kouZhangId }
+        and pppv.work_order_line_id = #{lineId}
+        AND pppv.is_ww_flag = #{isWwFlag}
+    </select>
+
+</mapper>

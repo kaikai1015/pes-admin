@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWorkPlanLineListMapper">
+
+    <resultMap type="PesWorkPlanLineList" id="PesWorkPlanLineListResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="planWieQuantity"    column="plan_wie_quantity"    />
+                    <result property="planStartDate"    column="plan_start_date"    />
+                    <result property="planEndDate"    column="plan_end_date"    />
+                    <result property="grossQuantity"    column="gross_quantity"    />
+                    <result property="grossDate"    column="gross_date"    />
+                    <result property="levelTreeCode"    column="level_tree_code"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="wieFlag"    column="wie_flag"    />
+                    <result property="workFlag"    column="work_flag"    />
+        <result property="documentNumber"    column="document_number"    />
+        <result property="custPoNumber"    column="cust_po_number"    />
+        <result property="documentLineNum"    column="DOCUMENT_LINE_NUM"    />
+        <result property="deleteFlag"    column="delete_flag"    />
+        <result property="level"    column="level"    />
+        <result property="workCenterId"    column="work_center_id"    />
+        <result property="supplierName"    column="supplier_name"    />
+            </resultMap>
+
+    <sql id="selectPesWorkPlanLineListVo">
+        SELECT
+            list.organization_id,
+            list.line_num,
+            list. LEVEL,
+            list.item_number,
+            list.item_description,
+            list.item_type,
+            list.uom,
+            list.plan_wie_quantity,
+            list.plan_start_date,
+            list.plan_end_date,
+            list.gross_quantity,
+            list.gross_date,
+            list.level_tree_code,
+            list.plan_lot_num,
+            list.DOCUMENT_NUMBER,
+            list.DOCUMENT_LINE_NUM,
+            list.CUST_PO_NUMBER,
+            list.wie_flag,
+            list.delete_flag,
+            list.last_update_by,
+            osp.work_center_id,
+            osp.supplier_name
+        FROM
+            pes_work_plan_line_list list
+            LEFT JOIN pes_wie_work_orders_ops_item_erp osp
+            ON (list.inventory_item_id = osp.inventory_item_id
+            AND list.organization_id = osp.organization_id
+            AND osp.prioryty = 1)
+    </sql>
+
+    <select id="selectPesWorkPlanLineListList" parameterType="PesWorkPlanLineList" resultMap="PesWorkPlanLineListResult">
+        <include refid="selectPesWorkPlanLineListVo"/>
+        <where>
+            <if test="planLotNum != null "> and list.plan_lot_num = #{planLotNum}</if>
+            <if test="lineNum != null  and lineNum != '' "> and list.line_num like (#{lineNum} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.item_number like (#{itemNumber} + '%')</if>
+            <if test="wieFlag != null and wieFlag != ''"> and list.wie_flag = #{wieFlag}</if>
+            <if test="workFlag != null and workFlag != ''"> and list.work_flag = #{workFlag}</if>
+            <if test="deleteFlag != null and deleteFlag != ''"> and list.delete_flag = #{deleteFlag}</if>
+            <if test="documentNumber != null  and documentNumber != ''"> and list.document_number like (#{documentNumber} + '%')</if>
+            <if test="lastUpdateBy != null and lastUpdateBy != ''"> and list.last_update_by = #{lastUpdateBy}</if>
+        </where>
+    </select>
+
+    <update id="wieWorkPlanLineListByIds">
+        update pes_work_plan_line_list set wie_flag = '1',last_update_date = getdate(),last_update_by = #{lastUpdateBy} where line_num in
+        <foreach collection="lineNums" item="lineNum" open="(" separator="," close=")">
+            #{lineNum}
+        </foreach>
+    </update>
+
+    <update id="deleteWorksLines" parameterType="Long">
+        update pes_work_plan_line_list set delete_flag = 'N',last_update_date = getdate(),last_update_by = #{lastUpdateBy} where line_num in
+        <foreach collection="lineNums" item="lineNum" open="(" separator="," close=")">
+            #{lineNum}
+        </foreach>
+    </update>
+
+</mapper>

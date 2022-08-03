@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPorRequisitionLinesAllMapper">
+
+    <resultMap type="SyncPorRequisitionLinesAllEO" id="SyncPorRequisitionLinesAllEOResult">
+        <result property="requisitionLineId"    column="REQUISITION_LINE_ID"    />
+        <result property="requisitionHeaderId"    column="REQUISITION_HEADER_ID"    />
+        <result property="needByDate"    column="NEED_BY_DATE"    />
+        <result property="poHeaderId"    column="PO_HEADER_ID"    />
+        <result property="poLineId"    column="PO_LINE_ID"    />
+        <result property="lineStatus"    column="LINE_STATUS"    />
+        <result property="lastSubmittedDate"    column="LAST_SUBMITTED_DATE"    />
+        <result property="lastApprovalDate"    column="LAST_APPROVAL_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="workOrderProduct"    column="WORK_ORDER_PRODUCT"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="workOrderOperationSeq"    column="WORK_ORDER_OPERATION_SEQ"    />
+        <result property="workOrderOperationId"    column="WORK_ORDER_OPERATION_ID"    />
+    </resultMap>
+
+    <delete id="deleteSyncPorRequisitionLinesAllEO">
+        delete from sync_por_requisition_lines_all where REQUISITION_LINE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.requisitionLineId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPorRequisitionLinesAllEO">
+        insert into sync_por_requisition_lines_all( REQUISITION_LINE_ID, REQUISITION_HEADER_ID, NEED_BY_DATE, PO_HEADER_ID, PO_LINE_ID, LINE_STATUS, LAST_SUBMITTED_DATE, LAST_APPROVAL_DATE, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE, WORK_ORDER_PRODUCT, WORK_ORDER_NUMBER, WORK_ORDER_ID, WORK_ORDER_OPERATION_SEQ, WORK_ORDER_OPERATION_ID,LINE_NUMBER,LINE_TYPE_ID,CATEGORY_ID,ITEM_DESCRIPTION,UOM_CODE,UNIT_PRICE,QUANTITY,ITEM_ID,VENDOR_ID) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.requisitionLineId,jdbcType=BIGINT}, #{item.requisitionHeaderId,jdbcType=BIGINT}, #{item.needByDate,jdbcType=TIMESTAMP}, #{item.poHeaderId,jdbcType=BIGINT}, #{item.poLineId,jdbcType=BIGINT}, #{item.lineStatus,jdbcType=VARCHAR}, #{item.lastSubmittedDate,jdbcType=TIMESTAMP}, #{item.lastApprovalDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.workOrderProduct,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.workOrderId,jdbcType=BIGINT}, #{item.workOrderOperationSeq,jdbcType=INTEGER}, #{item.workOrderOperationId,jdbcType=BIGINT}, #{item.lineNumber,jdbcType=INTEGER}, #{item.lineTypeId,jdbcType=BIGINT}, #{item.categoryId,jdbcType=BIGINT}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.uomCode,jdbcType=VARCHAR}, cast(#{item.unitPrice,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.itemId,jdbcType=BIGINT}, #{item.vendorId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+</mapper>

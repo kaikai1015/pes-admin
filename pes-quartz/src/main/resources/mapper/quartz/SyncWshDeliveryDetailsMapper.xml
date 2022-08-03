@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWshDeliveryDetailsMapper">
+
+    <resultMap type="SyncWshDeliveryDetailsEO" id="SyncWshDeliveryDetailsEOResult">
+        <result property="deliveryDetailId"    column="DELIVERY_DETAIL_ID"    />
+        <result property="sourceHeaderId"    column="SOURCE_HEADER_ID"    />
+        <result property="sourceLineId"    column="SOURCE_LINE_ID"    />
+        <result property="sourceHeaderNumber"    column="SOURCE_HEADER_NUMBER"    />
+        <result property="custPoNumber"    column="CUST_PO_NUMBER"    />
+        <result property="soldToContactId"    column="SOLD_TO_CONTACT_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="shipFromLocationId"    column="SHIP_FROM_LOCATION_ID"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="shipToLocationId"    column="SHIP_TO_LOCATION_ID"    />
+        <result property="shipToContactId"    column="SHIP_TO_CONTACT_ID"    />
+        <result property="srcRequestedQuantity"    column="SRC_REQUESTED_QUANTITY"    />
+        <result property="srcRequestedQuantityUom"    column="SRC_REQUESTED_QUANTITY_UOM"    />
+        <result property="cancelledQuantity"    column="CANCELLED_QUANTITY"    />
+        <result property="requestedQuantity"    column="REQUESTED_QUANTITY"    />
+        <result property="requestedQuantityUom"    column="REQUESTED_QUANTITY_UOM"    />
+        <result property="shippedQuantity"    column="SHIPPED_QUANTITY"    />
+        <result property="deliveredQuantity"    column="DELIVERED_QUANTITY"    />
+        <result property="cycleCountQuantity"    column="CYCLE_COUNT_QUANTITY"    />
+        <result property="moveOrderLineId"    column="MOVE_ORDER_LINE_ID"    />
+        <result property="subinventory"    column="SUBINVENTORY"    />
+        <result property="revision"    column="REVISION"    />
+        <result property="lotNumber"    column="LOT_NUMBER"    />
+        <result property="releasedStatus"    column="RELEASED_STATUS"    />
+        <result property="serialNumber"    column="SERIAL_NUMBER"    />
+        <result property="locatorId"    column="LOCATOR_ID"    />
+        <result property="dateRequested"    column="DATE_REQUESTED"    />
+        <result property="dateScheduled"    column="DATE_SCHEDULED"    />
+        <result property="loadSeqNumber"    column="LOAD_SEQ_NUMBER"    />
+        <result property="shipMethodCode"    column="SHIP_METHOD_CODE"    />
+        <result property="carrierId"    column="CARRIER_ID"    />
+        <result property="freightTermsCode"    column="FREIGHT_TERMS_CODE"    />
+        <result property="shipmentPriorityCode"    column="SHIPMENT_PRIORITY_CODE"    />
+        <result property="fobCode"    column="FOB_CODE"    />
+        <result property="customerItemId"    column="CUSTOMER_ITEM_ID"    />
+        <result property="netWeight"    column="NET_WEIGHT"    />
+        <result property="weightUomCode"    column="WEIGHT_UOM_CODE"    />
+        <result property="volume"    column="VOLUME"    />
+        <result property="volumeUomCode"    column="VOLUME_UOM_CODE"    />
+        <result property="shippingInstructions"    column="SHIPPING_INSTRUCTIONS"    />
+        <result property="packingInstructions"    column="PACKING_INSTRUCTIONS"    />
+        <result property="parentLpnId"    column="PARENT_LPN_ID"    />
+        <result property="orgId"    column="ORG_ID"    />
+        <result property="attributeCategory"    column="ATTRIBUTE_CATEGORY"    />
+        <result property="attribute1"    column="ATTRIBUTE1"    />
+        <result property="attribute2"    column="ATTRIBUTE2"    />
+        <result property="attribute3"    column="ATTRIBUTE3"    />
+        <result property="attribute4"    column="ATTRIBUTE4"    />
+        <result property="attribute5"    column="ATTRIBUTE5"    />
+        <result property="attribute6"    column="ATTRIBUTE6"    />
+        <result property="attribute7"    column="ATTRIBUTE7"    />
+        <result property="attribute8"    column="ATTRIBUTE8"    />
+        <result property="attribute9"    column="ATTRIBUTE9"    />
+        <result property="attribute10"    column="ATTRIBUTE10"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateLogin"    column="LAST_UPDATE_LOGIN"    />
+        <result property="objectVersionNumber"    column="object_version_number"    />
+        <result property="sourceLineNumber"    column="SOURCE_LINE_NUMBER"    />
+        <result property="sealCode"    column="SEAL_CODE"    />
+        <result property="grossWeight"    column="GROSS_WEIGHT"    />
+        <result property="preferredGrade"    column="PREFERRED_GRADE"    />
+        <result property="unitPrice"    column="UNIT_PRICE"    />
+        <result property="currencyCode"    column="CURRENCY_CODE"    />
+        <result property="lpnContentId"    column="LPN_CONTENT_ID"    />
+        <result property="inspectionFlag"    column="INSPECTION_FLAG"    />
+        <result property="shipToSiteUseId"    column="SHIP_TO_SITE_USE_ID"    />
+        <result property="originalSubinventory"    column="ORIGINAL_SUBINVENTORY"    />
+        <result property="pickableFlag"    column="PICKABLE_FLAG"    />
+        <result property="pickedQuantity"    column="PICKED_QUANTITY"    />
+        <result property="batchId"    column="BATCH_ID"    />
+        <result property="transactionId"    column="TRANSACTION_ID"    />
+        <result property="requestDateTypeCode"    column="REQUEST_DATE_TYPE_CODE"    />
+        <result property="sourceDocumentTypeId"    column="SOURCE_DOCUMENT_TYPE_ID"    />
+        <result property="unitWeight"    column="UNIT_WEIGHT"    />
+        <result property="unitVolume"    column="UNIT_VOLUME"    />
+        <result property="wvFrozenFlag"    column="WV_FROZEN_FLAG"    />
+        <result property="shipToPartyId"    column="SHIP_TO_PARTY_ID"    />
+        <result property="soldToPartyId"    column="SOLD_TO_PARTY_ID"    />
+        <result property="outsourcerPartyId"    column="OUTSOURCER_PARTY_ID"    />
+        <result property="billToPartyId"    column="BILL_TO_PARTY_ID"    />
+        <result property="billToLocationId"    column="BILL_TO_LOCATION_ID"    />
+        <result property="billToContactId"    column="BILL_TO_CONTACT_ID"    />
+        <result property="shipSetName"    column="SHIP_SET_NAME"    />
+        <result property="arrivalSetName"    column="ARRIVAL_SET_NAME"    />
+        <result property="sourceLineUpdateDate"    column="SOURCE_LINE_UPDATE_DATE"    />
+        <result property="sellingPrice"    column="SELLING_PRICE"    />
+        <result property="shipToPartySiteId"    column="SHIP_TO_PARTY_SITE_ID"    />
+        <result property="billToPartySiteId"    column="BILL_TO_PARTY_SITE_ID"    />
+        <result property="requisitionHeaderId"    column="REQUISITION_HEADER_ID"    />
+        <result property="requisitionLineId"    column="REQUISITION_LINE_ID"    />
+        <result property="convertedQuantity"    column="CONVERTED_QUANTITY"    />
+        <result property="sourceShipmentId"    column="SOURCE_SHIPMENT_ID"    />
+        <result property="sourceShipmentNumber"    column="SOURCE_SHIPMENT_NUMBER"    />
+        <result property="sourceSystemId"    column="SOURCE_SYSTEM_ID"    />
+        <result property="salesOrderLineNumber"    column="SALES_ORDER_LINE_NUMBER"    />
+        <result property="salesOrderNumber"    column="SALES_ORDER_NUMBER"    />
+        <result property="salesOrderShipmentNumber"    column="SALES_ORDER_SHIPMENT_NUMBER"    />
+        <result property="conversionType"    column="CONVERSION_TYPE"    />
+        <result property="conversionDate"    column="CONVERSION_DATE"    />
+        <result property="conversionRate"    column="CONVERSION_RATE"    />
+        <result property="spPickedQuantity"    column="SP_PICKED_QUANTITY"    />
+        <result property="spqUom"    column="SPQ_UOM"    />
+        <result property="parentInventoryItemId"    column="PARENT_INVENTORY_ITEM_ID"    />
+        <result property="parentSourceShipmentId"    column="PARENT_SOURCE_SHIPMENT_ID"    />
+        <result property="shipmentAdviceStatus"    column="SHIPMENT_ADVICE_STATUS"    />
+        <result property="calcWndWddDate"    column="CALC_WND_WDD_DATE"    />
+        <result property="sourceLineType"    column="SOURCE_LINE_TYPE"    />
+        <result property="doNotShipBeforeDate"    column="DO_NOT_SHIP_BEFORE_DATE"    />
+        <result property="doNotShipAfterDate"    column="DO_NOT_SHIP_AFTER_DATE"    />
+        <result property="defaultTaxationCountry"    column="DEFAULT_TAXATION_COUNTRY"    />
+        <result property="firstPtyRegId"    column="FIRST_PTY_REG_ID"    />
+        <result property="thirdPtyRegId"    column="THIRD_PTY_REG_ID"    />
+        <result property="finalDischargeLocationId"    column="FINAL_DISCHARGE_LOCATION_ID"    />
+        <result property="documentSubType"    column="DOCUMENT_SUB_TYPE"    />
+        <result property="trxBusinessCategory"    column="TRX_BUSINESS_CATEGORY"    />
+        <result property="userDefinedFiscClass"    column="USER_DEFINED_FISC_CLASS"    />
+        <result property="taxInvoiceNumber"    column="TAX_INVOICE_NUMBER"    />
+        <result property="taxInvoiceDate"    column="TAX_INVOICE_DATE"    />
+        <result property="productCategory"    column="PRODUCT_CATEGORY"    />
+        <result property="intendedUseClassifId"    column="INTENDED_USE_CLASSIF_ID"    />
+        <result property="productType"    column="PRODUCT_TYPE"    />
+        <result property="assessableValue"    column="ASSESSABLE_VALUE"    />
+        <result property="taxClassificationCode"    column="TAX_CLASSIFICATION_CODE"    />
+        <result property="exemptCertificateNumber"    column="EXEMPT_CERTIFICATE_NUMBER"    />
+        <result property="exemptReasonCode"    column="EXEMPT_REASON_CODE"    />
+        <result property="shipToLocationType"    column="SHIP_TO_LOCATION_TYPE"    />
+        <result property="categoryId"    column="CATEGORY_ID"    />
+        <result property="wmsInterfacedFlag"    column="WMS_INTERFACED_FLAG"    />
+        <result property="pickedFromSubinventory"    column="PICKED_FROM_SUBINVENTORY"    />
+    </resultMap>
+
+    <delete id="deleteSyncWshDeliveryDetailsEO">
+        delete from sync_wsh_delivery_details where DELIVERY_DETAIL_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.deliveryDetailId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+
+    <insert id="batchSyncWshDeliveryDetailsEO">
+        insert into sync_wsh_delivery_details( DELIVERY_DETAIL_ID, SOURCE_HEADER_ID, SOURCE_LINE_ID, SOURCE_HEADER_NUMBER, CUST_PO_NUMBER, SOLD_TO_CONTACT_ID, INVENTORY_ITEM_ID, ITEM_DESCRIPTION, SHIP_FROM_LOCATION_ID, ORGANIZATION_ID, SHIP_TO_LOCATION_ID, SHIP_TO_CONTACT_ID, SRC_REQUESTED_QUANTITY, SRC_REQUESTED_QUANTITY_UOM, CANCELLED_QUANTITY, REQUESTED_QUANTITY, REQUESTED_QUANTITY_UOM, SHIPPED_QUANTITY, DELIVERED_QUANTITY, CYCLE_COUNT_QUANTITY, MOVE_ORDER_LINE_ID, SUBINVENTORY, REVISION, LOT_NUMBER, RELEASED_STATUS, SERIAL_NUMBER, LOCATOR_ID, DATE_REQUESTED, DATE_SCHEDULED, LOAD_SEQ_NUMBER, SHIP_METHOD_CODE, CARRIER_ID, FREIGHT_TERMS_CODE, SHIPMENT_PRIORITY_CODE, FOB_CODE, CUSTOMER_ITEM_ID, NET_WEIGHT, WEIGHT_UOM_CODE, VOLUME, VOLUME_UOM_CODE, SHIPPING_INSTRUCTIONS, PACKING_INSTRUCTIONS, PARENT_LPN_ID, ORG_ID, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, ATTRIBUTE6, ATTRIBUTE7, ATTRIBUTE8, ATTRIBUTE9, ATTRIBUTE10, LAST_UPDATE_DATE, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY, LAST_UPDATE_LOGIN, object_version_number, SOURCE_LINE_NUMBER, SEAL_CODE, GROSS_WEIGHT, PREFERRED_GRADE, UNIT_PRICE, CURRENCY_CODE, LPN_CONTENT_ID, INSPECTION_FLAG, SHIP_TO_SITE_USE_ID, ORIGINAL_SUBINVENTORY, PICKABLE_FLAG, PICKED_QUANTITY, BATCH_ID, TRANSACTION_ID, REQUEST_DATE_TYPE_CODE, SOURCE_DOCUMENT_TYPE_ID, UNIT_WEIGHT, UNIT_VOLUME, WV_FROZEN_FLAG, SHIP_TO_PARTY_ID, SOLD_TO_PARTY_ID, OUTSOURCER_PARTY_ID, BILL_TO_PARTY_ID, BILL_TO_LOCATION_ID, BILL_TO_CONTACT_ID, SHIP_SET_NAME, ARRIVAL_SET_NAME, SOURCE_LINE_UPDATE_DATE, SELLING_PRICE, SHIP_TO_PARTY_SITE_ID, BILL_TO_PARTY_SITE_ID, REQUISITION_HEADER_ID, REQUISITION_LINE_ID, CONVERTED_QUANTITY, SOURCE_SHIPMENT_ID, SOURCE_SHIPMENT_NUMBER, SOURCE_SYSTEM_ID, SALES_ORDER_LINE_NUMBER, SALES_ORDER_NUMBER, SALES_ORDER_SHIPMENT_NUMBER, CONVERSION_TYPE, CONVERSION_DATE, CONVERSION_RATE, SP_PICKED_QUANTITY, SPQ_UOM, PARENT_INVENTORY_ITEM_ID, PARENT_SOURCE_SHIPMENT_ID, SHIPMENT_ADVICE_STATUS, CALC_WND_WDD_DATE, SOURCE_LINE_TYPE, DO_NOT_SHIP_BEFORE_DATE, DO_NOT_SHIP_AFTER_DATE, DEFAULT_TAXATION_COUNTRY, FIRST_PTY_REG_ID, THIRD_PTY_REG_ID, FINAL_DISCHARGE_LOCATION_ID, DOCUMENT_SUB_TYPE, TRX_BUSINESS_CATEGORY, USER_DEFINED_FISC_CLASS, TAX_INVOICE_NUMBER, TAX_INVOICE_DATE, PRODUCT_CATEGORY, INTENDED_USE_CLASSIF_ID, PRODUCT_TYPE, ASSESSABLE_VALUE, TAX_CLASSIFICATION_CODE, EXEMPT_CERTIFICATE_NUMBER, EXEMPT_REASON_CODE, SHIP_TO_LOCATION_TYPE, CATEGORY_ID, WMS_INTERFACED_FLAG, PICKED_FROM_SUBINVENTORY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.deliveryDetailId,jdbcType=BIGINT}, #{item.sourceHeaderId,jdbcType=BIGINT}, #{item.sourceLineId,jdbcType=BIGINT}, #{item.sourceHeaderNumber,jdbcType=VARCHAR}, #{item.custPoNumber,jdbcType=VARCHAR}, #{item.soldToContactId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.shipFromLocationId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.shipToLocationId,jdbcType=BIGINT}, #{item.shipToContactId,jdbcType=BIGINT}, cast(#{item.srcRequestedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.srcRequestedQuantityUom,jdbcType=VARCHAR}, cast(#{item.cancelledQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.requestedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.requestedQuantityUom,jdbcType=VARCHAR}, cast(#{item.shippedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.deliveredQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.cycleCountQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.moveOrderLineId,jdbcType=BIGINT}, #{item.subinventory,jdbcType=VARCHAR}, #{item.revision,jdbcType=VARCHAR}, #{item.lotNumber,jdbcType=VARCHAR}, #{item.releasedStatus,jdbcType=VARCHAR}, #{item.serialNumber,jdbcType=VARCHAR}, #{item.locatorId,jdbcType=BIGINT}, #{item.dateRequested,jdbcType=TIMESTAMP}, #{item.dateScheduled,jdbcType=TIMESTAMP}, cast(#{item.loadSeqNumber,jdbcType=DECIMAL} as decimal(15,5)), #{item.shipMethodCode,jdbcType=VARCHAR}, #{item.carrierId,jdbcType=BIGINT}, #{item.freightTermsCode,jdbcType=VARCHAR}, #{item.shipmentPriorityCode,jdbcType=VARCHAR}, #{item.fobCode,jdbcType=VARCHAR}, #{item.customerItemId,jdbcType=BIGINT}, cast(#{item.netWeight,jdbcType=DECIMAL} as decimal(15,5)), #{item.weightUomCode,jdbcType=VARCHAR}, cast(#{item.volume,jdbcType=DECIMAL} as decimal(15,5)), #{item.volumeUomCode,jdbcType=VARCHAR}, #{item.shippingInstructions,jdbcType=VARCHAR}, #{item.packingInstructions,jdbcType=VARCHAR}, #{item.parentLpnId,jdbcType=BIGINT}, #{item.orgId,jdbcType=BIGINT}, #{item.attributeCategory,jdbcType=VARCHAR}, #{item.attribute1,jdbcType=VARCHAR}, #{item.attribute2,jdbcType=VARCHAR}, #{item.attribute3,jdbcType=VARCHAR}, #{item.attribute4,jdbcType=VARCHAR}, #{item.attribute5,jdbcType=VARCHAR}, #{item.attribute6,jdbcType=VARCHAR}, #{item.attribute7,jdbcType=VARCHAR}, #{item.attribute8,jdbcType=VARCHAR}, #{item.attribute9,jdbcType=VARCHAR}, #{item.attribute10,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateLogin,jdbcType=VARCHAR}, #{item.objectVersionNumber,jdbcType=INTEGER}, #{item.sourceLineNumber,jdbcType=VARCHAR}, #{item.sealCode,jdbcType=VARCHAR}, cast(#{item.grossWeight,jdbcType=DECIMAL} as decimal(15,5)), #{item.preferredGrade,jdbcType=VARCHAR}, cast(#{item.unitPrice,jdbcType=DECIMAL} as decimal(15,5)), #{item.currencyCode,jdbcType=VARCHAR}, #{item.lpnContentId,jdbcType=BIGINT}, #{item.inspectionFlag,jdbcType=VARCHAR}, #{item.shipToSiteUseId,jdbcType=BIGINT}, #{item.originalSubinventory,jdbcType=VARCHAR}, #{item.pickableFlag,jdbcType=VARCHAR}, cast(#{item.pickedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.batchId,jdbcType=BIGINT}, #{item.transactionId,jdbcType=BIGINT}, #{item.requestDateTypeCode,jdbcType=VARCHAR}, #{item.sourceDocumentTypeId,jdbcType=BIGINT}, cast(#{item.unitWeight,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.unitVolume,jdbcType=DECIMAL} as decimal(15,5)), #{item.wvFrozenFlag,jdbcType=VARCHAR}, #{item.shipToPartyId,jdbcType=BIGINT}, #{item.soldToPartyId,jdbcType=BIGINT}, #{item.outsourcerPartyId,jdbcType=BIGINT}, #{item.billToPartyId,jdbcType=BIGINT}, #{item.billToLocationId,jdbcType=BIGINT}, #{item.billToContactId,jdbcType=BIGINT}, #{item.shipSetName,jdbcType=VARCHAR}, #{item.arrivalSetName,jdbcType=VARCHAR}, #{item.sourceLineUpdateDate,jdbcType=TIMESTAMP}, cast(#{item.sellingPrice,jdbcType=DECIMAL} as decimal(15,5)), #{item.shipToPartySiteId,jdbcType=BIGINT}, #{item.billToPartySiteId,jdbcType=BIGINT}, #{item.requisitionHeaderId,jdbcType=BIGINT}, #{item.requisitionLineId,jdbcType=BIGINT}, cast(#{item.convertedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.sourceShipmentId,jdbcType=BIGINT}, #{item.sourceShipmentNumber,jdbcType=VARCHAR}, #{item.sourceSystemId,jdbcType=BIGINT}, #{item.salesOrderLineNumber,jdbcType=VARCHAR}, #{item.salesOrderNumber,jdbcType=VARCHAR}, #{item.salesOrderShipmentNumber,jdbcType=VARCHAR}, #{item.conversionType,jdbcType=VARCHAR}, #{item.conversionDate,jdbcType=TIMESTAMP}, #{item.conversionRate,jdbcType=BIGINT}, cast(#{item.spPickedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.spqUom,jdbcType=VARCHAR}, #{item.parentInventoryItemId,jdbcType=BIGINT}, #{item.parentSourceShipmentId,jdbcType=BIGINT}, #{item.shipmentAdviceStatus,jdbcType=VARCHAR}, #{item.calcWndWddDate,jdbcType=TIMESTAMP}, #{item.sourceLineType,jdbcType=VARCHAR}, #{item.doNotShipBeforeDate,jdbcType=TIMESTAMP}, #{item.doNotShipAfterDate,jdbcType=TIMESTAMP}, #{item.defaultTaxationCountry,jdbcType=VARCHAR}, #{item.firstPtyRegId,jdbcType=BIGINT}, #{item.thirdPtyRegId,jdbcType=BIGINT}, #{item.finalDischargeLocationId,jdbcType=BIGINT}, #{item.documentSubType,jdbcType=VARCHAR}, #{item.trxBusinessCategory,jdbcType=VARCHAR}, #{item.userDefinedFiscClass,jdbcType=VARCHAR}, #{item.taxInvoiceNumber,jdbcType=VARCHAR}, #{item.taxInvoiceDate,jdbcType=TIMESTAMP}, #{item.productCategory,jdbcType=VARCHAR}, cast(#{item.intendedUseClassifId,jdbcType=DECIMAL} as decimal(15,5)), #{item.productType,jdbcType=VARCHAR}, cast(#{item.assessableValue,jdbcType=DECIMAL} as decimal(15,5)), #{item.taxClassificationCode,jdbcType=VARCHAR}, #{item.exemptCertificateNumber,jdbcType=VARCHAR}, #{item.exemptReasonCode,jdbcType=VARCHAR}, #{item.shipToLocationType,jdbcType=VARCHAR}, #{item.categoryId,jdbcType=BIGINT}, #{item.wmsInterfacedFlag,jdbcType=VARCHAR}, #{item.pickedFromSubinventory,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

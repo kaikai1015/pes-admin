@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesRcvPurchaseMapper">
+
+    <resultMap type="MesRcvPurchaseEO" id="MesRcvPurchaseEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="vendorId"    column="VENDOR_ID"    />
+        <result property="buId"    column="BU_ID"    />
+        <result property="employeeId"    column="EMPLOYEE_ID"    />
+        <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+        <result property="documentId"    column="DOCUMENT_ID"    />
+        <result property="documentLineNumber"    column="DOCUMENT_LINE_NUMBER"    />
+        <result property="documentLineId"    column="DOCUMENT_LINE_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="legelEntiytyId"    column="LEGEL_ENTIYTY_ID"    />
+        <result property="subinventoryCode"    column="SUBINVENTORY_CODE"    />
+        <result property="erpFlag"    column="ERP_FLAG"    />
+        <result property="rcvId"    column="RCV_ID"    />
+        <result property="remart"    column="REMART"    />
+        <result property="startUpdateDate"    column="START_UPDATE_DATE"    />
+        <result property="endUpdateDate"    column="END_UPDATE_DATE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lotControlCode"    column="LOT_CONTROL_CODE"    />
+        <result property="errorInfor"    column="error_infor"    />
+        <result property="erpFlagWork"    column="ERP_FLAG_WORK"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="lineQuantity"    column="line_quantity"    />
+        <result property="deliverQuantity"    column="DELIVER_QUANTITY"    />
+        <result property="lineStatus"    column="LINE_STATUS"    />
+        <result property="bItemNumber"    column="b_item_number"    />
+    </resultMap>
+
+    <sql id="selectMesPurchaeRcvAllVo">
+        SELECT
+            mpr.ORGANIZATION_ID,
+            mpr.VENDOR_ID,
+            mpr.BU_ID,
+            mpr.EMPLOYEE_ID,
+        (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = mpr.organization_id
+                AND esb.INVENTORY_ITEM_ID = mpr.INVENTORY_ITEM_ID) AS LOT_CONTROL_CODE,
+            mpr.DOCUMENT_NUMBER,
+            mpr.DOCUMENT_ID,
+            mpr.DOCUMENT_LINE_NUMBER,
+            mpr.DOCUMENT_LINE_ID,
+            mpr.INVENTORY_ITEM_ID,
+            mpr.ITEM_NUMBER,
+            mpr.QUANTITY,
+            mpr.UOM_CODE,
+            mpr.LEGEL_ENTIYTY_ID,
+            mpr.SUBINVENTORY_CODE,
+            mpr.ERP_FLAG,
+            mpr.RCV_ID,
+            mpr.REMART,
+            mpr.LAST_UPDATE_DATE,
+            mpr.ERP_FLAG_WORK,
+            mpr.WORK_ORDER_NUMBER
+        FROM
+            mes_purchae_rcv_all mpr
+    </sql>
+
+    <select id="getRcvPurchaseList" parameterType="MesRcvPurchaseEO" resultMap="MesRcvPurchaseEOResult">
+        <include refid="selectMesPurchaeRcvAllVo"/>
+        <where>
+            and (mpr.ERP_FLAG = 0 or mpr.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and mpr.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and mpr.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by mpr.ERP_FLAG asc
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesRcvPurchaseEO">
+        update mes_purchae_rcv_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where RCV_ID = #{rcvId}
+    </update>
+
+    <select id="selectMesPurchaeRcvAllList" parameterType="MesRcvPurchaseEO" resultMap="MesRcvPurchaseEOResult">
+        SELECT
+        rcv.ORGANIZATION_ID,
+        rcv.VENDOR_ID,
+        rcv.BU_ID,
+        rcv.EMPLOYEE_ID,
+        rcv.DOCUMENT_NUMBER,
+        rcv.DOCUMENT_ID,
+        rcv.DOCUMENT_LINE_NUMBER,
+        pla.LINE_STATUS,
+        rcv.DOCUMENT_LINE_ID,
+        rcv.INVENTORY_ITEM_ID,
+        rcv.ITEM_NUMBER,
+        pla.QUANTITY AS line_quantity,
+        rcv.QUANTITY,
+        (SELECT
+        isnull(SUM ((case when rcvl.transaction_type = 'RETURN TO VENDOR' then (-1)*rcvl.quantity ELSE rcvl.quantity end)),0)
+        FROM
+        sync_rcv_transactions rcvl
+        WHERE
+        rcvl.po_header_id = rcv.DOCUMENT_ID
+        AND rcvl.po_line_id = rcv.DOCUMENT_LINE_ID
+        AND rcvl.transaction_type IN ('DELIVER','RETURN TO VENDOR')) AS DELIVER_QUANTITY,
+        rcv.UOM_CODE,
+        rcv.LEGEL_ENTIYTY_ID,
+        rcv.SUBINVENTORY_CODE,
+        rcv.LAST_UPDATE_DATE,
+        rcv.ERP_FLAG,
+        rcv.RCV_ID,
+        rcv.REMART,
+        rcv.ERP_FLAG_DATE,
+        rcv.ERP_FLAG_WORK,
+        rcv.ERP_FLAG_WORK_DATE,
+        rcv.WORK_ORDER_NUMBER,
+        rcv.RU_KU_DAN,
+        rcv.error_infor,
+        wwob.p_item_number as b_item_number
+        FROM
+        mes_purchae_rcv_all rcv,
+        sync_po_lines_all pla
+        LEFT JOIN pes_wie_work_orders_b_erp wwob
+        on (pla.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+        and pla.WORK_ORDER_ID = wwob.WORK_ORDER_ID
+        AND wwob.work_order_id > 0)
+        <where>
+            <if test="erpFlag != null  and erpFlag != ''"> and rcv.erp_flag = #{erpFlag}</if>
+            <if test="erpFlagWork != null  and erpFlagWork != ''"> and rcv.ERP_FLAG_WORK = #{erpFlagWork}</if>
+            <if test="documentNumber != null  and documentNumber != ''"> and rcv.DOCUMENT_NUMBER = #{documentNumber}</if>
+            <if test="bItemNumber != null  and bItemNumber != ''"> and wwob.p_item_number = #{bItemNumber}</if>
+            AND rcv.DOCUMENT_LINE_ID = pla.PO_LINE_ID
+            AND rcv.DOCUMENT_ID = pla.PO_HEADER_ID
+        </where>
+        order by rcv.RCV_ID desc
+    </select>
+
+</mapper>

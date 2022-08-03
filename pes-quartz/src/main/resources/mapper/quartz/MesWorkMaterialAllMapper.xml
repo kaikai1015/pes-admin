@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesWorkMaterialAllMapper">
+
+    <resultMap type="MesWorkMaterialAllEO" id="MesWorkMaterialAllEOResult">
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="operationSequence"    column="operation_sequence"    />
+        <result property="transactionType"    column="transaction_type"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="materialId"    column="material_id"    />
+        <result property="endUpdateDate"    column="end_Update_Date"    />
+        <result property="lastUpdateDate"    column="last_Update_Date"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="uomCode"    column="uom_code"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+    </resultMap>
+
+    <sql id="selectMesWorkMaterialAllVo">
+        SELECT
+            mwm.work_order_id,
+            mwm.work_order_number,
+            mwm.operation_sequence,
+            mwm.transaction_type,
+            mwm.item_number,
+            mwm.inventory_item_id,
+            mwm.organization_id,
+        (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = mwm.organization_id
+                AND esb.INVENTORY_ITEM_ID = mwm.INVENTORY_ITEM_ID) AS lot_control_code,
+            mwm.transaction_quantity,
+            mwm.uom_code,
+            mwm.transaction_date,
+            mwm.subinventory_code,
+            mwm.remark,
+            mwm.last_update_date,
+            mwm.erp_flag,
+            mwm.erp_flag_date,
+            mwm.material_id
+        FROM
+            mes_work_material_all mwm
+    </sql>
+
+    <select id="getWorkMaterialList" parameterType="MesWorkMaterialAllEO" resultMap="MesWorkMaterialAllEOResult">
+        <include refid="selectMesWorkMaterialAllVo"/>
+        <where>
+            and (mwm.ERP_FLAG = 0 or mwm.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and mwm.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and mwm.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by mwm.ERP_FLAG asc
+    </select>
+
+    <select id="selectOrgnazationCode" parameterType="Long" resultMap="MesWorkMaterialAllEOResult">
+        select ORGANIZATION_CODE from sync_inv_org_parameters where ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesWorkMaterialAllEO">
+        update mes_work_material_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where material_id = #{materialId}
+    </update>
+
+</mapper>

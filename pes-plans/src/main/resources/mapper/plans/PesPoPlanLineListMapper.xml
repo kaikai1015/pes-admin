@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.plans.mapper.PesPoPlanLineListMapper">
+
+    <resultMap type="PesPoPlanLineList" id="PesPoPlanLineListResult">
+        <result property="id"    column="id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="level"    column="level"    />
+        <result property="lineNum"    column="line_num"    />
+        <result property="planType"    column="plan_type"    />
+        <result property="levelTreeCode"    column="level_tree_code"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="componentQuantity"    column="component_quantity"    />
+        <result property="uom"    column="uom"    />
+        <result property="planPoQuantity"    column="plan_po_quantity"    />
+        <result property="planRcvtDate"    column="plan_rcvt_date"    />
+        <result property="planPoDate"    column="plan_po_date"    />
+        <result property="grossQuantity"    column="gross_quantity"    />
+        <result property="grossDate"    column="gross_date"    />
+        <result property="sumGrossQuantity"    column="sum_gross_quantity"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="wieHQuantity"    column="wie_h_quantity"    />
+        <result property="wieLQuantity"    column="wie_l_quantity"    />
+        <result property="soQuantity"    column="so_quantity"    />
+        <result property="poQuantity"    column="po_quantity"    />
+        <result property="prQuantity"    column="pr_quantity"    />
+        <result property="parentPlanPoQuantity"    column="parent_plan_po_quantity"    />
+        <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+        <result property="pItemNumber"    column="p_item_number"    />
+        <result property="pItemDescription"    column="p_item_description"    />
+        <result property="parentLevelTreeCode"    column="parent_level_tree_code"    />
+        <result property="parentGrossQuantity"    column="parent_gross_quantity"    />
+        <result property="parentGrossDate"    column="parent_gross_date"    />
+        <result property="planLotNum"    column="plan_lot_num"    />
+        <result property="planLotLineNum"    column="plan_lot_line_num"    />
+        <result property="planItemNumber"    column="plan_item_number"    />
+        <result property="planItemType"    column="plan_item_type"    />
+        <result property="planItemQuantity"    column="plan_item_quantity"    />
+        <result property="planDate"    column="plan_date"    />
+        <result property="planTreeCode"    column="plan_tree_code"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="avaliableQuantity"    column="avaliable_quantity"    />
+        <result property="safetyStock"    column="safety_stock"    />
+    </resultMap>
+
+    <sql id="selectPesPoPlanLineListVo">
+        SELECT
+            list.line_num,
+            list.LEVEL,
+            list.organization_id,
+            list.plan_type,
+            list.level_tree_code,
+            list.item_number,
+            list.item_description,
+            list.item_type,
+            list.component_quantity,
+            list.uom,
+            list.plan_po_quantity,
+            list.plan_po_date,
+            DATEADD(DAY ,- 1, list.plan_date) AS plan_rcvt_date,
+            list.gross_quantity,
+            list.gross_date,
+            --SUM (list.parent_gross_quantity * list.component_quantity) OVER (partition BY list.organization_id,list.inventory_item_id ORDER BY list.plan_date,list.gross_quantity,list.line_num) AS sum_gross_quantity,
+            list.onhand_quantity,
+            list.wie_h_quantity,
+            list.wie_l_quantity,
+            list.so_quantity,
+            list.po_quantity,
+            list.pr_quantity,
+            list.parent_plan_po_quantity,
+            list.safety_stock,
+            (list.onhand_quantity + list.wie_h_quantity -list.wie_l_quantity - list.so_quantity + list.po_quantity + list.pr_quantity + list.parent_plan_po_quantity - list.safety_stock) as avaliable_quantity,
+            list.p_item_number,
+            list.p_item_description,
+            list.parent_level_tree_code,
+            list.parent_gross_quantity,
+            list.parent_gross_date,
+            list.plan_lot_num,
+            list.plan_lot_line_num,
+            list.plan_item_number,
+            list.plan_item_type,
+            list.plan_item_quantity,
+            list.plan_date,
+            list.plan_tree_code
+        FROM
+            pes_po_plan_line_list list
+    </sql>
+
+    <select id="selectPesPoPlanLineListList" parameterType="PesPoPlanLineList" resultMap="PesPoPlanLineListResult">
+        <include refid="selectPesPoPlanLineListVo"/>
+        <where>
+            <if test="levelTreeCode != null  and levelTreeCode != ''"> and list.level_tree_code = #{levelTreeCode}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.item_number like (#{itemNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and list.p_item_number = #{pItemNumber}</if>
+            <if test="parentLevelTreeCode != null  and parentLevelTreeCode != ''"> and list.parent_level_tree_code like (#{parentLevelTreeCode} + '%')</if>
+            <if test="planLotNum != null "> and list.plan_lot_num = #{planLotNum}</if>
+            <if test="planItemNumber != null  and planItemNumber != ''"> and list.plan_item_number = #{planItemNumber}</if>
+            <if test="planTreeCode != null  and planTreeCode != ''"> and list.plan_tree_code = #{planTreeCode}</if>
+        </where>
+    </select>
+
+    <update id="updatePoPlanLineList" parameterType="PesWiePlanLineList">
+        update pes_po_plan_line_list
+        set plan_po_quantity =  (gross_quantity * (SELECT plan_wie_quantity / gross_quantity FROM pes_wie_plan_line_list WHERE level_tree_code = #{levelTreeCode})),
+        last_update_date = getdate(),
+        last_update_by = #{lastUpdateBy}
+        where parent_level_tree_code like (#{levelTreeCode} + '%')
+    </update>
+
+    <select id="selectPesPoPlanLineListById" parameterType="Long" resultMap="PesPoPlanLineListResult">
+        <include refid="selectPesPoPlanLineListVo"/>
+        where list.line_num = #{lineNum}
+    </select>
+
+    <update id="updatePesPoPlanLineList" parameterType="PesWiePlanLineList">
+        update pes_po_plan_line_list
+        set plan_po_quantity = #{planPoQuantity},
+        last_update_date = getdate(),
+        last_update_by = #{lastUpdateBy}
+        where line_num = #{lineNum}
+    </update>
+
+    <insert id="insertMrpLists">
+        INSERT INTO pes_po_plan_line_list (
+        organization_id,
+        LEVEL,
+        line_num,
+        plan_type,
+        level_tree_code,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        component_quantity,
+        uom,
+        plan_po_quantity,
+        plan_po_date,
+        gross_quantity,
+        gross_date,
+        p_inventory_item_id,
+        p_item_number,
+        p_item_description,
+        parent_level_tree_code,
+        parent_gross_quantity,
+        parent_gross_date,
+        plan_lot_num,
+        plan_lot_line_num,
+        plan_item_number,
+        plan_item_type,
+        plan_item_quantity,
+        plan_date,
+        plan_tree_code,
+        create_by,
+        onhand_quantity,
+        wie_h_quantity,
+        wie_l_quantity,
+        pr_quantity,
+        po_quantity,
+        so_quantity,
+        parent_plan_po_quantity,
+        safety_stock,
+        prod_line
+        )
+        (SELECT
+        list.organization_id,
+        list. LEVEL,
+        list.line_num,
+        list.plan_type,
+        list.level_tree_code,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        list.item_type,
+        list.component_quantity,
+        list.uom,
+        temp.gross_quantity as plan_po_quantity,
+        DATEADD(DAY ,-(case when sqty.total_days = 0 then 7 else sqty.total_days end), list.plan_date) as plan_po_date,
+        list.gross_quantity,
+        list.plan_date AS gross_date,
+        list.p_inventory_item_id,
+        list.p_item_number,
+        list.p_item_description,
+        list.parent_level_tree_code,
+        temp.net_quantity as parent_gross_quantity,
+        list.plan_date AS parent_gross_date,
+        list.plan_lot_num,
+        list.plan_lot_line_num,
+        list.plan_item_number,
+        list.plan_item_type,
+        list.plan_item_quantity,
+        list.plan_date,
+        list.plan_tree_code,
+        list.create_by,
+        sqty.onhand_quantity,
+        sqty.wie_h_quantity,
+        sqty.wie_l_quantity,
+        sqty.pr_quantity,
+        sqty.po_quantity,
+        sqty.so_quantity,
+        sqty.parent_plan_po_quantity,
+        sqty.safety_stock,
+        pgl.prod_line
+        FROM
+        pes_plan_bom_detail_list list,
+        pes_plan_bom_sum_qty_list sqty,
+        pes_plan_bom_net_qty_temp temp,
+        pes_plan_header_list pgl
+        WHERE
+        list.plan_type = 'MRP'
+        and list.line_num = sqty.line_num
+        and list.line_num = temp.line_num
+        and list.plan_lot_num = pgl.plan_lot_num)
+    </insert>
+
+
+</mapper>

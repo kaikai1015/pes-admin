@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncInvOnhandQuantityNewCodeMapper">
+
+    <resultMap type="SyncInvOnhandQuantityNewCodeEO" id="SyncInvOnhandQuantityNewCodeEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="quantity"    column="quantity"    />
+    </resultMap>
+
+    <delete id="deleteSyncInvOnhandQuantityNewCodeTempEO">
+        TRUNCATE TABLE sync_inv_onhand_quantity_new_code_temp
+    </delete>
+
+    <insert id="batchSyncInvOnhandQuantityNewCodeTempEO">
+        insert into sync_inv_onhand_quantity_new_code_temp( inventory_item_id, organization_id,subinventory_code,status_id, quantity,min_date_received) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT},#{item.subinventoryCode,jdbcType=VARCHAR},#{item.statusId,jdbcType=BIGINT},cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.minDateReceived,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <delete id="batchSyncInvOnhandQuantityNewCodeEO">
+        TRUNCATE TABLE sync_inv_onhand_quantity_new_code;
+        INSERT INTO sync_inv_onhand_quantity_new_code (
+        inventory_item_id,
+        organization_id,
+        subinventory_code,
+        status_id,
+        quantity,
+        min_date_received
+        ) SELECT
+        inventory_item_id,
+        organization_id,
+        subinventory_code,
+        status_id,
+        quantity,
+        min_date_received
+        FROM
+        sync_inv_onhand_quantity_new_code_temp
+    </delete>
+
+</mapper>

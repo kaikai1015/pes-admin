@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.procument.mapper.PesPurchaseBuyerPlanListMapper">
+
+    <resultMap type="PesPurchaseBuyerPlanList" id="PesPurchaseBuyerPlanListResult">
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="buyerName"    column="buyer_name"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="planPoQuantity"    column="plan_po_quantity"    />
+                    <result property="planRcvtDate"    column="plan_rcvt_date"    />
+                    <result property="planPoDate"    column="plan_po_date"    />
+                    <result property="minOrderQuantity"    column="min_order_quantity"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="grossQuantity"    column="gross_quantity"    />
+        <result property="grossDate"    column="gross_date"    />
+        <result property="supplierId"    column="supplier_id"    />
+        <result property="requisitioningId"    column="requisitioning_id"    />
+            </resultMap>
+
+    <sql id="selectPesPurchaseBuyerPlanListVo">
+        select line_num, organization_id, inventory_item_id, item_number, item_description, item_type, buyer_name, uom, plan_po_quantity, plan_rcvt_date, plan_po_date, min_order_quantity,gross_quantity,gross_date,last_update_by from pes_purchase_buyer_plan_list
+    </sql>
+
+    <select id="selectPesPurchaseBuyerPlanListList" parameterType="PesPurchaseBuyerPlanList" resultMap="PesPurchaseBuyerPlanListResult">
+        <include refid="selectPesPurchaseBuyerPlanListVo"/>
+        <where>
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+        </where>
+        order by organization_id,inventory_item_id
+    </select>
+
+    <select id="selectPesProcumentPlanLineListById" parameterType="Long" resultMap="PesPurchaseBuyerPlanListResult">
+        SELECT
+        list.line_num,
+        list.organization_id,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        list.item_type,
+        esb.BUYER_NAME,
+        list.uom,
+        list.plan_po_quantity,
+        list.plan_rcvt_date,
+        list.plan_po_date,
+        list.gross_quantity,
+        list.gross_date,
+        esb.MINIMUM_ORDER_QUANTITY as min_order_quantity
+        FROM
+        pes_procument_plan_line_list list
+        LEFT JOIN sync_egp_system_items_b_w esb ON (
+        list.organization_id = esb.ORGANIZATION_ID
+        AND list.inventory_item_id = esb.INVENTORY_ITEM_ID
+        )
+        where list.line_num = #{lineNum}
+    </select>
+
+    <insert id="insertPesPurchaseBuyerPlanList" parameterType="PesPurchaseBuyerPlanList">
+        insert into pes_purchase_buyer_plan_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">line_num,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="buyerName != null">buyer_name,</if>
+            <if test="uom != null">uom,</if>
+            <if test="planPoQuantity != null">plan_po_quantity,</if>
+            <if test="planRcvtDate != null">plan_rcvt_date,</if>
+            <if test="planPoDate != null">plan_po_date,</if>
+            <if test="minOrderQuantity != null">min_order_quantity,</if>
+            <if test="grossDate != null">gross_date,</if>
+            <if test="grossQuantity != null">gross_quantity,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">#{lineNum},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+            <if test="uom != null">#{uom},</if>
+            <if test="planPoQuantity != null">#{planPoQuantity},</if>
+            <if test="planRcvtDate != null">#{planRcvtDate},</if>
+            <if test="planPoDate != null">#{planPoDate},</if>
+            <if test="minOrderQuantity != null">#{minOrderQuantity},</if>
+            <if test="grossDate != null">#{grossDate},</if>
+            <if test="grossQuantity != null">#{grossQuantity},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesPurchaseBuyerPlanListByIds" parameterType="Long">
+        update pes_procument_plan_line_list set relase_flag = '0' where line_num = #{lineNum}
+    </update>
+
+    <delete id="deletePesPurchaseBuyerPlanListByIds" parameterType="Long">
+        delete from pes_purchase_buyer_plan_list where line_num = #{lineNum}
+    </delete>
+
+    <insert id="insertPesPurchaseBuyerRcvList" parameterType="PesPurchaseBuyerPlanList">
+        insert into pes_purchase_buyer_rcv_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">line_num,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="buyerName != null">buyer_name,</if>
+            <if test="uom != null">uom,</if>
+            <if test="planPoQuantity != null">plan_po_quantity,</if>
+            <if test="planRcvtDate != null">plan_rcvt_date,</if>
+            <if test="planPoDate != null">plan_po_date,</if>
+            <if test="minOrderQuantity != null">min_order_quantity,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">#{lineNum},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+            <if test="uom != null">#{uom},</if>
+            <if test="planPoQuantity != null">#{planPoQuantity},</if>
+            <if test="planRcvtDate != null">#{planRcvtDate},</if>
+            <if test="planPoDate != null">#{planPoDate},</if>
+            <if test="minOrderQuantity != null">#{minOrderQuantity},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <sql id="selectPesPurchaseBuyerRcvListVo">
+        select line_num, organization_id, inventory_item_id, item_number, item_description, item_type, buyer_name, uom, plan_po_quantity, plan_rcvt_date, plan_po_date, min_order_quantity,last_update_by from pes_purchase_buyer_rcv_list
+    </sql>
+
+    <select id="selectPesPurchaseBuyerRcvListList" parameterType="PesPurchaseBuyerPlanList" resultMap="PesPurchaseBuyerPlanListResult">
+        <include refid="selectPesPurchaseBuyerRcvListVo"/>
+        <where>
+            and por_flag = '0'
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number = #{itemNumber}</if>
+            <if test="itemDescription != null  and itemDescription != ''"> and item_description like ('%' + #{itemDescription} + '%')</if>
+        </where>
+        order by organization_id,inventory_item_id
+    </select>
+
+    <select id="selectPesPurchaseBuyerPlanListById" parameterType="Long" resultMap="PesPurchaseBuyerPlanListResult">
+        <include refid="selectPesPurchaseBuyerRcvListVo"/>
+        where line_num = #{lineNum}
+    </select>
+
+    <update id="updatePesPurchaseBuyerPlanList" parameterType="PesPurchaseBuyerPlanList">
+        update pes_purchase_buyer_rcv_list
+        <trim prefix="SET" suffixOverrides=",">
+                                                                            <if test="organizationId != null">organization_id = #{organizationId},</if>
+                                                                <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+                                                                <if test="itemNumber != null">item_number = #{itemNumber},</if>
+                                                                <if test="itemDescription != null">item_description = #{itemDescription},</if>
+                                                                <if test="itemType != null">item_type = #{itemType},</if>
+                                                                <if test="buyerName != null">buyer_name = #{buyerName},</if>
+                                                                <if test="uom != null">uom = #{uom},</if>
+                                                                <if test="planPoQuantity != null">plan_po_quantity = #{planPoQuantity},</if>
+                                                                <if test="planRcvtDate != null">plan_rcvt_date = #{planRcvtDate},</if>
+                                                                <if test="planPoDate != null">plan_po_date = #{planPoDate},</if>
+                                                                <if test="minOrderQuantity != null">min_order_quantity = #{minOrderQuantity},</if>
+            last_update_date = getdate(),
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+                                    </trim>
+        where line_num = #{lineNum}
+    </update>
+
+    <insert id="insertPesPorBuyerRcvList" parameterType="PesPurchaseBuyerPlanList">
+        insert into cux_por_requisition_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">line_num,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="buyerName != null">buyer_name,</if>
+            <if test="uom != null">uom,</if>
+            <if test="planPoQuantity != null">plan_po_quantity,</if>
+            <if test="planRcvtDate != null">plan_rcvt_date,</if>
+            <if test="planPoDate != null">plan_po_date,</if>
+            <if test="minOrderQuantity != null">min_order_quantity,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lineNum != null">#{lineNum},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+            <if test="uom != null">#{uom},</if>
+            <if test="planPoQuantity != null">#{planPoQuantity},</if>
+            <if test="planRcvtDate != null">#{planRcvtDate},</if>
+            <if test="planPoDate != null">#{planPoDate},</if>
+            <if test="minOrderQuantity != null">#{minOrderQuantity},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="delPorPoBuyer" parameterType="Long">
+        update pes_purchase_buyer_rcv_list set por_flag = '1' where line_num = #{lineNum}
+    </update>
+
+    <select id="porList" parameterType="PesPurchaseBuyerPlanList" resultMap="PesPurchaseBuyerPlanListResult">
+        SELECT
+        prl.line_num,
+        prl.inventory_item_id,
+        prl.organization_id,
+        prl.item_number,
+        prl.item_description,
+        prl.item_type,
+        prl.buyer_name,
+        prl.uom,
+        prl.plan_po_quantity,
+        prl.plan_po_date,
+        prl.min_order_quantity,
+        sis.sourcing_item_id,
+        #{requisitioningId} as requisitioning_id
+        FROM
+        cux_por_requisition_list prl,
+        pes_sourcing_item_supplier sis
+        WHERE
+        sis.supplier_id = #{supplierId}
+        AND prl.inventory_item_id = sis.inventory_item_id
+        AND prl.organization_id = sis.organization_id
+        and prl.pr_flag = '0'
+        order by prl.organization_id,prl.inventory_item_id
+    </select>
+
+</mapper>

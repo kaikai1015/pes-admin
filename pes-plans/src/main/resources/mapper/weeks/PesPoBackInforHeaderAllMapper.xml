@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.PesPoBackInforHeaderAllMapper">
+
+    <resultMap type="PesPoBackInforHeaderAll" id="PesPoBackInforHeaderAllResult">
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="headerId"    column="header_id"    />
+        <result property="activeCode"    column="active_code"    />
+            </resultMap>
+
+    <sql id="selectPesPoBackInforHeaderAllVo">
+        select lot_num, remark, create_date, create_by, last_update_by, last_update_date, header_id,active_code from pes_po_back_infor_header_all
+    </sql>
+
+    <select id="selectPesPoBackInforHeaderAllList" parameterType="PesPoBackInforHeaderAll" resultMap="PesPoBackInforHeaderAllResult">
+        <include refid="selectPesPoBackInforHeaderAllVo"/>
+        <where>
+            <if test="lotNum != null "> and lot_num = #{lotNum}</if>
+        </where>
+    </select>
+
+    <insert id="insertPesPoBackInforHeaderAll" parameterType="PesPoBackInforHeaderAll">
+        insert into pes_po_back_infor_header_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lotNum != null">lot_num,</if>
+            <if test="remark != null">remark,</if>
+            <if test="activeCode != null">active_code,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">create_by,</if>
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lotNum != null">#{lotNum},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="activeCode != null">#{activeCode},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <delete id="deletePesPoBackInforHeaderAllById" parameterType="Long">
+        delete from pes_po_back_infor_header_all where header_id = #{headerId}
+    </delete>
+
+    <select id="selectPesPoBackInforHeaderAllById" parameterType="Long" resultMap="PesPoBackInforHeaderAllResult">
+        <include refid="selectPesPoBackInforHeaderAllVo"/>
+        where header_id = #{headerId}
+    </select>
+
+    <update id="updatePesPoBackInforHeaderAll" parameterType="PesPoBackInforHeaderAll">
+        update pes_po_back_infor_header_all set active_code = 'N',last_update_date = getdate(),last_update_by = #{createBy} where header_id = #{headerId}
+    </update>
+
+</mapper>

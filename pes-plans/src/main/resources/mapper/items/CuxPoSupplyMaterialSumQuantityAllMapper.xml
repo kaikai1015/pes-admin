@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxPoSupplyMaterialSumQuantityAllMapper">
+
+    <resultMap type="CuxPoSupplyMaterialSumQuantityAll" id="CuxPoSupplyMaterialSumQuantityAllResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="janQuantity"    column="jan_quantity"    />
+                    <result property="febQuantity"    column="feb_quantity"    />
+                    <result property="marQuantity"    column="mar_quantity"    />
+                    <result property="aprQuantity"    column="apr_quantity"    />
+                    <result property="mayQuantity"    column="may_quantity"    />
+                    <result property="junQuantity"    column="jun_quantity"    />
+                    <result property="julQuantity"    column="jul_quantity"    />
+                    <result property="augQuantity"    column="aug_quantity"    />
+                    <result property="sepQuantity"    column="sep_quantity"    />
+                    <result property="octQuantity"    column="oct_quantity"    />
+                    <result property="novQuantity"    column="nov_quantity"    />
+                    <result property="decQuantity"    column="dec_quantity"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="transactionYear"    column="transaction_year"    />
+                    <result property="sumUnitCost"    column="sum_unit_cost"    />
+            </resultMap>
+
+    <sql id="selectCuxPoSupplyMaterialSumQuantityAllVo">
+        SELECT
+            list.organization_id,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            psmsa.jan_quantity,
+            psmsa.feb_quantity,
+            psmsa.mar_quantity,
+            psmsa.apr_quantity,
+            psmsa.may_quantity,
+            psmsa.jun_quantity,
+            psmsa.jul_quantity,
+            psmsa.aug_quantity,
+            psmsa.sep_quantity,
+            psmsa.oct_quantity,
+            psmsa.nov_quantity,
+            psmsa.dec_quantity,
+            psmsa.transaction_year,
+            isnull(price.sum_unit_cost,0) as sum_unit_cost
+        FROM
+            sync_items_num_des_list list,
+            cux_po_supply_material_sum_quantity_all psmsa
+            LEFT JOIN sync_cst_costed_vu_costs_v_unit_price price
+            on (psmsa.organization_id = price.organization_id
+            and psmsa.inventory_item_id = price.inventory_item_id)
+    </sql>
+
+    <select id="selectCuxPoSupplyMaterialSumQuantityAllList" parameterType="CuxPoSupplyMaterialSumQuantityAll" resultMap="CuxPoSupplyMaterialSumQuantityAllResult">
+        <include refid="selectCuxPoSupplyMaterialSumQuantityAllVo"/>
+        <where>
+            and list.ORGANIZATION_ID = psmsa.organization_id
+            AND list.INVENTORY_ITEM_ID = psmsa.INVENTORY_ITEM_ID
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="transactionYear != null "> and psmsa.transaction_year = #{transactionYear}</if>
+            <if test="organizationId != null "> and psmsa.organization_id = #{organizationId}</if>
+        </where>
+    </select>
+
+</mapper>

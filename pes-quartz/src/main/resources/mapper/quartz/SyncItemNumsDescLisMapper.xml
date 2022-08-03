@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncItemNumsDescLisMapper">
+
+    <resultMap type="SyncItemNumsDescLisEO" id="SyncItemNumsDescLisEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="itemType"    column="ITEM_TYPE"    />
+        <result property="planningMakeBuyCode"    column="PLANNING_MAKE_BUY_CODE"    />
+        <result property="primaryUomCode"    column="PRIMARY_UOM_CODE"    />
+        <result property="inventoryItemStatusCode"    column="INVENTORY_ITEM_STATUS_CODE"    />
+        <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+        <result property="fixedSuoHaoQuantiy"    column="fixed_suo_hao_quantiy"    />
+    </resultMap>
+
+    <sql id="selectSyncItemsNumDesListVo">
+        SELECT
+            list.ORGANIZATION_ID,
+            list.INVENTORY_ITEM_ID,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.LAST_UPDATE_DATE,
+            list.ITEM_TYPE,
+            list.PLANNING_MAKE_BUY_CODE,
+            list.PRIMARY_UOM_CODE,
+            list.INVENTORY_ITEM_STATUS_CODE,
+            pitc.item_work_name_flag,
+            pitc.fixed_suo_hao_quantiy
+        FROM
+            sync_items_num_des_list list
+        LEFT JOIN pes_item_techniques_code_all pitc
+        ON (list.ORGANIZATION_ID = pitc.organization_id
+        AND list.INVENTORY_ITEM_ID = pitc.inventory_item_id)
+    </sql>
+
+    <select id="selectSyncItemsNumDesListList" parameterType="SyncItemNumsDescLisEO" resultMap="SyncItemNumsDescLisEOResult">
+        <include refid="selectSyncItemsNumDesListVo"/>
+        <where>
+            <if test="inventoryItemId != null "> and list.INVENTORY_ITEM_ID = #{inventoryItemId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER = #{itemNumber}</if>
+            <if test="beginTime != null and beginTime != ''"> and list.LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-10,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and list.LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncItemNumsDescLis">
+        delete from sync_items_num_des_list where
+        <foreach collection="list" item="item" index="index" separator="or">
+            ( INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT} )
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncItemNumsDescLis">
+        insert into sync_items_num_des_list( INVENTORY_ITEM_ID, ORGANIZATION_ID, item_number, item_description,BUYER_NAME,ITEM_TYPE,PLANNING_MAKE_BUY_CODE, LAST_UPDATE_DATE,PRIMARY_UOM_CODE,INVENTORY_ITEM_STATUS_CODE,FIXED_LEAD_TIME,MINIMUM_ORDER_QUANTITY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.itemDescription,jdbcType=VARCHAR},#{item.buyerName,jdbcType=VARCHAR},#{item.itemType,jdbcType=VARCHAR},#{item.planningMakeBuyCode,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP},#{item.primaryUomCode,jdbcType=VARCHAR},#{item.inventoryItemStatusCode,jdbcType=VARCHAR}, cast(#{item.fixedLeadTime,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.minimumOrderQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+</mapper>

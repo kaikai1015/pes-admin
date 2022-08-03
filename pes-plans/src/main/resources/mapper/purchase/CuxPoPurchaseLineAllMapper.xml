@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.purchase.mapper.CuxPoPurchaseLineAllMapper">
+
+    <resultMap type="CuxPoPurchaseLineAll" id="CuxPoPurchaseLineAllResult">
+                    <result property="poLineId"    column="po_line_id"    />
+                    <result property="lineNumber"    column="line_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="lineTypeId"    column="line_type_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="categoryId"    column="category_id"    />
+                    <result property="uomCode"    column="uom_code"    />
+                    <result property="unitPrice"    column="unit_price"    />
+                    <result property="quantity"    column="quantity"    />
+                    <result property="needByDate"    column="need_by_date"    />
+                    <result property="poHeaderId"    column="po_header_id"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="buyerName"    column="buyer_name"    />
+                    <result property="minOrderQuantity"    column="min_order_quantity"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="taxCode"    column="tax_code"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+            </resultMap>
+
+    <sql id="selectCuxPoPurchaseLineAllVo">
+        select po_line_id, line_number, inventory_item_id, line_type_id, organization_id, category_id, uom_code, unit_price, quantity, need_by_date, po_header_id, line_num, item_type, buyer_name, min_order_quantity, item_number, item_description, tax_code, create_by, create_date, last_update_by, last_update_date from cux_po_purchase_line_all
+    </sql>
+
+    <select id="selectCuxPoPurchaseLineAllList" parameterType="CuxPoPurchaseLineAll" resultMap="CuxPoPurchaseLineAllResult">
+        <include refid="selectCuxPoPurchaseLineAllVo"/>
+        <where>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </where>
+    </select>
+
+    <select id="selectCuxPoPurchaseLineAllById" parameterType="Long" resultMap="CuxPoPurchaseLineAllResult">
+        <include refid="selectCuxPoPurchaseLineAllVo"/>
+        where po_line_id = #{poLineId}
+    </select>
+
+    <insert id="insertCuxPoPurchaseLineAll" parameterType="CuxPoPurchaseLineAll">
+        insert into cux_po_purchase_line_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                                                <if test="poLineId != null">po_line_id,</if>
+                                                                <if test="lineNumber != null">line_number,</if>
+                                                                <if test="inventoryItemId != null">inventory_item_id,</if>
+                                                                <if test="lineTypeId != null">line_type_id,</if>
+                                                                <if test="organizationId != null">organization_id,</if>
+                                                                <if test="categoryId != null">category_id,</if>
+                                                                <if test="uomCode != null">uom_code,</if>
+                                                                <if test="unitPrice != null">unit_price,</if>
+                                                                <if test="quantity != null">quantity,</if>
+                                                                <if test="needByDate != null">need_by_date,</if>
+                                                                <if test="poHeaderId != null">po_header_id,</if>
+                                                                <if test="lineNum != null">line_num,</if>
+                                                                <if test="itemType != null">item_type,</if>
+                                                                <if test="buyerName != null">buyer_name,</if>
+                                                                <if test="minOrderQuantity != null">min_order_quantity,</if>
+                                                                <if test="itemNumber != null">item_number,</if>
+                                                                <if test="itemDescription != null">item_description,</if>
+                                                                <if test="taxCode != null">tax_code,</if>
+                                                                <if test="createBy != null">create_by,</if>
+                                                                <if test="createDate != null">create_date,</if>
+                                                                <if test="lastUpdateBy != null">last_update_by,</if>
+                                                                <if test="lastUpdateDate != null">last_update_date,</if>
+                                    </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                                                <if test="poLineId != null">#{poLineId},</if>
+                                                                <if test="lineNumber != null">#{lineNumber},</if>
+                                                                <if test="inventoryItemId != null">#{inventoryItemId},</if>
+                                                                <if test="lineTypeId != null">#{lineTypeId},</if>
+                                                                <if test="organizationId != null">#{organizationId},</if>
+                                                                <if test="categoryId != null">#{categoryId},</if>
+                                                                <if test="uomCode != null">#{uomCode},</if>
+                                                                <if test="unitPrice != null">#{unitPrice},</if>
+                                                                <if test="quantity != null">#{quantity},</if>
+                                                                <if test="needByDate != null">#{needByDate},</if>
+                                                                <if test="poHeaderId != null">#{poHeaderId},</if>
+                                                                <if test="lineNum != null">#{lineNum},</if>
+                                                                <if test="itemType != null">#{itemType},</if>
+                                                                <if test="buyerName != null">#{buyerName},</if>
+                                                                <if test="minOrderQuantity != null">#{minOrderQuantity},</if>
+                                                                <if test="itemNumber != null">#{itemNumber},</if>
+                                                                <if test="itemDescription != null">#{itemDescription},</if>
+                                                                <if test="taxCode != null">#{taxCode},</if>
+                                                                <if test="createBy != null">#{createBy},</if>
+                                                                <if test="createDate != null">#{createDate},</if>
+                                                                <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+                                                                <if test="lastUpdateDate != null">#{lastUpdateDate},</if>
+                                    </trim>
+    </insert>
+
+    <update id="updateCuxPoPurchaseLineAll" parameterType="CuxPoPurchaseLineAll">
+        update cux_po_purchase_line_all
+        <trim prefix="SET" suffixOverrides=",">
+                                                                            <if test="lineNumber != null">line_number = #{lineNumber},</if>
+                                                                <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+                                                                <if test="lineTypeId != null">line_type_id = #{lineTypeId},</if>
+                                                                <if test="organizationId != null">organization_id = #{organizationId},</if>
+                                                                <if test="categoryId != null">category_id = #{categoryId},</if>
+                                                                <if test="uomCode != null">uom_code = #{uomCode},</if>
+                                                                <if test="unitPrice != null">unit_price = #{unitPrice},</if>
+                                                                <if test="quantity != null">quantity = #{quantity},</if>
+                                                                <if test="needByDate != null">need_by_date = #{needByDate},</if>
+                                                                <if test="poHeaderId != null">po_header_id = #{poHeaderId},</if>
+                                                                <if test="lineNum != null">line_num = #{lineNum},</if>
+                                                                <if test="itemType != null">item_type = #{itemType},</if>
+                                                                <if test="buyerName != null">buyer_name = #{buyerName},</if>
+                                                                <if test="minOrderQuantity != null">min_order_quantity = #{minOrderQuantity},</if>
+                                                                <if test="itemNumber != null">item_number = #{itemNumber},</if>
+                                                                <if test="itemDescription != null">item_description = #{itemDescription},</if>
+                                                                <if test="taxCode != null">tax_code = #{taxCode},</if>
+                                                                <if test="createBy != null">create_by = #{createBy},</if>
+                                                                <if test="createDate != null">create_date = #{createDate},</if>
+                                                                <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+                                                                <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+                                    </trim>
+        where po_line_id = #{poLineId}
+    </update>
+
+    <delete id="deleteCuxPoPurchaseLineAllById" parameterType="Long">
+        delete from cux_po_purchase_line_all where po_line_id = #{poLineId}
+    </delete>
+
+    <delete id="deleteCuxPoPurchaseLineAllByIds" parameterType="String">
+        delete from cux_po_purchase_line_all where po_line_id in
+        <foreach item="poLineId" collection="array" open="(" separator="," close=")">
+            #{poLineId}
+        </foreach>
+    </delete>
+
+    <insert id="batchCuxPoPurchaseLineAll">
+        insert into cux_po_purchase_line_all( po_line_id, line_number, inventory_item_id, line_type_id, organization_id, category_id, uom_code, unit_price, quantity, need_by_date, po_header_id, line_num, item_type, buyer_name, min_order_quantity, item_number, item_description, tax_code, create_by, create_date, last_update_by, last_update_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.poLineId,jdbcType=$column.columnComment}, #{item.lineNumber,jdbcType=行号}, #{item.inventoryItemId,jdbcType=$column.columnComment}, #{item.lineTypeId,jdbcType=$column.columnComment}, #{item.organizationId,jdbcType=库存组织}, #{item.categoryId,jdbcType=物料类别}, #{item.uomCode,jdbcType=单位}, #{item.unitPrice,jdbcType=单位价格}, #{item.quantity,jdbcType=采购数量}, #{item.needByDate,jdbcType=需求日期}, #{item.poHeaderId,jdbcType=$column.columnComment}, #{item.lineNum,jdbcType=计划批次行号}, #{item.itemType,jdbcType=物料类别}, #{item.buyerName,jdbcType=采购员}, #{item.minOrderQuantity,jdbcType=最小订购量}, #{item.itemNumber,jdbcType=物料编码}, #{item.itemDescription,jdbcType=物料描述}, #{item.taxCode,jdbcType=税分类代码}, #{item.createBy,jdbcType=$column.columnComment}, #{item.createDate,jdbcType=$column.columnComment}, #{item.lastUpdateBy,jdbcType=$column.columnComment}, #{item.lastUpdateDate,jdbcType=$column.columnComment})
+        </foreach>
+    </insert>
+
+</mapper>

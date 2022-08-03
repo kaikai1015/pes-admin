@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncBomItemDataLisMapper">
+
+    <resultMap type="SyncBomItemDataLisEO" id="SyncBomItemDataLisEOResult"></resultMap>
+
+    <delete id="deleteSyncItemNumsDescLis">
+        delete from sync_bom_item_data_list where COMPONENT_SEQUENCE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.componentSequenceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncBomItemDataLis">
+        insert into sync_bom_item_data_list( COMPONENT_SEQUENCE_ID,p_inventory_item_id, organization_id, inventory_item_id, component_quantity,disable_date,implementation_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.componentSequenceId,jdbcType=BIGINT},#{item.pInventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT},#{item.inventoryItemId,jdbcType=BIGINT}, cast(#{item.component_quantity,jdbcType=DECIMAL} as decimal(15,5)),#{item.disableDate,jdbcType=TIMESTAMP},#{item.implementationDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

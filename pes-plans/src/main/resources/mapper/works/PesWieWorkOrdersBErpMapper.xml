@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkOrdersBErpMapper">
+
+    <resultMap type="PesWieWorkOrdersBErp" id="PesWieWorkOrdersBErpResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="workOrderStatusId"    column="work_order_status_id"    />
+                    <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+                    <result property="plannedStartDate"    column="planned_start_date"    />
+                    <result property="plannedCompletionDate"    column="planned_completion_date"    />
+                    <result property="customerName"    column="customer_name"    />
+                    <result property="orderNumber"    column="order_number"    />
+                    <result property="workOrderType"    column="work_order_type"    />
+                    <result property="contractNumber"    column="contract_number"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="uomCode"    column="uom_code"    />
+                    <result property="completedQuantity"    column="completed_quantity"    />
+                    <result property="completedSubinventoryCode"    column="completed_subinventory_code"    />
+                    <result property="workVersionNumber"    column="work_version_number"    />
+                    <result property="pItemVersionNumber"    column="p_item_version_number"    />
+                    <result property="workItemLevel"    column="work_item_level"    />
+                    <result property="planName"    column="plan_name"    />
+                    <result property="orderNumberLine"    column="order_number_line"    />
+                    <result property="sourceLineNum"    column="source_line_num"    />
+                    <result property="levelTreeCode"    column="level_tree_code"    />
+                    <result property="parentLevelTreeCode"    column="parent_level_tree_code"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="pesWorkOrderId"    column="pes_work_order_id"    />
+        <result property="erpSubmitDate"    column="erp_submit_date"    />
+        <result property="workOrderTypeId"    column="work_order_type_id"    />
+        <result property="workCenterId"    column="work_center_id"    />
+        <result property="workCenterCode"    column="work_center_code"    />
+        <result property="isWwFlag"    column="is_ww_flag"    />
+        <result property="supplySubinventory"    column="supply_subinventory"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+            </resultMap>
+
+    <sql id="selectPesWieWorkOrdersBErpVo">
+        SELECT
+            wwob.organization_id,
+            wwob.work_order_id,
+            wwob.work_order_number,
+            wwob.inventory_item_id,
+            wwob.work_order_status_id,
+            wwob.work_center_id,
+            (SELECT pwcda.work_center_code FROM pes_work_center_description_all pwcda WHERE pwcda.organization_id = wwob.organization_id AND pwcda.work_center_id = wwob.work_center_id) AS work_center_code,
+            wwob.planned_start_quantity,
+            wwob.planned_start_date,
+            wwob.planned_completion_date,
+            wwob.customer_name,
+            wwob.order_number,
+            wwob.work_order_type,
+            wwob.work_order_type_id,
+            wwob.contract_number,
+            wwob.p_item_number,
+            wwob.p_item_description,
+            wwob.uom_code,
+            wwob.completed_quantity,
+            wwob.completed_subinventory_code,
+            wwob.work_version_number,
+            wwob.p_item_version_number,
+            wwob.work_item_level,
+            wwob.plan_name,
+            wwob.order_number_line,
+            wwob.source_line_num,
+            wwob.level_tree_code,
+            wwob.parent_level_tree_code,
+            wwob.remark,
+            wwob.create_date,
+            wwob.create_by,
+            wwob.pes_work_order_id,
+            wwob.erp_submit_date,
+            wwob.last_update_date
+        FROM
+            pes_wie_work_orders_b_erp wwob
+    </sql>
+
+    <select id="selectPesWieWorkOrdersBErpList" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        <include refid="selectPesWieWorkOrdersBErpVo"/>
+        <where>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and wwob.order_number like (#{orderNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wwob.p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="planName != null  and planName != ''"> and wwob.plan_name = #{planName}</if>
+            <if test="workOrderStatusIdAll != null and workOrderStatusIdAll != ''"> and wwob.work_order_status_id in (
+                <foreach collection="workOrderStatusIdAll.split(',')" item="workOrderStatusId" index="index" separator=",">
+                    #{workOrderStatusId}
+                </foreach>
+                )</if>
+        </where>
+        order by wwob.pes_work_order_id desc
+    </select>
+
+    <select id="selectPesWieWorkOrdersBErpById" parameterType="Long" resultMap="PesWieWorkOrdersBErpResult">
+        <include refid="selectPesWieWorkOrdersBErpVo"/>
+        where wwob.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+            pes_work_order_id
+        FROM
+            pes_wie_work_orders_b_erp
+        where work_order_id = 0
+        and  work_order_status_id = 10005
+        AND create_date = erp_submit_date
+    </select>
+
+    <select id="updateSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWorkOrdersBErpResult">
+        <include refid="selectPesWieWorkOrdersBErpVo"/>
+        where wwob.work_order_id > 0
+        and wwob.last_update_date > wwob.create_date
+        and wwob.last_update_date > wwob.erp_submit_date
+        and wwob.work_order_status_id &lt;= 10005
+    </select>
+
+    <insert id="insertPesWieWorkOrdersBErp" parameterType="PesWieWorkOrdersBErp" useGeneratedKeys="true" keyProperty="pesWorkOrderId">
+        INSERT INTO pes_wie_work_orders_b_erp (
+                    organization_id,
+                    work_order_number,
+                    inventory_item_id,
+                    planned_start_quantity,
+                    planned_start_date,
+                    planned_completion_date,
+                    work_order_type,
+                    work_order_type_id,
+                    work_order_status_id,
+                    p_item_number,
+                    p_item_description,
+                    uom_code,
+                    work_item_level,
+                    plan_name,
+                    customer_name,
+                    order_number,
+                    order_number_line,
+                    contract_number,
+                    source_line_num,
+                    level_tree_code,
+                    parent_level_tree_code,
+                    completed_quantity,
+                    create_date,
+                    create_by,
+                    last_update_date,
+                    last_update_by,
+                    erp_submit_date,
+                    work_order_id,
+                    work_center_id)
+                    (SELECT
+                        list.organization_id,
+                        (case when list.prod_line = '0' then #{workOrderNumber} ELSE (SELECT sdd.remark FROM sys_dict_data sdd WHERE sdd.dict_type = 'erp_prod_lines' AND sdd.dict_value = list.prod_line) + #{workOrderNumber} end),
+                        list.inventory_item_id,
+                        list.plan_wie_quantity,
+                        list.plan_start_date,
+                        DATEADD(DAY ,7, list.plan_start_date) as plan_end_date,
+                        list.item_type,
+                        #{lotNumFlag},
+                        #{workOrderStatusId},
+                        list.item_number,
+                        list.item_description,
+                        list.uom,
+                        list.level,
+                        list.last_update_by,
+                        list.customer_name,
+                        list.DOCUMENT_NUMBER,
+                        list.DOCUMENT_LINE_NUM,
+                        list.CUST_PO_NUMBER,
+                        list.line_num,
+                        list.level_tree_code,
+                        list.parent_level_tree_code,
+                        0,
+                        #{createDate},
+                        #{createBy},
+                        #{createDate},
+                        #{createBy},
+                        #{createDate},
+                        0,
+                        osp.work_center_id
+                    FROM
+                        pes_work_plan_line_list list
+                        left join pes_wie_work_orders_ops_item_erp osp
+                        on (list.inventory_item_id = osp.inventory_item_id
+                        and list.organization_id = osp.organization_id
+                        and osp.prioryty = 1)
+                    WHERE
+                        list.work_flag = 0
+                    AND list.delete_flag = 'Y'
+                    AND list.wie_flag = 1
+                    AND list.line_num = #{sourceLineNum})
+    </insert>
+
+    <update id="updatePesWieWorkOrdersBErp" parameterType="PesWieWorkOrdersBErp">
+        update pes_wie_work_orders_b_erp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workOrderStatusId != null">work_order_status_id = #{workOrderStatusId},</if>
+            <if test="plannedStartQuantity != null">planned_start_quantity = #{plannedStartQuantity},</if>
+            <if test="plannedStartDate != null">planned_start_date = #{plannedStartDate},</if>
+            <if test="plannedStartDate != null">planned_completion_date = DATEADD(DAY ,7, #{plannedStartDate}),</if>
+            <if test="customerName != null">customer_name = #{customerName},</if>
+            <if test="orderNumber != null">order_number = #{orderNumber},</if>
+            <if test="workOrderType != null">work_order_type = #{workOrderType},</if>
+            <if test="workOrderTypeId != null">work_order_type_id = #{workOrderTypeId},</if>
+            <if test="contractNumber != null">contract_number = #{contractNumber},</if>
+            <if test="pItemNumber != null">p_item_number = #{pItemNumber},</if>
+            <if test="pItemDescription != null">p_item_description = #{pItemDescription},</if>
+            <if test="uomCode != null">uom_code = #{uomCode},</if>
+            <if test="completedQuantity != null">completed_quantity = #{completedQuantity},</if>
+            <if test="completedSubinventoryCode != null">completed_subinventory_code = #{completedSubinventoryCode},</if>
+            <if test="workVersionNumber != null">work_version_number = #{workVersionNumber},</if>
+            <if test="pItemVersionNumber != null">p_item_version_number = #{pItemVersionNumber},</if>
+            <if test="workItemLevel != null">work_item_level = #{workItemLevel},</if>
+            <if test="planName != null">plan_name = #{planName},</if>
+            <if test="orderNumberLine != null">order_number_line = #{orderNumberLine},</if>
+            <if test="sourceLineNum != null">source_line_num = #{sourceLineNum},</if>
+            <if test="levelTreeCode != null">level_tree_code = #{levelTreeCode},</if>
+            <if test="parentLevelTreeCode != null">parent_level_tree_code = #{parentLevelTreeCode},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            last_update_date = #{createDate},
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+            <if test="workCenterId != null">work_center_id = #{workCenterId},</if>
+        </trim>
+        where pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <update id="insertPesWieWorkOrdersBErpByWorkOrderMaterialId" parameterType="pesWieWorkOrdersBErp">
+        update pes_wie_wo_operation_materials_erp set required_quantity = (case when basis_type = 2 then quantity_per_product else quantity_per_product * #{plannedStartQuantity} end),required_date = #{plannedStartDate},erp_submit_date = #{createDate},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <delete id="deletePesWieWorkOrdersBErpByIds" parameterType="pesWieWorkOrdersBErp">
+        UPDATE pes_wie_work_orders_b_erp set work_order_status_id = #{workOrderStatusId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId}
+    </delete>
+
+
+    <update id="updatePesWieWorkOrdersBErpByLineNums" parameterType="String">
+        update pes_work_plan_line_list set work_flag = '1',last_update_date = getdate() where line_num in
+        <foreach item="sourceLineNum" collection="array" open="(" separator="," close=")">
+            #{sourceLineNum}
+        </foreach>
+    </update>
+
+    <update id="updatePesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWorkOrdersBErp">
+        update pes_wie_work_orders_b_erp set work_order_id = #{workOrderId},last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId};
+        update pes_wie_work_order_operation_erp set work_order_id = #{workOrderId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId};
+        update pes_wie_work_order_operation_resource_erp set work_order_id = #{workOrderId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId};
+        update pes_wie_wo_operation_materials_erp set work_order_id = #{workOrderId},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <insert id="insertPesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWorkOrdersBErp">
+        insert into pes_wie_work_submit_erp_infor_list (pes_work_order_id,pes_id,erp_id,count_number,item_number,item_description,wie_work_date,work_order_status_id,quantity,erp_type,type,erp_flag,remark,create_by,create_date,last_update_by,last_update_date) values
+        ( #{pesWorkOrderId,jdbcType=BIGINT},#{pesWorkOrderId,jdbcType=BIGINT}, #{workOrderId,jdbcType=BIGINT},0,#{pItemNumber,jdbcType=VARCHAR},#{pItemDescription,jdbcType=VARCHAR},#{plannedStartDate,jdbcType=TIMESTAMP},#{workOrderStatusId,jdbcType=INTEGER},#{plannedStartQuantity,jdbcType=DECIMAL},#{erpType,jdbcType=INTEGER},0,#{erpFlag,jdbcType=VARCHAR},#{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="selectPitemNumberDescriptionByItemOrgIds" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+            list.INVENTORY_ITEM_ID,
+            list.ITEM_NUMBER AS p_item_number,
+            list.ITEM_DESCRIPTION AS p_item_description,
+            list.PRIMARY_UOM_CODE AS uom_code,
+            list.ITEM_TYPE AS work_order_type
+        FROM
+            sync_items_num_des_list list
+        WHERE
+            list.ORGANIZATION_ID = #{organizationId}
+        AND list.ITEM_NUMBER = #{pItemNumber}
+        and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and list.ITEM_TYPE in ('BCP','WWBCP','FG','INTER_COMPANY_FEE')
+    </select>
+
+    <insert id="insertAddPesWieWorkOrdersBErp" parameterType="PesWieWorkOrdersBErp" useGeneratedKeys="true" keyProperty="pesWorkOrderId">
+        insert into pes_wie_work_orders_b_erp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="workOrderNumber != null">work_order_number,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="workOrderStatusId != null">work_order_status_id,</if>
+            <if test="plannedStartQuantity != null">planned_start_quantity,</if>
+            <if test="plannedStartDate != null">planned_start_date,</if>
+            <if test="completedQuantity != null">completed_quantity,</if>
+            <if test="plannedStartDate != null">planned_completion_date,</if>
+            <if test="customerName != null and customerName != ''">customer_name,</if>
+            <if test="orderNumber != null and orderNumber != ''">order_number,</if>
+            <if test="workOrderType != null">work_order_type,</if>
+            <if test="workOrderTypeId != null and workOrderTypeId != ''">work_order_type_id,</if>
+            <if test="contractNumber != null">contract_number,</if>
+            <if test="pItemNumber != null and pItemNumber != ''">p_item_number,</if>
+            <if test="pItemDescription != null">p_item_description,</if>
+            <if test="uomCode != null">uom_code,</if>
+            <if test="workVersionNumber != null">work_version_number,</if>
+            <if test="pItemVersionNumber != null">p_item_version_number,</if>
+            <if test="workItemLevel != null">work_item_level,</if>
+            <if test="planName != null">plan_name,</if>
+            <if test="orderNumberLine != null">order_number_line,</if>
+            <if test="sourceLineNum != null">source_line_num,</if>
+            <if test="levelTreeCode != null">level_tree_code,</if>
+            <if test="parentLevelTreeCode != null">parent_level_tree_code,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">last_update_date,</if>
+            <if test="createBy != null">last_update_by,</if>
+            <if test="createDate != null">erp_submit_date,</if>
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="workCenterId != null">work_center_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workOrderNumber != null">#{workOrderNumber},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="workOrderStatusId != null">#{workOrderStatusId},</if>
+            <if test="plannedStartQuantity != null">#{plannedStartQuantity},</if>
+            <if test="plannedStartDate != null">#{plannedStartDate},</if>
+            <if test="completedQuantity != null">#{completedQuantity},</if>
+            <if test="plannedStartDate != null">DATEADD(DAY ,7, #{plannedStartDate}),</if>
+            <if test="customerName != null and customerName != ''">#{customerName},</if>
+            <if test="orderNumber != null and orderNumber != ''">#{orderNumber},</if>
+            <if test="workOrderType != null">#{workOrderType},</if>
+            <if test="workOrderTypeId != null and workOrderTypeId != ''">#{workOrderTypeId},</if>
+            <if test="contractNumber != null">#{contractNumber},</if>
+            <if test="pItemNumber != null and pItemNumber != ''">#{pItemNumber},</if>
+            <if test="pItemDescription != null">#{pItemDescription},</if>
+            <if test="uomCode != null">#{uomCode},</if>
+            <if test="workVersionNumber != null">#{workVersionNumber},</if>
+            <if test="pItemVersionNumber != null">#{pItemVersionNumber},</if>
+            <if test="workItemLevel != null">#{workItemLevel},</if>
+            <if test="planName != null">#{planName},</if>
+            <if test="orderNumberLine != null">#{orderNumberLine},</if>
+            <if test="sourceLineNum != null">#{sourceLineNum},</if>
+            <if test="levelTreeCode != null">#{levelTreeCode},</if>
+            <if test="parentLevelTreeCode != null">#{parentLevelTreeCode},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="workCenterId != null">#{workCenterId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSubmitDatePesWieWorkOrdersBErp" parameterType="PesWieWorkOrdersBErp">
+        update pes_wie_work_orders_b_erp set last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = (case when last_update_date > #{lastUpdateDate} then #{lastUpdateDate} else #{createDate} end) where pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+    <select id="selectSourceLinesData" parameterType="Long" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+            list.organization_id,
+            list.line_num AS source_line_num,
+            list.LEVEL AS work_item_level,
+            list.inventory_item_id,
+            list.item_number AS p_item_number,
+            list.item_description AS p_item_description,
+            list.item_type AS work_order_type,
+            list.uom AS uom_code,
+            list.plan_wie_quantity AS planned_start_quantity,
+            list.plan_start_date AS planned_start_date,
+            DATEADD(DAY,7,list.plan_start_date) AS planned_completion_date,
+            list.level_tree_code,
+            list.parent_level_tree_code,
+            list.DOCUMENT_NUMBER AS order_number,
+            list.DOCUMENT_LINE_NUM AS order_number_line,
+            list.CUST_PO_NUMBER AS contract_number,
+            list.customer_name,
+            osp.work_center_id
+        FROM
+            pes_wie_orders_line_list list
+            LEFT JOIN pes_wie_work_orders_ops_item_erp osp
+            ON (list.inventory_item_id = osp.inventory_item_id
+            AND list.organization_id = osp.organization_id
+            AND osp.prioryty = 1)
+        WHERE
+            list.line_num = #{sourceLineNum}
+    </select>
+
+    <delete id="deletPesWieWorkMaterialByIds" parameterType="Long">
+        delete from pes_wie_wo_operation_materials_erp where pes_work_order_id = #{pesWorkOrderId} and material_sequence_number > 0
+    </delete>
+
+    <select id="selectWieWorkCenterId" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+        work_center_id,
+        is_ww_flag
+        FROM
+        pes_work_center_description_all
+        WHERE
+        organization_id = #{organizationId}
+        AND work_center_code = #{workCenterCode}
+    </select>
+
+
+    <select id="selectSupplySubinventoryById" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+          wwom.subinventory_code as supply_subinventory
+        FROM
+          pes_wie_wo_operation_materials_erp wwom,
+          sync_inv_onhand_quantity_new_code ioqc
+        WHERE
+        1 = 1
+        and wwom.organization_id = ioqc.organization_id
+        and wwom.inventory_item_id = ioqc.inventory_item_id
+        and wwom.subinventory_code = ioqc.subinventory_code
+        and ioqc.quantity >= #{plannedStartQuantity}
+        and wwom.pes_work_order_id = #{pesWorkOrderId}
+        and wwom.organization_id = #{organizationId}
+        and wwom.inventory_item_id = #{inventoryItemId}
+        and wwom.material_sequence_number > 0
+    </select>
+
+    <update id="updatePesWieWorkOrdersBMaterialErpByWorkOrderId" parameterType="PesWieWorkOrdersBErp">
+        update pes_wie_wo_operation_materials_erp set work_order_operation_material_id = #{woOperationMaterialId},last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId} and organization_id = #{organizationId} and inventory_item_id = #{inventoryItemId} and material_sequence_number > 0
+    </update>
+
+    <select id="getPitemNumLotControlCodeByIds" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+          esb.LOT_CONTROL_CODE
+        FROM
+          sync_egp_system_items_b esb
+        WHERE
+            esb.ORGANIZATION_ID = #{organizationId}
+        AND esb.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+    <select id="allowRetormWorksQuantitys" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        sync_inv_onhand_quantity_new_code ioqc
+        WHERE
+        1 = 1
+        and ioqc.quantity >= #{plannedStartQuantity}
+        and ioqc.organization_id = #{organizationId}
+        and ioqc.inventory_item_id = #{inventoryItemId}
+        and ioqc.subinventory_code = #{supplySubinventory}
+    </select>
+
+    <update id="updatePesWieWorkMaterialByIds" parameterType="PesWieWorkOrdersBErp">
+        update pes_wie_wo_operation_materials_erp set material_sequence_number = 10,subinventory_code = #{supplySubinventory} where pes_work_order_id = #{pesWorkOrderId} and material_sequence_number = 0
+    </update>
+
+
+    <select id="selectCountUpdateOperation" parameterType="Long" resultType="Integer">
+        SELECT
+            count(1)
+        FROM
+            pes_wie_work_order_operation_erp wwop
+        WHERE
+            1 = 1
+        AND wwop.work_order_id > 0
+        AND wwop.last_update_date > wwop.create_date
+        AND wwop.last_update_date > wwop.erp_submit_date
+        AND wwop.work_order_operation_id > 0
+        and wwop.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+    <select id="selectHandle" parameterType="PesWieWorkOrdersBErp" resultMap="PesWieWorkOrdersBErpResult">
+        SELECT
+            list.wie_compl_return_id as pes_work_order_id,
+            list.work_order_number,
+            list.organization_id,
+            list.transaction_quantity as planned_start_quantity,
+            list.compl_subinventory_code as completed_subinventory_code,
+            list.uom as uom_code,
+            list.wo_operation_sequence_number as work_order_status_id
+        FROM
+            cux_wie_compltion_return_quantity_all list
+        <where>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and list.work_order_number = #{workOrderNumber}</if>
+        </where>
+        ORDER BY
+            list.create_date DESC
+    </select>
+
+</mapper>

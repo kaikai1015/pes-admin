@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxItemDemandQuantityListMapper">
+
+    <resultMap type="CuxItemDemandQuantityList" id="CuxItemDemandQuantityListResult">
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="maxUnitPrice"    column="max_unit_price"    />
+        <result property="onhandQuantityAmount"    column="onhand_quantity_amount"    />
+        <result property="days"    column="days"    />
+            </resultMap>
+
+
+    <select id="selectCuxItemDemandQuantityListList" parameterType="CuxItemDemandQuantityList" resultMap="CuxItemDemandQuantityListResult">
+        SELECT
+        list.ORGANIZATION_ID,
+        list.ITEM_NUMBER,
+        list.item_description,
+        ioq.quantity AS onhand_quantity,
+        isnull(cidl.quantity, 0) as quantity,
+        list.ITEM_TYPE,
+        isnull(mprice.MAX_UNIT_PRICE,0) as MAX_UNIT_PRICE,
+        (ioq.quantity * isnull(mprice.MAX_UNIT_PRICE,0)) AS onhand_quantity_amount,
+        (CASE WHEN isnull(cidl.quantity, 0) &gt; 0 THEN ioq.quantity / cidl.quantity ELSE 0 END) AS days
+        FROM
+        sync_items_num_des_list list,
+        sync_inv_onhand_quantity_new ioq
+        LEFT JOIN (
+        SELECT
+        mplla.ITEM_ID,
+        mplla.ORGANIZATION_ID,
+        MAX (mplla.UNIT_PRICE) AS MAX_UNIT_PRICE
+        FROM
+        sync_po_lines_all mplla
+        WHERE
+        mplla.ITEM_ID &gt; 0
+        AND isnull(mplla.LINE_STATUS, 'OPEN') &lt;&gt; 'CANCELED'
+        GROUP BY
+        mplla.ITEM_ID,
+        mplla.ORGANIZATION_ID
+        ) mprice ON (
+        ioq.inventory_item_id = mprice.ITEM_ID
+        AND ioq.organization_id = mprice.organization_id
+        )
+        LEFT JOIN cux_item_demand_quantity_list cidl ON (
+        ioq.inventory_item_id = cidl.inventory_item_id
+        AND ioq.organization_id = cidl.organization_id
+        )
+        <where>
+            and ioq.inventory_item_id = list.INVENTORY_ITEM_ID
+            AND ioq.organization_id = list.ORGANIZATION_ID
+            <if test="itemNumber != null  and itemNumber != ''">and list.item_number = #{itemNumber}</if>
+        </where>
+    </select>
+
+</mapper>

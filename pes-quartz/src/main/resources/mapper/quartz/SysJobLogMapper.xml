@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SysJobLogMapper">
+
+	<resultMap type="SysJobLog" id="SysJobLogResult">
+		<id     property="jobLogId"       column="job_log_id"      />
+		<result property="jobName"        column="job_name"        />
+		<result property="jobGroup"       column="job_group"       />
+		<result property="invokeTarget"   column="invoke_target"   />
+		<result property="status"         column="status"          />
+		<result property="exceptionInfo"  column="exception_info"  />
+		<result property="createTime"     column="create_time"     />
+		<result property="startTime"     column="start_time"     />
+		<result property="stopTime"     column="stop_time"     />
+		<result property="fromDate"     column="from_date"     />
+		<result property="toDate"     column="to_date"     />
+		<result property="fromDateToErp"     column="from_date_to_erp"     />
+	</resultMap>
+
+	<sql id="selectJobLogVo">
+		select job_log_id, job_name, job_group, invoke_target, status, exception_info, create_time,start_time,stop_time,from_date,to_date,DATEADD(MINUTE, -2, to_date) as from_date_to_erp
+		from sys_job_log
+	</sql>
+
+	<select id="selectJobLogList" parameterType="SysJobLog" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+		<where>
+			<if test="jobName != null and jobName != ''">
+				AND job_name like (#{jobName} + '%')
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				AND job_group = #{jobGroup}
+			</if>
+			<if test="status != null and status != ''">
+				AND status = #{status}
+			</if>
+			<if test="invokeTarget != null and invokeTarget != ''">
+				AND invoke_target like ('%' + #{invokeTarget} + '%')
+			</if>
+			<if test="beginTime != null and beginTime != ''"><!-- 开始时间检索 -->
+				and datediff(dd,#{beginTime},create_time)&gt;= 0
+			</if>
+			<if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+				and datediff(dd,create_time,#{endTime})&lt;= 0
+			</if>
+		</where>
+		order by job_log_id desc
+	</select>
+
+	<select id="selectJobLogAll" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+	</select>
+
+	<select id="selectJobLogById" parameterType="Long" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+		where job_log_id = #{jobLogId}
+	</select>
+
+	<delete id="deleteJobLogById" parameterType="Long">
+		delete from sys_job_log where job_log_id = #{jobLogId}
+	</delete>
+
+	<delete id="deleteJobLogByIds" parameterType="Long">
+		delete from sys_job_log where job_log_id in
+		<foreach collection="array" item="jobLogId" open="(" separator="," close=")">
+			#{jobLogId}
+		</foreach>
+	</delete>
+
+	<update id="cleanJobLog">
+		truncate table sys_job_log
+	</update>
+
+	<insert id="insertJobLog" parameterType="SysJobLog">
+		insert into sys_job_log(
+		<if test="jobLogId != null and jobLogId != 0">job_log_id,</if>
+		<if test="jobName != null and jobName != ''">job_name,</if>
+		<if test="jobGroup != null and jobGroup != ''">job_group,</if>
+		<if test="invokeTarget != null and invokeTarget != ''">invoke_target,</if>
+		<if test="status != null and status != ''">status,</if>
+		<if test="exceptionInfo != null and exceptionInfo != ''">exception_info,</if>
+		start_time,
+		stop_time,
+		from_date,
+		create_time
+		)values(
+		<if test="jobLogId != null and jobLogId != 0">#{jobLogId},</if>
+		<if test="jobName != null and jobName != ''">#{jobName},</if>
+		<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+		<if test="invokeTarget != null and invokeTarget != ''">#{invokeTarget},</if>
+		<if test="status != null and status != ''">#{status},</if>
+		<if test="exceptionInfo != null and exceptionInfo != ''">#{exceptionInfo},</if>
+		#{startTime},
+		#{stopTime},
+		(SELECT max(jl.to_date) FROM sys_job_log jl WHERE job_name = #{jobName} AND status = 0),
+		GETDATE()
+		)
+	</insert>
+
+	<select id="getTaskNameLastDate" parameterType="string" resultMap="SysJobLogResult">
+		<include refid="selectJobLogVo"/>
+		where job_name = #{tsakName}
+		AND status = 0
+		ORDER BY job_log_id DESC offset 0 ROWS FETCH NEXT 1 ROWS ONLY
+	</select>
+
+	<select id="getJobLogIds" parameterType="SysJobLog" resultMap="SysJobLogResult">
+		SELECT
+		max(jl.job_log_id) as job_log_id
+		FROM
+		sys_job_log jl
+		WHERE
+		jl.job_name = #{jobName}
+		AND jl.status = '2'
+	</select>
+
+	<update id="updateLatJobStatus" parameterType="SysJobLog">
+		update sys_job_log
+		set status = #{status},
+		stop_time = #{stopTime},
+		exception_info = #{exceptionInfo}
+		where job_log_id = #{jobLogId}
+	</update>
+
+	<update id="updateLatUpdateDate" parameterType="SysJobLog">
+		update sys_job_log set to_date = #{stopTime} where job_log_id = (SELECT
+								max(jl.job_log_id)
+							FROM
+								sys_job_log jl
+							WHERE
+								jl.job_name = #{jobName})
+	</update>
+
+</mapper>

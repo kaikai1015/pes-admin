@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPerPersonNamesFMapper">
+
+    <resultMap type="SyncPerPersonNamesFEO" id="SyncPerPersonNamesFEOResult">
+        <result property="personNameId"    column="PERSON_NAME_ID"    />
+        <result property="effectiveStartDate"    column="EFFECTIVE_START_DATE"    />
+        <result property="effectiveEndDate"    column="EFFECTIVE_END_DATE"    />
+        <result property="personId"    column="PERSON_ID"    />
+        <result property="displayName"    column="DISPLAY_NAME"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+    </resultMap>
+
+    <sql id="selectSyncPerPersonNamesFVo">
+        select PERSON_NAME_ID, EFFECTIVE_START_DATE, EFFECTIVE_END_DATE, PERSON_ID, DISPLAY_NAME, LAST_UPDATE_DATE, LAST_UPDATED_BY from sync_per_person_names_f
+    </sql>
+
+    <select id="selectSyncPerPersonNamesFList" parameterType="SyncPerPersonNamesFEO" resultMap="SyncPerPersonNamesFEOResult">
+        <include refid="selectSyncPerPersonNamesFVo"/>
+        <where>
+            <if test="personId != null "> and PERSON_ID = #{personId}</if>
+            <if test="displayName != null "> and DISPLAY_NAME like ('%' + #{displayName} + '%')</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-20,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+
+    <delete id="deleteSyncPerPersonNamesFEO">
+        delete from sync_per_person_names_f where
+        <foreach collection="list" item="item" index="index" separator="or">
+            ( PERSON_NAME_ID=#{item.personNameId,jdbcType=BIGINT}
+            AND EFFECTIVE_START_DATE=#{item.effectiveStartDate,jdbcType=TIMESTAMP}
+            AND EFFECTIVE_END_DATE=#{item.effectiveEndDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPerPersonNamesFEO">
+        insert into sync_per_person_names_f( PERSON_NAME_ID, EFFECTIVE_START_DATE, EFFECTIVE_END_DATE, PERSON_ID, DISPLAY_NAME, LAST_UPDATE_DATE, LAST_UPDATED_BY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.personNameId,jdbcType=BIGINT}, #{item.effectiveStartDate,jdbcType=TIMESTAMP}, #{item.effectiveEndDate,jdbcType=TIMESTAMP}, #{item.personId,jdbcType=BIGINT}, #{item.displayName,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

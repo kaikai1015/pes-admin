@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.lotNums.mapper.PesWieOrdersLineListMapper">
+
+    <resultMap type="PesWieOrdersLineList" id="PesWieOrdersLineListResult">
+                    <result property="id"    column="id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="level"    column="level"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="levelTreeCode"    column="level_tree_code"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="componentQuantity"    column="component_quantity"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="planWieQuantity"    column="plan_wie_quantity"    />
+                    <result property="grossQuantity"    column="gross_quantity"    />
+                    <result property="grossDate"    column="gross_date"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+                    <result property="sumGrossQuantity"    column="sum_gross_quantity"    />
+                    <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="parentLevelTreeCode"    column="parent_level_tree_code"    />
+                    <result property="parentGrossQuantity"    column="parent_gross_quantity"    />
+                    <result property="parentGrossDate"    column="parent_gross_date"    />
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planLotLineNum"    column="plan_lot_line_num"    />
+                    <result property="planItemNumber"    column="plan_item_number"    />
+                    <result property="planItemType"    column="plan_item_type"    />
+                    <result property="planItemQuantity"    column="plan_item_quantity"    />
+                    <result property="planDate"    column="plan_date"    />
+                    <result property="planTreeCode"    column="plan_tree_code"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+                    <result property="custPoNumber"    column="CUST_PO_NUMBER"    />
+        <result property="planStartDate"    column="plan_start_date"    />
+        <result property="planEndDate"    column="plan_end_date"    />
+        <result property="wieHQuantity"    column="wie_h_quantity"    />
+        <result property="wieLQuantity"    column="wie_l_quantity"    />
+        <result property="poQuantity"    column="po_quantity"    />
+        <result property="prQuantity"    column="pr_quantity"    />
+        <result property="documentLineNum"    column="DOCUMENT_LINE_NUM"    />
+        <result property="parentPlanPoQuantity"    column="parent_plan_po_quantity"    />
+        <result property="avaliableQuantity"    column="avaliable_quantity"    />
+        <result property="customerName"    column="CUSTOMER_NAME"    />
+            </resultMap>
+
+    <sql id="selectPesWieOrdersLineListVo">
+        SELECT
+            organization_id,
+            LEVEL,
+            line_num,
+            plan_type,
+            level_tree_code,
+            item_number,
+            item_description,
+            item_type,
+            component_quantity,
+            uom,
+            plan_wie_quantity,
+            plan_start_date,
+            DATEADD(DAY ,- 1,plan_date) AS plan_end_date,
+            gross_quantity,
+            gross_date,
+            onhand_quantity,
+            (onhand_quantity + wie_h_quantity - isnull(wie_l_quantity,0)+ po_quantity + pr_quantity + parent_plan_po_quantity) as avaliable_quantity,
+            --SUM (parent_gross_quantity * component_quantity) OVER (partition BY organization_id,inventory_item_id ORDER BY plan_date,gross_quantity,line_num) AS sum_gross_quantity,
+            p_item_number,
+            p_item_description,
+            parent_level_tree_code,
+            parent_gross_quantity,
+            parent_gross_date,
+            plan_lot_num,
+            plan_lot_line_num,
+            plan_item_number,
+            plan_item_type,
+            plan_item_quantity,
+            plan_date,
+            plan_tree_code,
+            DOCUMENT_NUMBER,
+            DOCUMENT_LINE_NUM,
+            CUST_PO_NUMBER,
+            CUSTOMER_NAME,
+            wie_h_quantity,
+            isnull(wie_l_quantity,0) as wie_l_quantity,
+            pr_quantity,
+            po_quantity,
+            parent_plan_po_quantity
+        FROM
+            pes_wie_orders_line_list
+    </sql>
+
+    <select id="selectPesWieOrdersLineListList" parameterType="PesWieOrdersLineList" resultMap="PesWieOrdersLineListResult">
+        <include refid="selectPesWieOrdersLineListVo"/>
+        <where>
+            <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>
+            <if test="lineNum != null "> and line_num = #{lineNum}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number like (#{itemNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="parentLevelTreeCode != null  and parentLevelTreeCode != ''"> and parent_level_tree_code like (#{parentLevelTreeCode} + '%')</if>
+            <if test="planItemNumber != null  and planItemNumber != ''"> and plan_item_number like (#{planItemNumber} + '%')</if>
+            <if test="documentNumber != null  and documentNumber != ''"> and DOCUMENT_NUMBER like (#{documentNumber} + '%')</if>
+            <if test="custPoNumber != null  and custPoNumber != ''"> and CUST_PO_NUMBER like (#{custPoNumber} + '%')</if>
+        </where>
+    </select>
+
+    <update id="updatOrdersHeaderListCode">
+        update pes_orders_header_list set active_code = 'N' where plan_lot_num = #{planLotNum}
+    </update>
+
+    <delete id="deleteOrdersSumGrossQuantity">
+        TRUNCATE TABLE pes_orders_bom_sum_qty_temp;
+        TRUNCATE TABLE pes_orders_bom_net_qty_temp
+    </delete>
+
+    <select id="getCountLlcs" parameterType="Long" resultMap="PesWieOrdersLineListResult">
+        select DISTINCT llc from pes_orders_bom_sum_qty_list where left(line_num,10) = #{planLotNum}
+    </select>
+
+    <insert id="insertSumGrossQuantity">
+        INSERT INTO pes_orders_bom_sum_qty_temp (
+        line_num,
+        first_line_num,
+        sum_gross_quantity
+        )
+        (SELECT
+        list.line_num,
+        First_Value(list.line_num) OVER (partition BY list.organization_id,list.inventory_item_id ORDER BY list.plan_date,isnull(temp.gross_quantity,list.gross_quantity),list.line_num) AS first_line_num,
+        SUM (isnull(temp.gross_quantity,list.gross_quantity)) OVER (partition BY list.organization_id,list.inventory_item_id ORDER BY list.plan_date,isnull(temp.gross_quantity,list.gross_quantity),list.line_num) AS sum_gross_quantity
+        FROM
+        pes_orders_bom_sum_qty_list list
+        LEFT JOIN pes_orders_bom_net_qty_temp temp
+        on (list.line_num = temp.line_num)
+        WHERE
+        list.llc = #{llc})
+    </insert>
+
+    <delete id="deleteQarentQuantityTemp">
+        TRUNCATE TABLE pes_orders_bom_parent_qty_temp
+    </delete>
+
+    <insert id="insertQarentQuantityTemp">
+        INSERT INTO pes_orders_bom_parent_qty_temp (
+        line_num,
+        level_tree_code,
+        net_quantity,
+        gross_quantity,
+        plan_net_quantity
+        )
+        (SELECT
+        list.line_num,
+        list.level_tree_code,
+        isnull(netqty.net_quantity,list.net_quantity) as net_quantity,
+        isnull(netqty.gross_quantity,list.gross_quantity) as gross_quantity,
+        (case when (list.onhand_quantity + list.wie_h_quantity - list.wie_l_quantity + list.pr_quantity + list.po_quantity + list.parent_plan_po_quantity) - temp.sum_gross_quantity >= 0 then 0 else
+        (case when (list.onhand_quantity + list.wie_h_quantity - list.wie_l_quantity + list.pr_quantity + list.po_quantity + list.parent_plan_po_quantity) - temp.sum_gross_quantity + isnull(netqty.gross_quantity,list.gross_quantity) > 0
+        then abs((list.onhand_quantity + list.wie_h_quantity - list.wie_l_quantity + list.pr_quantity + list.po_quantity + list.parent_plan_po_quantity) - temp.sum_gross_quantity) else (case when temp.line_num = temp.first_line_num then (abs((list.onhand_quantity + list.wie_h_quantity - list.wie_l_quantity + list.pr_quantity + list.po_quantity + list.parent_plan_po_quantity)) + isnull(netqty.gross_quantity,list.gross_quantity)) ELSE isnull(netqty.gross_quantity,list.gross_quantity) end) end) end) as plan_net_quantity
+        FROM
+        pes_orders_bom_sum_qty_temp temp,
+        pes_orders_bom_sum_qty_list list
+        LEFT JOIN pes_orders_bom_net_qty_temp netqty
+        on (list.line_num = netqty.line_num)
+        WHERE list.line_num = temp.line_num
+        and list.llc = #{llc})
+    </insert>
+
+    <select id="getCountLlcsDatas" resultMap="PesWieOrdersLineListResult">
+        SELECT
+        line_num,
+        level_tree_code,
+        net_quantity,
+        gross_quantity,
+        plan_net_quantity
+        FROM
+        pes_orders_bom_parent_qty_temp
+    </select>
+
+    <delete id="deleteLevelTreeCodeTemp">
+        delete from pes_orders_bom_net_qty_temp
+        where line_num in
+        (SELECT
+        list.line_num
+        FROM
+        pes_orders_bom_sum_qty_list list,
+        pes_orders_bom_parent_qty_temp temp
+        WHERE list.level_tree_code = temp.level_tree_code)
+    </delete>
+
+    <insert id="getNextGrossQuantity">
+        INSERT INTO pes_orders_bom_net_qty_temp (
+        line_num,
+        gross_quantity,
+        net_quantity
+        )
+        (SELECT
+        list.line_num,
+        (case when list.level_tree_code = temp.level_tree_code then temp.plan_net_quantity else temp.plan_net_quantity * list.component_quantity end) as gross_quantity,
+        (case when list.level_tree_code = temp.level_tree_code then (case when list.llc = 0 then temp.gross_quantity else isnull(temp.net_quantity,temp.gross_quantity) end) else temp.plan_net_quantity end) as net_quantity
+        FROM
+        pes_orders_bom_sum_qty_list list,
+        pes_orders_bom_parent_qty_temp temp
+        WHERE list.parent_level_tree_code = temp.level_tree_code
+        union ALL
+        SELECT
+        list.line_num,
+        (case when list.level_tree_code = temp.level_tree_code then temp.plan_net_quantity else temp.plan_net_quantity * list.component_quantity end) as gross_quantity,
+        (case when list.level_tree_code = temp.level_tree_code then (case when list.llc = 0 then temp.gross_quantity else isnull(temp.net_quantity,temp.gross_quantity) end) else temp.plan_net_quantity end) as net_quantity
+        FROM
+        pes_orders_bom_sum_qty_list list,
+        pes_orders_bom_parent_qty_temp temp
+        WHERE list.level_tree_code = temp.level_tree_code)
+    </insert>
+
+
+    <insert id="mpsSyncOrdersDemandListByIds">
+        INSERT INTO pes_wie_orders_line_list (
+        organization_id,
+        LEVEL,
+        line_num,
+        plan_type,
+        level_tree_code,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        component_quantity,
+        uom,
+        plan_wie_quantity,
+        plan_start_date,
+        gross_quantity,
+        gross_date,
+        p_inventory_item_id,
+        p_item_number,
+        p_item_description,
+        parent_level_tree_code,
+        parent_gross_quantity,
+        parent_gross_date,
+        plan_lot_num,
+        plan_lot_line_num,
+        plan_item_number,
+        plan_item_type,
+        plan_item_quantity,
+        plan_date,
+        plan_tree_code,
+        create_by,
+        onhand_quantity,
+        DOCUMENT_NUMBER,
+        DOCUMENT_LINE_NUM,
+        CUST_PO_NUMBER,
+        CUSTOMER_NAME,
+        wie_h_quantity,
+        wie_l_quantity,
+        pr_quantity,
+        po_quantity,
+        parent_plan_po_quantity
+        )
+        (SELECT
+        list.organization_id,
+        list. LEVEL,
+        list.line_num,
+        list.plan_type,
+        list.level_tree_code,
+        list.inventory_item_id,
+        list.item_number,
+        list.item_description,
+        list.item_type,
+        list.component_quantity,
+        list.uom,
+        temp.gross_quantity as plan_wie_quantity,
+        DATEADD(DAY ,-(case when sqty.total_days = 0 then 7 else sqty.total_days end), list.plan_date) as plan_start_date,
+        list.gross_quantity,
+        list.plan_date AS gross_date,
+        list.p_inventory_item_id,
+        list.p_item_number,
+        list.p_item_description,
+        list.parent_level_tree_code,
+        temp.net_quantity as parent_gross_quantity,
+        list.plan_date AS parent_gross_date,
+        list.plan_lot_num,
+        list.plan_lot_line_num,
+        list.plan_item_number,
+        list.plan_item_type,
+        list.plan_item_quantity,
+        list.plan_date,
+        list.plan_tree_code,
+        list.create_by,
+        sqty.onhand_quantity,
+        sqty.DOCUMENT_NUMBER,
+        sqty.DOCUMENT_LINE_NUM,
+        sqty.CUST_PO_NUMBER,
+        sqty.CUSTOMER_NAME,
+        sqty.wie_h_quantity,
+        sqty.wie_l_quantity,
+        sqty.pr_quantity,
+        sqty.po_quantity,
+        sqty.parent_plan_po_quantity
+        FROM
+        pes_orders_bom_detail_list list,
+        pes_orders_bom_sum_qty_list sqty,
+        pes_orders_bom_net_qty_temp temp
+        WHERE
+        list.plan_type = 'MPS'
+        and list.line_num = sqty.line_num
+        and list.line_num = temp.line_num)
+    </insert>
+
+</mapper>

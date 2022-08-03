@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncHzPartiesMapper">
+
+    <resultMap type="SyncHzPartiesEO" id="SyncHzPartiesEOResult">
+        <result property="partyId"    column="PARTY_ID"    />
+        <result property="partyNumber"    column="PARTY_NUMBER"    />
+        <result property="partyName"    column="PARTY_NAME"    />
+        <result property="partyType"    column="PARTY_TYPE"    />
+        <result property="partyUniqueName"    column="PARTY_UNIQUE_NAME"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+    </resultMap>
+
+    <sql id="selectSyncHzPartiesVo">
+        select PARTY_ID, PARTY_NUMBER, PARTY_NAME, PARTY_TYPE, PARTY_UNIQUE_NAME, LAST_UPDATED_BY, LAST_UPDATE_DATE from sync_hz_parties
+    </sql>
+
+    <select id="selectSyncHzPartiesList" parameterType="SyncHzPartiesEO" resultMap="SyncHzPartiesEOResult">
+        <include refid="selectSyncHzPartiesVo"/>
+        <where>
+            <if test="partyId != null "> and PARTY_ID = #{partyId}</if>
+            <if test="partyNumber != null  and partyNumber != ''"> and PARTY_NUMBER = #{partyNumber}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncHzPartiesEO">
+        delete from sync_hz_parties where PARTY_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.partyId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncHzPartiesEO">
+        insert into sync_hz_parties( PARTY_ID, PARTY_NUMBER, COMMENTS,PARTY_NAME, PARTY_TYPE, PARTY_UNIQUE_NAME, LAST_UPDATED_BY, LAST_UPDATE_DATE) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.partyId,jdbcType=BIGINT}, #{item.partyNumber,jdbcType=VARCHAR}, #{item.comments,jdbcType=VARCHAR}, #{item.partyName,jdbcType=VARCHAR}, #{item.partyType,jdbcType=VARCHAR}, #{item.partyUniqueName,jdbcType=VARCHAR}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

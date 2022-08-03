@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.plans.mapper.PlanLineBomMapper">
+
+    <resultMap type="PlanLineBom" id="PlanLineBomResult">
+        <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="pItemNumber"    column="p_item_number"    />
+        <result property="pItemDescription"    column="p_item_description"    />
+        <result property="level"    column="level"    />
+        <result property="planType"    column="plan_type"    />
+        <result property="levelTreeCode"    column="level_tree_code"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="componentQuantity"    column="component_quantity"    />
+        <result property="biaoComponentQuantity"    column="biao_component_quantity"    />
+        <result property="uom"    column="uom"    />
+        <result property="grossQuantity"    column="gross_quantity"    />
+        <result property="grossDate"    column="gross_date"    />
+        <result property="parentLevelTreeCode"    column="parent_level_tree_code"    />
+        <result property="planLotNum"    column="plan_lot_num"    />
+        <result property="planLotLineNum"    column="plan_lot_line_num"    />
+        <result property="lineNum"    column="line_num"    />
+        <result property="planItemNumber"    column="plan_item_number"    />
+        <result property="planItemDescription"    column="plan_item_description"    />
+        <result property="planItemType"    column="plan_item_type"    />
+        <result property="planItemQuantity"    column="plan_item_quantity"    />
+        <result property="planDate"    column="plan_date"    />
+        <result property="planTreeCode"    column="plan_tree_code"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="id"    column="id"    />
+        <result property="parentGrossQuantity"    column="parent_gross_quantity"    />
+        <result property="parentGrossDate"    column="parent_gross_date"    />
+        <result property="mrpFlag"    column="mrp_flag"    />
+        <result property="sumGrossQuantity"    column="sum_gross_quantity"    />
+    </resultMap>
+
+    <insert id="selectPesPlanBomList">
+        INSERT INTO pes_plan_bom_detail_list (
+            plan_lot_num,
+            plan_lot_line_num,
+            plan_tree_code,
+            p_inventory_item_id,
+            organization_id,
+            p_item_number,
+            p_item_description,
+            LEVEL,
+            level_tree_code,
+            parent_level_tree_code,
+            inventory_item_id,
+            item_number,
+            item_description,
+            item_type,
+            plan_type,
+            component_quantity,
+            biao_component_quantity,
+            gross_quantity,
+            uom,
+            line_num,
+            plan_item_number,
+            plan_item_type,
+            plan_item_quantity,
+            plan_date,
+            create_by,
+            last_update_by
+            )(SELECT
+            list.plan_lot_num,
+            list.plan_lot_line_num,
+            plan_tree_code,
+            list.INVENTORY_ITEM_ID AS p_inventory_item_id,
+            list.ORGANIZATION_ID,
+            items.ITEM_NUMBER AS p_item_number,
+            items.ITEM_DESCRIPTION AS p_item_description,
+            '0' AS LEVEL,
+            plan_tree_code + 'M0001' as level_tree_code,
+            plan_tree_code + 'M0001' as parent_level_tree_code,
+            list.inventory_item_id,
+            items.ITEM_NUMBER,
+            items.ITEM_DESCRIPTION AS item_description,
+            list.plan_item_type AS item_type,
+            (case when items.PLANNING_MAKE_BUY_CODE = 1 then 'MPS' else 'MRP' end) as plan_type,
+            1 as component_quantity,
+            1 as biao_component_quantity,
+            list.plan_item_quantity AS gross_quantity,
+            items.PRIMARY_UOM_CODE AS uom,
+            (CAST(list.plan_lot_num as VARCHAR(150)) + '0' + CAST(list.plan_lot_line_num as VARCHAR(150)) + '0000') as line_num,
+            list.plan_item_number,
+            list.plan_item_type,
+            list.plan_item_quantity,
+            list.plan_date,
+            #{createBy},
+            #{createBy}
+            FROM
+            pes_plan_line_list list,
+            sync_items_num_des_list items
+            WHERE
+            1 = 1
+            AND list.ORGANIZATION_ID = items.ORGANIZATION_ID
+            AND list.inventory_item_id = items.inventory_item_id
+            AND items.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            AND list.plan_lot_num = #{planLotNum})
+    </insert>
+
+
+    <insert id="mrpOrdersLists">
+        INSERT INTO pes_orders_bom_detail_list (
+                plan_lot_num,
+                plan_lot_line_num,
+                plan_tree_code,
+                p_inventory_item_id,
+                organization_id,
+                p_item_number,
+                p_item_description,
+                LEVEL,
+                level_tree_code,
+                parent_level_tree_code,
+                inventory_item_id,
+                item_number,
+                item_description,
+                item_type,
+                plan_type,
+                component_quantity,
+                biao_component_quantity,
+                gross_quantity,
+                uom,
+                line_num,
+                plan_item_number,
+                plan_item_type,
+                plan_item_quantity,
+                plan_date,
+                create_by,
+                last_update_by
+            )(SELECT
+                list.plan_lot_num,
+                list.plan_lot_line_num,
+                (CAST(list.plan_lot_num as VARCHAR(150)) + '0000' + list.demand_id) AS plan_tree_code,
+                list.INVENTORY_ITEM_ID AS p_inventory_item_id,
+                list.ORGANIZATION_ID,
+                items.ITEM_NUMBER AS p_item_number,
+                items.ITEM_DESCRIPTION AS p_item_description,
+                '0' AS LEVEL,
+                CAST((CAST(list.plan_lot_num as VARCHAR(150)) + '0000' + list.demand_id) as VARCHAR(150)) + 'M0001' as level_tree_code,
+                CAST((CAST(list.plan_lot_num as VARCHAR(150)) + '0000' + list.demand_id) as VARCHAR(150)) + 'M0001' as parent_level_tree_code,
+                list.inventory_item_id,
+                items.ITEM_NUMBER,
+                items.ITEM_DESCRIPTION AS item_description,
+                list.plan_item_type AS item_type,
+                (case when items.PLANNING_MAKE_BUY_CODE = 1 then 'MPS' else 'MRP' end) as plan_type,
+                1 as component_quantity,
+                1 as biao_component_quantity,
+                list.plan_item_quantity AS gross_quantity,
+                items.PRIMARY_UOM_CODE AS uom,
+                (CAST(list.plan_lot_num as VARCHAR(150)) + '0' + CAST(list.plan_lot_line_num as VARCHAR(150)) + '0000') as line_num,
+                list.plan_item_number,
+                list.plan_item_type,
+                list.plan_item_quantity,
+                list.plan_date,
+                #{createBy},
+                #{createBy}
+            FROM
+                sync_orders_demand_list list,
+                sync_items_num_des_list items
+            WHERE
+                1 = 1
+            AND list.ORGANIZATION_ID = items.ORGANIZATION_ID
+            AND list.inventory_item_id = items.inventory_item_id
+            AND items.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            AND list.plan_lot_num = #{planLotNum})
+    </insert>
+
+    <insert id="insertMrpOrdersLists">
+        INSERT INTO pes_orders_bom_detail_list (
+                plan_lot_num,
+                plan_lot_line_num,
+                plan_tree_code,
+                p_inventory_item_id,
+                organization_id,
+                p_item_number,
+                p_item_description,
+                LEVEL,
+                level_tree_code,
+                parent_level_tree_code,
+                inventory_item_id,
+                item_number,
+                item_description,
+                item_type,
+                plan_type,
+                component_quantity,
+                biao_component_quantity,
+                gross_quantity,
+                uom,
+                line_num,
+                plan_item_number,
+                plan_item_type,
+                plan_item_quantity,
+                plan_date,
+                create_by,
+                last_update_by
+            )(SELECT
+                list.plan_lot_num,
+                list.plan_lot_line_num,
+                list.plan_tree_code,
+                bom.p_inventory_item_id,
+                bom.organization_id,
+                ebs.ITEM_NUMBER AS p_item_number,
+                ebs.ITEM_DESCRIPTION AS p_item_description,
+                list.[level] + 1 as level,
+                (case when subebs.PLANNING_MAKE_BUY_CODE = 2 then list.level_tree_code + 'P' else list.level_tree_code + 'M' end) + RIGHT('000' + CAST(row_number() over(partition by list.level_tree_code,subebs.PLANNING_MAKE_BUY_CODE order by (select 0)) as VARCHAR(5)),4) AS level_tree_code,
+                list.level_tree_code AS parent_level_tree_code,
+                subebs.inventory_item_id,
+                subebs.ITEM_NUMBER,
+                subebs.ITEM_DESCRIPTION,
+                subebs.ITEM_TYPE,
+                (CASE WHEN subebs.PLANNING_MAKE_BUY_CODE = 1 THEN 'MPS' ELSE 'MRP' END) AS plan_type,
+                bom.component_quantity,
+                bom.component_quantity * list.biao_component_quantity AS biao_component_quantity,
+                bom.component_quantity * list.biao_component_quantity * list.plan_item_quantity as gross_quantity,
+                subebs.PRIMARY_UOM_CODE AS uom,
+                (select max(line_num) from pes_orders_bom_detail_list lists where lists.plan_tree_code = list.plan_tree_code and lists.level = #{level}) + row_number() over(partition by list.plan_tree_code order by (select 0)) as line_num,
+                list.plan_item_number,
+                list.plan_item_type,
+                list.plan_item_quantity,
+                list.plan_date,
+                #{createBy},
+                #{createBy}
+            FROM
+                sync_items_num_des_list ebs,
+                sync_bom_item_data_list bom,
+                sync_items_num_des_list subebs,
+                pes_orders_bom_detail_list list
+            WHERE
+                1 = 1
+            AND bom.p_inventory_item_id = ebs.inventory_item_id
+            AND bom.organization_id = ebs.organization_id
+            AND bom.inventory_item_id = subebs.inventory_item_id
+            AND bom.organization_id = subebs.organization_id
+            AND bom.disable_date IS NULL
+            AND bom.IMPLEMENTATION_DATE IS NOT NULL
+            AND bom.p_inventory_item_id = list.inventory_item_id
+            AND bom.organization_id = list.organization_id
+            AND ebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            AND subebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            and list.level = #{level}
+            and list.plan_type = 'MPS')
+    </insert>
+
+    <insert id="insertData">
+        INSERT INTO pes_plan_bom_detail_list (
+        plan_lot_num,
+        plan_lot_line_num,
+        plan_tree_code,
+        p_inventory_item_id,
+        organization_id,
+        p_item_number,
+        p_item_description,
+        LEVEL,
+        level_tree_code,
+        parent_level_tree_code,
+        inventory_item_id,
+        item_number,
+        item_description,
+        item_type,
+        plan_type,
+        component_quantity,
+        biao_component_quantity,
+        gross_quantity,
+        uom,
+        line_num,
+        plan_item_number,
+        plan_item_type,
+        plan_item_quantity,
+        plan_date,
+        create_by,
+        last_update_by
+        )(SELECT
+        list.plan_lot_num,
+        list.plan_lot_line_num,
+        list.plan_tree_code,
+        bom.p_inventory_item_id,
+        bom.organization_id,
+        ebs.ITEM_NUMBER AS p_item_number,
+        ebs.ITEM_DESCRIPTION AS p_item_description,
+        list.[level] + 1 as level,
+        (case when subebs.PLANNING_MAKE_BUY_CODE = 2 then list.level_tree_code + 'P' else list.level_tree_code + 'M' end) + RIGHT('000' + CAST(row_number() over(partition by list.level_tree_code,subebs.PLANNING_MAKE_BUY_CODE order by (select 0)) as VARCHAR(5)),4) AS level_tree_code,
+        list.level_tree_code AS parent_level_tree_code,
+        subebs.inventory_item_id,
+        subebs.ITEM_NUMBER,
+        subebs.ITEM_DESCRIPTION,
+        subebs.ITEM_TYPE,
+        (CASE WHEN subebs.PLANNING_MAKE_BUY_CODE = 1 THEN 'MPS' ELSE 'MRP' END) AS plan_type,
+        bom.component_quantity,
+        bom.component_quantity * list.biao_component_quantity AS biao_component_quantity,
+        bom.component_quantity * list.biao_component_quantity * list.plan_item_quantity as gross_quantity,
+        subebs.PRIMARY_UOM_CODE AS uom,
+        (select max(line_num) from pes_plan_bom_detail_list lists where lists.plan_tree_code = list.plan_tree_code and lists.level = #{level}) + row_number() over(partition by list.plan_tree_code order by (select 0)) as line_num,
+        list.plan_item_number,
+        list.plan_item_type,
+        list.plan_item_quantity,
+        list.plan_date,
+        #{createBy},
+        #{createBy}
+        FROM
+        sync_items_num_des_list ebs,
+        sync_bom_item_data_list bom,
+        sync_items_num_des_list subebs,
+        pes_plan_bom_detail_list list
+        WHERE
+        1 = 1
+        AND bom.p_inventory_item_id = ebs.inventory_item_id
+        AND bom.organization_id = ebs.organization_id
+        AND bom.inventory_item_id = subebs.inventory_item_id
+        AND bom.organization_id = subebs.organization_id
+        AND bom.disable_date IS NULL
+        AND bom.IMPLEMENTATION_DATE IS NOT NULL
+        AND bom.p_inventory_item_id = list.inventory_item_id
+        AND bom.organization_id = list.organization_id
+        AND ebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        AND subebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and list.level = #{level}
+        and list.plan_type = 'MPS')
+    </insert>
+
+    <select id="checkPlotNumActive" parameterType="Long" resultType="int">
+        SELECT
+        COUNT (1)
+        FROM
+        pes_plan_header_list list
+        WHERE
+        1 = 1
+        and list.active_code = 'N'
+        AND list.plan_lot_num = #{planLotNum}
+    </select>
+
+    <delete id="deleSumGrossQuantityLists">
+        TRUNCATE TABLE pes_plan_bom_sum_qty_list;
+        TRUNCATE TABLE pes_plan_bom_sum_qty_list_llc
+    </delete>
+
+    <insert id="saveSumGrossQuantityList">
+        INSERT INTO pes_plan_bom_sum_qty_list (
+        line_num,
+        level_tree_code,
+        parent_level_tree_code,
+        organization_id,
+        inventory_item_id,
+        component_quantity,
+        gross_quantity,
+        plan_date,
+        llc,
+        onhand_quantity,
+        wie_h_quantity,
+        wie_l_quantity,
+        pr_quantity,
+        po_quantity,
+        so_quantity,
+        parent_plan_po_quantity,
+        safety_stock,
+        total_days
+        )
+        (SELECT
+        list.line_num,
+        list.level_tree_code,
+        list.parent_level_tree_code,
+        list.organization_id,
+        list.inventory_item_id,
+        list.component_quantity,
+        list.gross_quantity,
+        list.plan_date,
+        llc.llc,
+        isnull(ioq.quantity, 0) AS onhand_quantity,
+        isnull(isq.wie_s, 0) AS wie_h_quantity,
+        isnull(abs(isq.wie_d), 0) AS wie_l_quantity,
+        isnull(isq.pr_s, 0) AS pr_quantity,
+        isnull(isq.po_s, 0) AS po_quantity,
+        isnull(abs(isq.doo_d), 0) AS so_quantity,
+        isnull(llc.parent_plan_po_quantity, 0) AS parent_plan_po_quantity,
+        --(case when list.plan_type = 'MPS' then isnull(wlt.bu_huo_dian, 0) else isnull(plt.bu_huo_dian, 0) end) as safety_stock,
+        0 as safety_stock,
+        (case when list.plan_type = 'MPS' then (isnull(wlt.pre_date,0) + isnull(wlt.wie_date,0) + isnull(wlt.standard_wie_date,0) + isnull(wlt.standard_wie_quantity,0) + isnull(wlt.rcv_date,0) + isnull(wlt.exp_prod_date,0)) else (isnull(plt.pr_date,0) + isnull(plt.po_date,0) + isnull(plt.supplier_date,0) + isnull(plt.logist_date,0) + isnull(plt.rcv_date,0) + isnull(plt.exp_prod_date,0)) end) as total_days
+        FROM
+        pes_plan_bom_detail_list list
+        LEFT JOIN pes_plan_bom_sum_qty_list_llc llc ON (
+        list.organization_id = llc.organization_id
+        AND list.inventory_item_id = llc.inventory_item_id)
+        LEFT JOIN pes_item_supply_demand_quantity isq ON (
+        list.organization_id = isq.organization_id
+        AND list.inventory_item_id = isq.inventory_item_id)
+        LEFT JOIN sync_inv_onhand_quantity_new ioq ON (
+        list.organization_id = ioq.organization_id
+        AND list.inventory_item_id = ioq.inventory_item_id)
+        LEFT JOIN cux_po_lead_time_list plt ON (
+        list.organization_id = plt.organization_id
+        AND list.inventory_item_id = plt.inventory_item_id)
+        LEFT JOIN cux_wie_lead_time_list wlt ON (
+        list.organization_id =wlt.organization_id
+        AND list.inventory_item_id = wlt.inventory_item_id
+        )
+        WHERE list.plan_lot_num = #{planLotNum})
+    </insert>
+
+    <delete id="deleOrdersSumGrossQuantityLists">
+        TRUNCATE TABLE pes_orders_bom_sum_qty_list;
+        TRUNCATE TABLE pes_orders_bom_sum_qty_list_llc
+    </delete>
+
+    <insert id="saveOrdersSumGrossQuantityListLlc">
+        INSERT INTO pes_orders_bom_sum_qty_list_llc (
+        organization_id,
+        inventory_item_id,
+        parent_plan_po_quantity,
+        llc
+        )
+        (SELECT
+            list.organization_id,
+            list.inventory_item_id,
+            parqty.parent_plan_po_quantity,
+            MAX (list.LEVEL) AS llc
+        FROM
+            pes_orders_bom_detail_list list
+            left JOIN
+            (SELECT
+                wpl.organization_id,
+                wpl.inventory_item_id,
+                SUM (wpl.plan_wie_quantity) AS parent_plan_po_quantity
+            FROM
+                pes_work_plan_line_list wpl,
+                pes_work_plan_header_list wph
+            WHERE
+                1 = 1
+            AND wpl.delete_flag = 'Y'
+            AND wpl.wie_flag = 0
+            and wph.plan_lot_num = wpl.plan_lot_num
+            AND wph.organization_id = 0
+            GROUP BY
+                wpl.organization_id,
+                wpl.inventory_item_id) parqty
+        on (list.organization_id = parqty.organization_id
+        and list.inventory_item_id = parqty.inventory_item_id)
+        GROUP BY
+            list.organization_id,
+            list.inventory_item_id,
+            parqty.parent_plan_po_quantity)
+    </insert>
+
+    <insert id="saveSumGrossQuantityListLlc">
+        INSERT INTO pes_plan_bom_sum_qty_list_llc (
+        organization_id,
+        inventory_item_id,
+        parent_plan_po_quantity,
+        llc
+        )
+        (SELECT
+            list.organization_id,
+            list.inventory_item_id,
+            parqty.parent_plan_po_quantity,
+            MAX (list.LEVEL) AS llc
+        FROM
+            pes_plan_bom_detail_list list
+            left JOIN
+            (SELECT
+                wpl.organization_id,
+                wpl.inventory_item_id,
+                SUM (wpl.plan_wie_quantity) AS parent_plan_po_quantity
+            FROM
+                pes_work_plan_line_list wpl,
+                pes_work_plan_header_list wph
+            WHERE
+                1 = 1
+            AND wpl.delete_flag = 'Y'
+            AND wpl.wie_flag = 0
+            and wph.plan_lot_num = wpl.plan_lot_num
+            AND wpl.plan_lot_num &gt; 0
+            GROUP BY
+                wpl.organization_id,
+                wpl.inventory_item_id) parqty
+            on (list.organization_id = parqty.organization_id
+            and list.inventory_item_id = parqty.inventory_item_id)
+            GROUP BY
+                list.organization_id,
+                list.inventory_item_id,
+                parqty.parent_plan_po_quantity)
+    </insert>
+
+    <insert id="saveOrdersSumGrossQuantityList">
+        INSERT INTO pes_orders_bom_sum_qty_list (
+        line_num,
+        level_tree_code,
+        parent_level_tree_code,
+        organization_id,
+        inventory_item_id,
+        component_quantity,
+        gross_quantity,
+        plan_date,
+        llc,
+        onhand_quantity,
+        wie_h_quantity,
+        wie_l_quantity,
+        pr_quantity,
+        po_quantity,
+        parent_plan_po_quantity,
+        total_days,
+        DOCUMENT_NUMBER,
+        DOCUMENT_LINE_NUM,
+        CUST_PO_NUMBER,
+        CUSTOMER_NAME
+        )
+        (SELECT
+        list.line_num,
+        list.level_tree_code,
+        list.parent_level_tree_code,
+        list.organization_id,
+        list.inventory_item_id,
+        list.component_quantity,
+        list.gross_quantity,
+        list.plan_date,
+        llc.llc,
+        isnull(ioq.quantity, 0) AS onhand_quantity,
+        isnull(isq.wie_s, 0) AS wie_h_quantity,
+        isnull(abs(isq.wie_d), 0) AS wie_l_quantity,
+        isnull(isq.pr_s, 0) AS pr_quantity,
+        isnull(isq.po_s, 0) AS po_quantity,
+        isnull(llc.parent_plan_po_quantity, 0) AS parent_plan_po_quantity,
+        (case when list.plan_type = 'MPS' then (isnull(wlt.pre_date,0) + isnull(wlt.wie_date,0) + isnull(wlt.standard_wie_date,0) + isnull(wlt.standard_wie_quantity,0) + isnull(wlt.rcv_date,0) + isnull(wlt.exp_prod_date,0)) else (isnull(plt.pr_date,0) + isnull(plt.po_date,0) + isnull(plt.supplier_date,0) + isnull(plt.logist_date,0) + isnull(plt.rcv_date,0) + isnull(plt.exp_prod_date,0)) end) as total_days,
+        odl.DOCUMENT_NUMBER,
+        odl.DOCUMENT_LINE_NUM,
+	    odl.CUST_PO_NUMBER,
+	    odl.CUSTOMER_NAME
+	    FROM
+	    sync_orders_demand_list odl,
+        pes_orders_bom_detail_list list
+        LEFT JOIN pes_orders_bom_sum_qty_list_llc llc ON (
+        list.organization_id = llc.organization_id
+        AND list.inventory_item_id = llc.inventory_item_id)
+        LEFT JOIN pes_item_supply_demand_quantity isq ON (
+        list.organization_id = isq.organization_id
+        AND list.inventory_item_id = isq.inventory_item_id)
+        LEFT JOIN sync_inv_onhand_quantity_new ioq ON (
+        list.organization_id = ioq.organization_id
+        AND list.inventory_item_id = ioq.inventory_item_id)
+        LEFT JOIN cux_po_lead_time_list plt ON (
+        list.organization_id = plt.organization_id
+        AND list.inventory_item_id = plt.inventory_item_id)
+        LEFT JOIN cux_wie_lead_time_list wlt ON (
+        list.organization_id =wlt.organization_id
+        AND list.inventory_item_id = wlt.inventory_item_id
+        )
+        where odl.plan_lot_line_num = list.plan_lot_line_num
+        and odl.plan_lot_num = list.plan_lot_num
+        and odl.plan_lot_num = #{planLotNum})
+    </insert>
+
+    <delete id="deleteSyncDemandListLists">
+        TRUNCATE TABLE pes_plan_bom_detail_list
+    </delete>
+
+</mapper>

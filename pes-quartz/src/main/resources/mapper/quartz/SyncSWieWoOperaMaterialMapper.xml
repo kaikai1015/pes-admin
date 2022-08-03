@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncSWieWoOperaMaterialMapper">
+
+    <resultMap type="SyncSWieWoOperaMaterialEO" id="SyncSWieWoOperaMaterialEOResult">
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="materialSeqNumber"    column="MATERIAL_SEQ_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="requiredDate"    column="REQUIRED_DATE"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="woOperationId"    column="WO_OPERATION_ID"    />
+        <result property="materialType"    column="MATERIAL_TYPE"    />
+        <result property="quantityPerProduct"    column="QUANTITY_PER_PRODUCT"    />
+        <result property="basisType"    column="BASIS_TYPE"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="includeInPlanningFlag"    column="INCLUDE_IN_PLANNING_FLAG"    />
+        <result property="supplyType"    column="SUPPLY_TYPE"    />
+        <result property="supplySubinventory"    column="SUPPLY_SUBINVENTORY"    />
+    </resultMap>
+
+    <delete id="deleteSyncSWieWoOperaMaterialEO">
+        delete from sync_wie_wo_operation_materials where WO_OPERATION_MATERIAL_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.woOperationMaterialId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncSWieWoOperaMaterialEO">
+        insert into sync_wie_wo_operation_materials( WO_OPERATION_MATERIAL_ID, ORGANIZATION_ID, WORK_ORDER_ID, MATERIAL_SEQ_NUMBER, INVENTORY_ITEM_ID, QUANTITY, REQUIRED_DATE, ISSUED_QUANTITY,WO_OPERATION_ID,MATERIAL_TYPE,QUANTITY_PER_PRODUCT,BASIS_TYPE,UOM_CODE,INCLUDE_IN_PLANNING_FLAG,SUPPLY_TYPE,SUPPLY_SUBINVENTORY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.woOperationMaterialId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderId,jdbcType=BIGINT}, #{item.materialSeqNumber,jdbcType=INTEGER}, #{item.inventoryItemId,jdbcType=BIGINT}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.requiredDate,jdbcType=TIMESTAMP}, cast(#{item.issuedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.woOperationId,jdbcType=BIGINT}, #{item.materialType,jdbcType=VARCHAR}, cast(#{item.quantityPerProduct,jdbcType=DECIMAL} as decimal(15,5)), #{item.basisType,jdbcType=VARCHAR}, #{item.uomCode,jdbcType=VARCHAR}, #{item.includeInPlanningFlag,jdbcType=VARCHAR}, #{item.supplyType,jdbcType=VARCHAR}, #{item.supplySubinventory,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

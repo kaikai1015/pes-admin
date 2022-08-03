@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesItemSupplyDemandListDetailsMapper">
+
+    <resultMap type="PesItemSupplyDemandListDetails" id="PesItemSupplyDemandListDetailsResult">
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="type"    column="TYPE"    />
+                    <result property="quantity"    column="QUANTITY"    />
+                    <result property="date"    column="DATE"    />
+                    <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+                    <result property="onhandQuantity"    column="ONHAND_QUANTITY"    />
+                    <result property="uom"    column="UOM"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="productCatalog"    column="Product_Catalog"    />
+        <result property="itemCatalog"    column="Item_Catalog"    />
+            </resultMap>
+
+    <sql id="selectPesItemSupplyDemandListDetailsVo">
+        SELECT
+            list.TYPE,
+            isnull(ioq.quantity, 0) AS ONHAND_QUANTITY,
+            list.QUANTITY,
+            list. DATE,
+            list.DOCUMENT_NUMBER,
+            list.UOM,
+            list.ORGANIZATION_ID,
+            item.ITEM_NUMBER,
+            item.ITEM_DESCRIPTION,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = item.ORGANIZATION_ID
+            and eic.inventory_item_id = item.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = item.ORGANIZATION_ID
+            and eic.inventory_item_id = item.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog
+        FROM
+            sync_items_num_des_list item,
+            pes_item_supply_demand_list list
+            LEFT JOIN
+            sync_inv_onhand_quantity_new ioq ON (
+            list.ORGANIZATION_ID = ioq.organization_id
+            AND list.INVENTORY_ITEM_ID = ioq.inventory_item_id
+        )
+    </sql>
+
+    <select id="selectPesItemSupplyDemandListDetailsList" parameterType="PesItemSupplyDemandListDetails" resultMap="PesItemSupplyDemandListDetailsResult">
+        <include refid="selectPesItemSupplyDemandListDetailsVo"/>
+        <where>
+            AND list.ORGANIZATION_ID = item.organization_id
+            AND list.INVENTORY_ITEM_ID = item.inventory_item_id
+            <if test="organizationId != null "> and item.ORGANIZATION_ID = #{organizationId}</if>
+            <if test="itemNumber != null "> and item.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="type != null  and type != ''"> and list.TYPE = #{type}</if>
+        </where>
+    </select>
+
+</mapper>

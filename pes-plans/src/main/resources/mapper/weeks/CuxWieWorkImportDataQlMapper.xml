@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.CuxWieWorkImportDataQlMapper">
+
+    <resultMap type="CuxWieWorkImportDataQl" id="CuxWieWorkImportDataQlResult">
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="workOrderId"    column="WORK_ORDER_ID"    />
+                    <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+                    <result property="pInventoryItemId"    column="P_INVENTORY_ITEM_ID"    />
+                    <result property="pItemNumber"    column="P_ITEM_NUMBER"    />
+                    <result property="pDescription"    column="P_DESCRIPTION"    />
+                    <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+                    <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+                    <result property="lineNum"    column="LINE_NUM"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="description"    column="DESCRIPTION"    />
+                    <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+                    <result property="num"    column="NUM"    />
+                    <result property="onhandQuantity"    column="ONHAND_QUANTITY"    />
+                    <result property="avaliableOnhandQuantity"    column="AVALIABLE_ONHAND_QUANTITY"    />
+                    <result property="receiveQuantity"    column="receive_quantity"    />
+                    <result property="inboundQuantity"    column="inbound_quantity"    />
+                    <result property="buyerName"    column="buyer_name"    />
+                    <result property="prodLines"    column="prod_lines"    />
+                    <result property="customerName"    column="CUSTOMER_NAME"    />
+                    <result property="orderNumber"    column="order_number"    />
+                    <result property="lotNumber"    column="lot_number"    />
+        <result property="requiredDate"    column="REQUIRED_DATE"    />
+        <result property="sumRequiredQuantity"    column="SUM_REQUIRED_QUANTITY"    />
+        <result property="remainQuantity"    column="remain_quantity"    />
+        <result property="overRemainQuantity"    column="over_remain_quantity"    />
+        <result property="revRemainQuantity"    column="REV_REMAIN_QUANTITY"    />
+        <result property="workType"    column="work_type"    />
+        <result property="sumUntransferedQuantity"    column="sum_untransfered_quantity"    />
+        <result property="maxRequiredQuantity"    column="MAX_REQUIRED_QUANTITY"    />
+        <result property="importStartDate"    column="import_start_date"    />
+            </resultMap>
+
+    <sql id="selectCuxWieWorkImportDataQlVo">
+        SELECT
+            ORGANIZATION_ID,
+            WORK_ORDER_ID,
+            WORK_ORDER_NUMBER,
+            P_INVENTORY_ITEM_ID,
+            P_ITEM_NUMBER,
+            P_DESCRIPTION,
+            PLANNED_START_QUANTITY,
+            COMPLETED_QUANTITY,
+            LINE_NUM,
+            INVENTORY_ITEM_ID,
+            ITEM_NUMBER,
+            DESCRIPTION,
+            REQUIRED_QUANTITY,
+            REQUIRED_DATE,
+            import_start_date,
+            NUM,
+            SUM_REQUIRED_QUANTITY,
+            ONHAND_QUANTITY,
+            (ONHAND_QUANTITY - sum_untransfered_quantity) as AVALIABLE_ONHAND_QUANTITY,
+            sum_untransfered_quantity,
+            remain_quantity,
+            (case when (remain_quantity + required_quantity) &lt; 0 then (-1)*required_quantity else remain_quantity end) as over_remain_quantity,
+            (case when (AVALIABLE_ONHAND_QUANTITY - MAX_REQUIRED_QUANTITY) &gt; 0 then 0 else (AVALIABLE_ONHAND_QUANTITY - MAX_REQUIRED_QUANTITY) end) as MAX_REQUIRED_QUANTITY,
+            receive_quantity,
+            inbound_quantity,
+            (RECEIVE_QUANTITY + inbound_quantity + AVALIABLE_ONHAND_QUANTITY - SUM_REQUIRED_QUANTITY) as REV_REMAIN_QUANTITY,
+            buyer_name,
+            prod_lines,
+            CUSTOMER_NAME,
+            order_number,
+            lot_number,
+            work_type
+        FROM
+            cux_wie_work_import_data_ql
+    </sql>
+
+    <select id="selectCuxWieWorkImportDataQlList" parameterType="CuxWieWorkImportDataQl" resultMap="CuxWieWorkImportDataQlResult">
+        <include refid="selectCuxWieWorkImportDataQlVo"/>
+        <where>
+            <if test="lotNumber != null  and lotNumber != ''"> and lot_number = #{lotNumber}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER like (#{workOrderNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and P_ITEM_NUMBER like (#{pItemNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+        order by work_type desc,INVENTORY_ITEM_ID asc,SUM_REQUIRED_QUANTITY asc
+    </select>
+
+    <insert id="deleteCuxWieWorkImportDataQlById" parameterType="Long">
+        INSERT INTO cux_wie_work_import_data_ql (
+            ORGANIZATION_ID,
+            WORK_ORDER_ID,
+            WORK_ORDER_NUMBER,
+            P_INVENTORY_ITEM_ID,
+            P_ITEM_NUMBER,
+            P_DESCRIPTION,
+            PLANNED_START_QUANTITY,
+            COMPLETED_QUANTITY,
+            LINE_NUM,
+            INVENTORY_ITEM_ID,
+            ITEM_NUMBER,
+            DESCRIPTION,
+            REQUIRED_QUANTITY,
+            REQUIRED_DATE,
+            import_start_date,
+            NUM,
+            SUM_REQUIRED_QUANTITY,
+            MAX_REQUIRED_QUANTITY,
+            ONHAND_QUANTITY,
+            AVALIABLE_ONHAND_QUANTITY,
+            sum_untransfered_quantity,
+            remain_quantity,
+            receive_quantity,
+            inbound_quantity,
+            buyer_name,
+            prod_lines,
+            CUSTOMER_NAME,
+            order_number,
+            lot_number,
+            work_type,
+            CREATE_BY,
+            CREATE_DATE,
+            last_update_by,
+            last_update_date)
+        (SELECT
+            pwk.ORGANIZATION_ID,
+            pwk.WORK_ORDER_ID,
+            pwk.WORK_ORDER_NUMBER,
+            pwk.P_INVENTORY_ITEM_ID,
+            pwk.P_ITEM_NUMBER,
+            pwk.P_DESCRIPTION,
+            pwk.PLANNED_START_QUANTITY,
+            pwk.COMPLETED_QUANTITY,
+            pwk.MATERIAL_SEQ_NUMBER,
+            pwk.INVENTORY_ITEM_ID,
+            pwk.item_number,
+            pwk.description,
+            pwk.REQUIRED_QUANTITY,
+            pwk.PLANNED_START_DATE,
+            pwk.import_start_date,
+            pwk.NUM,
+            pwk.SUM_REQUIRED_QUANTITY,
+            pwk.MAX_REQUIRED_QUANTITY,
+            pwk.onhand_quantity,
+            pwk.available_onhand_quantity,
+            pwk.sum_untransfered_quantity,
+            (isnull(pwk.available_onhand_quantity,0) - pwk.SUM_REQUIRED_QUANTITY) as REMAIN_QUANTITY,
+            pwk.RECEIVE_QUANTITY,
+            pwk.inbound_quantity,
+            pwk.BUYER_NAME,
+            pwk.PROD_LINES,
+            pwk.CUSTOMER_NAME,
+            pwk.ORDER_NUMBER,
+            pwk.LOT_NUMBER,
+            pwk.work_type,
+            pwk.CREATE_BY,
+            getdate(),
+            pwk.CREATE_BY,
+            getdate()
+            FROM
+            (SELECT
+            wwidl.ORGANIZATION_ID,
+            wwidl.WORK_ORDER_ID,
+            wwidl.WORK_ORDER_NUMBER,
+            wwidl.P_INVENTORY_ITEM_ID,
+            wwidl.P_ITEM_NUMBER,
+            wwidl.P_DESCRIPTION,
+            wwidl.PLANNED_START_QUANTITY,
+            isnull(wwidl.COMPLETED_QUANTITY,0) as COMPLETED_QUANTITY,
+            wwdv.MATERIAL_SEQ_NUMBER,
+            wwdv.INVENTORY_ITEM_ID,
+            wwdv.item_number,
+            wwdv.description,
+            wwdv.REQUIRED_QUANTITY,
+            wwidl.PLANNED_START_DATE,
+            wwidl.import_start_date,
+            wwidl.NUM,
+            SUM (wwdv.REQUIRED_QUANTITY) OVER (PARTITION BY wwdv.ORGANIZATION_ID,wwdv.INVENTORY_ITEM_ID ORDER BY wwidl.WORK_TYPE desc,wwidl.NUM asc,wwdv.REQUIRED_QUANTITY asc,wwdv.WORK_ORDER_ID asc) as SUM_REQUIRED_QUANTITY,
+            SUM (wwdv.REQUIRED_QUANTITY) OVER (PARTITION BY wwdv.ORGANIZATION_ID,wwdv.INVENTORY_ITEM_ID) as MAX_REQUIRED_QUANTITY,
+            isnull(iioqa.onhand_quantity,0) as onhand_quantity,
+            isnull(iioqa.available_onhand_quantity,0) as available_onhand_quantity,
+            isnull(iioqa.sum_untransfered_quantity,0) as sum_untransfered_quantity,
+            isnull(iioqa.RECEIVE_QUANTITY,0) as RECEIVE_QUANTITY,
+            isnull(iioqa.inbound_quantity,0) as inbound_quantity,
+            wwdv.BUYER_NAME,
+            wwidl.PROD_LINES,
+            wwidl.CUSTOMER_NAME,
+            wwidl.ORDER_NUMBER,
+            wwidl.LOT_NUMBER,
+            wwidl.CREATE_BY,
+            wwidl.work_type
+            FROM
+            cux_wie_work_import_data_list wwidl,
+            cux_wie_wo_demand_list_all_v wwdv
+            left JOIN cux_inv_item_onhand_quantity_available_list iioqa
+            on (wwdv.ORGANIZATION_ID = iioqa.ORGANIZATION_ID
+            AND wwdv.INVENTORY_ITEM_ID = iioqa.INVENTORY_ITEM_ID)
+            WHERE
+            wwidl.ORGANIZATION_ID = wwdv.ORGANIZATION_ID
+            AND wwidl.WORK_ORDER_ID = wwdv.WORK_ORDER_ID
+            and wwidl.LOT_NUMBER = #{lotNumber}) pwk)
+    </insert>
+
+    <delete id="deleteCuxWieWorkImportDataQlByIds" parameterType="Long">
+        delete from cux_wie_work_import_data_ql where LOT_NUMBER = #{lotNumber}
+    </delete>
+
+    <insert id="insertCuxWieWorkImportDataQlByIds">
+        TRUNCATE TABLE cux_item_untransfered_quantity_list;
+        INSERT INTO cux_item_untransfered_quantity_list (
+            inventory_item_id,
+            organization_id,
+            untransfered_quantity)
+        SELECT
+            wwom.inventory_item_id,
+            wwom.organization_id,
+            SUM(wwom.required_quantity + wwom.sun_hao_quantity - wwom.ISSUED_QUANTITY) AS untransfered_quantity
+        FROM
+            cux_prod_line_days_lines_all_v pppv,
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+        WHERE
+            pppv.organization_id = wwob.ORGANIZATION_ID
+        AND pppv.work_order_id = wwob.WORK_ORDER_ID
+        AND wwob.organization_id = wwom.organization_id
+        AND wwob.work_order_id = wwom.WORK_ORDER_ID
+        and wwob.pes_work_order_id = wwom.pes_work_order_id
+        and wwom.work_order_operation_material_id > 0
+        and wwob.work_order_id > 0
+        AND (wwom.required_quantity + wwom.sun_hao_quantity - wwom.ISSUED_QUANTITY) > 0
+        and wwom.required_quantity > 0
+        AND pppv.days_prod_flag = 1
+        AND wwob.WORK_ORDER_STATUS_ID IN (10002, 10004, 10005)
+        AND wwom.material_sequence_number > 0
+        GROUP BY
+            wwom.inventory_item_id,
+            wwom.organization_id
+    </insert>
+
+    <insert id="insertCuxWieWorkImportDataQlByIdsQuantity">
+        TRUNCATE TABLE cux_inv_item_onhand_quantity_available_list;
+        INSERT INTO cux_inv_item_onhand_quantity_available_list (
+                organization_id,
+                inventory_item_id,
+                RECEIVE_QUANTITY,
+                inbound_quantity,
+                onhand_quantity,
+                sum_untransfered_quantity,
+                available_onhand_quantity)
+        SELECT
+                list.organization_id,
+                list.inventory_item_id,
+                isnull(pir.RECEIVE_QUANTITY,0) as RECEIVE_QUANTITY,
+                isnull(pir.inbound_quantity,0) as inbound_quantity,
+                isnull(ioq.quantity,0) AS onhand_quantity,
+                isnull(iuql.untransfered_quantity,0) as sum_untransfered_quantity,
+                (case when isnull(ioq.quantity,0) >= isnull(iuql.untransfered_quantity,0) then isnull(ioq.quantity,0) - isnull(iuql.untransfered_quantity,0) else 0 end) AS available_onhand_quantity
+            FROM
+                 sync_items_num_des_list list
+                 LEFT JOIN sync_inv_onhand_quantity_new ioq
+                 on (list.inventory_item_id = ioq.inventory_item_id
+                 AND list.organization_id = ioq.organization_id)
+                 LEFT JOIN cux_item_untransfered_quantity_list iuql
+                 ON (list.inventory_item_id = iuql.inventory_item_id
+                 AND list.organization_id = iuql.organization_id)
+                 LEFT JOIN sync_po_inbound_rcv_qty pir
+               ON (list.INVENTORY_ITEM_ID = pir.ITEM_ID
+               AND list.ORGANIZATION_ID = pir.SHIP_TO_ORGANIZATION_ID)
+            where isnull(pir.RECEIVE_QUANTITY,0) + isnull(pir.inbound_quantity,0) + isnull(ioq.quantity,0) + (case when isnull(ioq.quantity,0) >= isnull(iuql.untransfered_quantity,0) then isnull(ioq.quantity,0) - isnull(iuql.untransfered_quantity,0) else 0 end) > 0
+    </insert>
+
+
+    <select id="selectListUntransferQuantityList" parameterType="CuxWieWorkImportDataQl" resultMap="CuxWieWorkImportDataQlResult">
+        SELECT
+            wwob.work_order_number,
+            wwom.item_number,
+            wwom.item_description as description,
+            (wwom.required_quantity + wwom.sun_hao_quantity - wwom.ISSUED_QUANTITY) AS sum_untransfered_quantity
+        FROM
+            cux_prod_line_days_lines_all_v pppv,
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+        WHERE
+            pppv.organization_id = wwob.ORGANIZATION_ID
+        AND pppv.work_order_id = wwob.WORK_ORDER_ID
+        AND wwob.organization_id = wwom.organization_id
+        AND wwob.work_order_id = wwom.WORK_ORDER_ID
+        AND (wwom.required_quantity + wwom.sun_hao_quantity - wwom.ISSUED_QUANTITY) > 0
+        AND wwom.required_quantity > 0
+        AND pppv.days_prod_flag = 1
+        and wwob.pes_work_order_id = wwom.pes_work_order_id
+        and wwom.work_order_operation_material_id > 0
+        and wwob.work_order_id > 0
+        AND wwob.WORK_ORDER_STATUS_ID IN (10002, 10004, 10005)
+        AND wwom.material_sequence_number > 0
+        <if test="itemNumber != null  and itemNumber != ''"> and wwom.item_number = #{itemNumber}</if>
+        <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number = #{workOrderNumber}</if>
+    </select>
+
+</mapper>

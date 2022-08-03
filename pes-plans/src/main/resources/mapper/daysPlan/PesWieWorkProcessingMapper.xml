@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesWieWorkProcessingMapper">
+
+    <resultMap type="PesWieWorkProcessing" id="PesWieWorkProcessingResult">
+                    <result property="workOrderId"    column="work_order_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="completeQuantity"    column="complete_quantity"    />
+                    <result property="completeDate"    column="complete_date"    />
+                    <result property="laoHuaQuantity"    column="lao_hua_quantity"    />
+                    <result property="laoHuaDate"    column="lao_hua_date"    />
+                    <result property="testQuantity"    column="test_quantity"    />
+                    <result property="testDate"    column="test_date"    />
+                    <result property="baoZhuangQuantity"    column="bao_zhuang_quantity"    />
+                    <result property="baoZhuangDate"    column="bao_zhuang_date"    />
+                    <result property="zuZhuangStartQuantity"    column="zu_zhuang_start_quantity"    />
+                    <result property="zuZhuangStartDate"    column="zu_zhuang_start_date"    />
+                    <result property="zuZhuangCaiQuantity"    column="zu_zhuang_cai_quantity"    />
+                    <result property="zuZhuangCaiDate"    column="zu_zhuang_cai_date"    />
+                    <result property="zuZhuangEndQuantity"    column="zu_zhuang_end_quantity"    />
+                    <result property="zuZhuangEndDate"    column="zu_zhuang_end_date"    />
+                    <result property="planLotsId"    column="plan_lots_id"    />
+                    <result property="isWwFlag"    column="is_ww_flag"    />
+            </resultMap>
+
+    <sql id="selectPesWieWorkProcessingVo">
+        select work_order_id, organization_id, work_order_number, last_update_date, complete_quantity, complete_date, lao_hua_quantity, lao_hua_date, test_quantity, test_date, bao_zhuang_quantity, bao_zhuang_date, zu_zhuang_start_quantity, zu_zhuang_start_date, zu_zhuang_cai_quantity, zu_zhuang_cai_date, zu_zhuang_end_quantity, zu_zhuang_end_date, plan_lots_id,is_ww_flag from pes_wie_work_processing
+    </sql>
+
+    <select id="selectPesWieWorkProcessingList" parameterType="PesWieWorkProcessing" resultMap="PesWieWorkProcessingResult">
+        <include refid="selectPesWieWorkProcessingVo"/>
+--         select  * from pes_wie_work_processing_v
+        <where>
+                <if test="lastUpdateDate != null "> and last_update_date = #{lastUpdateDate}</if>
+                <if test="completeQuantity != null "> and complete_quantity = #{completeQuantity}</if>
+                <if test="completeDate != null "> and complete_date = #{completeDate}</if>
+                <if test="laoHuaQuantity != null "> and lao_hua_quantity = #{laoHuaQuantity}</if>
+                <if test="laoHuaDate != null "> and lao_hua_date = #{laoHuaDate}</if>
+                <if test="testQuantity != null "> and test_quantity = #{testQuantity}</if>
+                <if test="testDate != null "> and test_date = #{testDate}</if>
+                <if test="baoZhuangQuantity != null "> and bao_zhuang_quantity = #{baoZhuangQuantity}</if>
+                <if test="baoZhuangDate != null "> and bao_zhuang_date = #{baoZhuangDate}</if>
+                <if test="zuZhuangStartQuantity != null "> and zu_zhuang_start_quantity = #{zuZhuangStartQuantity}</if>
+                <if test="zuZhuangStartDate != null "> and zu_zhuang_start_date = #{zuZhuangStartDate}</if>
+                <if test="zuZhuangCaiQuantity != null "> and zu_zhuang_cai_quantity = #{zuZhuangCaiQuantity}</if>
+                <if test="zuZhuangCaiDate != null "> and zu_zhuang_cai_date = #{zuZhuangCaiDate}</if>
+                <if test="zuZhuangEndQuantity != null "> and zu_zhuang_end_quantity = #{zuZhuangEndQuantity}</if>
+                <if test="zuZhuangEndDate != null "> and zu_zhuang_end_date = #{zuZhuangEndDate}</if>
+                <if test="planLotsId != null  and planLotsId != ''"> and plan_lots_id = #{planLotsId}</if>
+        </where>
+    </select>
+
+    <select id="selectPesWieWorkProcessingById" parameterType="Long" resultMap="PesWieWorkProcessingResult">
+        <include refid="selectPesWieWorkProcessingVo"/>
+        where work_order_id = #{workOrderId}
+    </select>
+
+    <insert id="insertPesWieWorkProcessing" parameterType="PesWieWorkProcessing">
+        insert into pes_wie_work_processing
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workOrderId != null">work_order_id,</if>
+                <if test="organizationId != null">organization_id,</if>
+                <if test="workOrderNumber != null">work_order_number,</if>
+                <if test="lastUpdateDate != null">last_update_date,</if>
+                <if test="completeQuantity != null">complete_quantity,</if>
+                <if test="completeDate != null">complete_date,</if>
+                <if test="laoHuaQuantity != null">lao_hua_quantity,</if>
+                <if test="laoHuaDate != null">lao_hua_date,</if>
+                <if test="testQuantity != null">test_quantity,</if>
+                <if test="testDate != null">test_date,</if>
+                <if test="baoZhuangQuantity != null">bao_zhuang_quantity,</if>
+                <if test="baoZhuangDate != null">bao_zhuang_date,</if>
+                <if test="zuZhuangStartQuantity != null">zu_zhuang_start_quantity,</if>
+                <if test="zuZhuangStartDate != null">zu_zhuang_start_date,</if>
+                <if test="zuZhuangCaiQuantity != null">zu_zhuang_cai_quantity,</if>
+                <if test="zuZhuangCaiDate != null">zu_zhuang_cai_date,</if>
+                <if test="zuZhuangEndQuantity != null">zu_zhuang_end_quantity,</if>
+                <if test="zuZhuangEndDate != null">zu_zhuang_end_date,</if>
+                <if test="planLotsId != null">plan_lots_id,</if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="workOrderId != null">#{workOrderId},</if>
+                <if test="organizationId != null">#{organizationId},</if>
+                <if test="workOrderNumber != null">#{workOrderNumber},</if>
+                <if test="lastUpdateDate != null">#{lastUpdateDate},</if>
+                <if test="completeQuantity != null">#{completeQuantity},</if>
+                <if test="completeDate != null">#{completeDate},</if>
+                <if test="laoHuaQuantity != null">#{laoHuaQuantity},</if>
+                <if test="laoHuaDate != null">#{laoHuaDate},</if>
+                <if test="testQuantity != null">#{testQuantity},</if>
+                <if test="testDate != null">#{testDate},</if>
+                <if test="baoZhuangQuantity != null">#{baoZhuangQuantity},</if>
+                <if test="baoZhuangDate != null">#{baoZhuangDate},</if>
+                <if test="zuZhuangStartQuantity != null">#{zuZhuangStartQuantity},</if>
+                <if test="zuZhuangStartDate != null">#{zuZhuangStartDate},</if>
+                <if test="zuZhuangCaiQuantity != null">#{zuZhuangCaiQuantity},</if>
+                <if test="zuZhuangCaiDate != null">#{zuZhuangCaiDate},</if>
+                <if test="zuZhuangEndQuantity != null">#{zuZhuangEndQuantity},</if>
+                <if test="zuZhuangEndDate != null">#{zuZhuangEndDate},</if>
+                <if test="planLotsId != null">#{planLotsId},</if>
+            </trim>
+    </insert>
+    <insert id="insertInit">
+        INSERT INTO pes_wie_work_processing ( work_order_id, organization_id, work_order_number, last_update_date, plan_lots_id, plan_id,is_ww_flag )
+
+SELECT
+	ppldl.work_order_id,
+	ppldl.organization_id,
+	ppldl.work_order_number,
+	GETDATE() AS dateNow,
+	ppldhl.lot_num,
+	ppldl.id,
+	#{isWw}
+FROM
+        <if test='isWw == "N"'>
+            pes_prod_line_days_header_all ppldhl,
+            pes_prod_line_days_line_all ppldl
+        </if>
+        <if test='isWw == "Y"'>
+            pes_prod_line_days_header_all_ww ppldhl,
+            pes_prod_line_days_line_all_ww ppldl
+        </if>
+	LEFT JOIN sync_hz_parties hp ON ( ppldl.party_id = hp.party_id AND hp.party_type = 'ORGANIZATION' )
+WHERE
+	ppldl.id = #{pId}
+	AND ppldl.id = ppldhl.id
+	AND ppldhl.is_ww_flag = #{isWw}
+    </insert>
+    <update id="updatePesWieWorkProcessing" parameterType="PesWieWorkProcessing">
+        update pes_wie_work_processing
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="workOrderNumber != null">work_order_number = #{workOrderNumber},</if>
+            <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+            <if test="completeQuantity != null">complete_quantity = #{completeQuantity},</if>
+            <if test="completeDate != null">complete_date = #{completeDate},</if>
+            <if test="laoHuaQuantity != null">lao_hua_quantity = #{laoHuaQuantity},</if>
+            <if test="laoHuaDate != null">lao_hua_date = #{laoHuaDate},</if>
+            <if test="testQuantity != null">test_quantity = #{testQuantity},</if>
+            <if test="testDate != null">test_date = #{testDate},</if>
+            <if test="baoZhuangQuantity != null">bao_zhuang_quantity = #{baoZhuangQuantity},</if>
+            <if test="baoZhuangDate != null">bao_zhuang_date = #{baoZhuangDate},</if>
+            <if test="zuZhuangStartQuantity != null">zu_zhuang_start_quantity = #{zuZhuangStartQuantity},</if>
+            <if test="zuZhuangStartDate != null">zu_zhuang_start_date = #{zuZhuangStartDate},</if>
+            <if test="zuZhuangCaiQuantity != null">zu_zhuang_cai_quantity = #{zuZhuangCaiQuantity},</if>
+            <if test="zuZhuangCaiDate != null">zu_zhuang_cai_date = #{zuZhuangCaiDate},</if>
+            <if test="zuZhuangEndQuantity != null">zu_zhuang_end_quantity = #{zuZhuangEndQuantity},</if>
+            <if test="zuZhuangEndDate != null">zu_zhuang_end_date = #{zuZhuangEndDate},</if>
+            <if test="planLotsId != null">plan_lots_id = #{planLotsId},</if>
+        </trim>
+        where work_order_id = #{workOrderId}
+    </update>
+    <update id="sumQuantity" >
+        update pes_wie_work_processing
+        <trim prefix="SET" suffixOverrides=",">
+            last_update_date = GETDATE(),
+            <if test="type == 'COMPLETE'">
+                complete_quantity = complete_quantity + #{qty},
+                complete_date = GETDATE(),
+            </if>
+            <if test="type == 'AGEING'">
+                lao_hua_quantity = lao_hua_quantity + #{qty},
+                lao_hua_date = GETDATE(),
+            </if>
+            <if test="type == 'TEST'">
+                test_quantity = test_quantity + #{qty},
+                test_date = GETDATE(),
+            </if>
+            <if test="type == 'PACKING'">
+                bao_zhuang_quantity = bao_zhuang_quantity + #{qty},
+                bao_zhuang_date = GETDATE(),
+            </if>
+            <if test="type == 'FEEDING'">
+                zu_zhuang_start_quantity = zu_zhuang_start_quantity + #{qty},
+                zu_zhuang_start_date = GETDATE(),
+            </if>
+            <if test="type == 'ZU_ZHUANG_CAI'">
+                zu_zhuang_cai_quantity = zu_zhuang_cai_quantity + #{qty},
+                zu_zhuang_cai_date = GETDATE(),
+            </if>
+            <if test="type == 'ASSEMBLING_COMPLETE'">
+                zu_zhuang_end_quantity = zu_zhuang_end_quantity + #{qty},
+                zu_zhuang_end_date = GETDATE(),
+            </if>
+        </trim>
+        where work_order_id = #{workOrderId} and organization_id = #{organizationId}
+    </update>
+
+    <delete id="deletePesWieWorkProcessingById" parameterType="Long">
+        delete from pes_wie_work_processing where work_order_id = #{workOrderId}
+    </delete>
+
+    <delete id="deletePesWieWorkProcessingByIds" parameterType="String">
+        delete from pes_wie_work_processing where work_order_id in
+        <foreach item="workOrderId" collection="array" open="(" separator="," close=")">
+            #{workOrderId}
+        </foreach>
+    </delete>
+
+
+</mapper>

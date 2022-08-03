@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.CuxWieWorkImportDataListMapper">
+
+    <resultMap type="CuxWieWorkImportDataList" id="CuxWieWorkImportDataListResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="prodLines"    column="PROD_LINES"    />
+        <result property="orderNumber"    column="ORDER_NUMBER"    />
+        <result property="customerName"    column="CUSTOMER_NAME"    />
+        <result property="num"    column="NUM"    />
+        <result property="plannedStartDate"    column="PLANNED_START_DATE"    />
+        <result property="pInventoryItemId"    column="P_INVENTORY_ITEM_ID"    />
+        <result property="pItemNumber"    column="P_ITEM_NUMBER"    />
+        <result property="pDescription"    column="P_DESCRIPTION"    />
+        <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="lotNumber"    column="LOT_NUMBER"    />
+        <result property="createDate"    column="CREATE_DATE"    />
+        <result property="createBy"    column="CREATE_BY"    />
+        <result property="workType"    column="WORK_TYPE"    />
+        <result property="importStartDate"    column="import_start_date"    />
+    </resultMap>
+
+    <sql id="selectCuxWieWorkImportDataListVo">
+        SELECT
+        ORGANIZATION_ID,
+        WORK_ORDER_ID,
+        WORK_ORDER_NUMBER,
+        PROD_LINES,
+        ORDER_NUMBER,
+        CUSTOMER_NAME,
+        NUM,
+        PLANNED_START_DATE,
+        import_start_date,
+        P_INVENTORY_ITEM_ID,
+        P_ITEM_NUMBER,
+        P_DESCRIPTION,
+        PLANNED_START_QUANTITY,
+        COMPLETED_QUANTITY,
+        LOT_NUMBER,
+        WORK_TYPE
+        FROM
+        cux_wie_work_import_data_list
+    </sql>
+
+    <select id="selectCuxWieWorkImportDataListList" parameterType="CuxWieWorkImportDataList" resultMap="CuxWieWorkImportDataListResult">
+        <include refid="selectCuxWieWorkImportDataListVo"/>
+        <where>
+            <if test="lotNumber != null  and lotNumber != ''"> and lot_number = #{lotNumber}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER like (#{workOrderNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and P_ITEM_NUMBER like (#{pItemNumber} + '%')</if>
+        </where>
+        order by WORK_TYPE desc,NUM asc
+    </select>
+
+    <insert id="addBatchInsertCuxWieWorkImportDataList" parameterType="CuxWieWorkImportDataList">
+        insert into cux_wie_work_qian_liao_temp (organization_code,work_order_number,num,prod_lines,lot_number,import_start_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.organizationCode,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.num,jdbcType=INTEGER}, #{item.prodLines,jdbcType=VARCHAR}, #{item.lotNumber,jdbcType=BIGINT}, #{item.importStartDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <insert id="insertCuxWieWorkImportDataList" parameterType="CuxWieWorkImportDataList">
+        INSERT INTO cux_wie_work_import_data_list (
+            ORGANIZATION_ID,
+            WORK_ORDER_ID,
+            WORK_ORDER_NUMBER,
+            PROD_LINES,
+            ORDER_NUMBER,
+            CUSTOMER_NAME,
+            NUM,
+            PLANNED_START_DATE,
+            import_start_date,
+            P_INVENTORY_ITEM_ID,
+            P_ITEM_NUMBER,
+            P_DESCRIPTION,
+            PLANNED_START_QUANTITY,
+            COMPLETED_QUANTITY,
+            LOT_NUMBER,
+            WORK_TYPE,
+            CREATE_BY,
+            CREATE_DATE,
+            last_update_by,
+            last_update_date)
+            (SELECT
+                wwob.organization_id,
+                wwob.WORK_ORDER_ID,
+                wwob.WORK_ORDER_NUMBER,
+                wtemp.PROD_LINES,
+                wwob.order_number,
+                wwob.customer_name,
+                isnull(pv.line_id, wtemp.NUM) AS NUM,
+                wwob.planned_start_date,
+                wtemp.import_start_date,
+                wwob.inventory_item_id,
+                wwob.p_item_number,
+                wwob.p_item_description,
+                wwob.planned_start_quantity,
+                wwob.completed_quantity,
+                wtemp.LOT_NUMBER,
+                (case when isnull(pv.line_id,0) > 0 then 1 else 0 end) as work_type,
+                #{createBy},
+                getdate(),
+                #{createBy},
+                getdate()
+            FROM
+                cux_wie_work_qian_liao_temp wtemp,
+                sync_inv_org_parameters org,
+                pes_wie_work_orders_b_erp wwob
+                LEFT JOIN cux_prod_line_days_lines_all_v pv
+                ON (wwob.ORGANIZATION_ID = pv.organization_id
+                AND wwob.WORK_ORDER_ID = pv.WORK_ORDER_ID)
+            WHERE
+                org.ORGANIZATION_CODE = wtemp.organization_code
+            AND org.ORGANIZATION_ID = wwob.organization_id
+            AND wtemp.work_order_number = wwob.work_order_number
+            AND isnull(pv.days_prod_flag, 0) = 0
+            AND wtemp.LOT_NUMBER = #{lotNumber})
+    </insert>
+
+    <delete id="deleteCuxWieWorkImportDataListById" parameterType="Long">
+        delete from cux_wie_work_import_data_list where LOT_NUMBER = #{lotNumber};
+    </delete>
+
+    <delete id="deleteCuxWieWorkImportDataListByIds" parameterType="Long">
+        delete from cux_wie_work_qian_liao_temp where LOT_NUMBER = #{lotNumber}
+    </delete>
+
+    <select id="getCuxWieWorkImportDataListById" resultType="Integer">
+        select count(1) from cux_wie_work_import_data_ql where LOT_NUMBER = #{lotNumber}
+    </select>
+
+</mapper>

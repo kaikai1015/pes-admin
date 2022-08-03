@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkOrdersOpsItemErpMapper">
+
+    <resultMap type="PesWieWorkOrdersOpsItemErp" id="PesWieWorkOrdersOpsItemErpResult">
+                            <result property="inventoryItemId"    column="inventory_item_id"    />
+                            <result property="pItemNumber"    column="p_item_number"    />
+                            <result property="pItemDescription"    column="p_item_description"    />
+                            <result property="ospItemId"    column="osp_item_id"    />
+                            <result property="ospItemNumber"    column="osp_item_number"    />
+                            <result property="ospItemDescription"    column="osp_item_description"    />
+                            <result property="supplierId"    column="supplier_id"    />
+                            <result property="supplierNumber"    column="supplier_number"    />
+                            <result property="supplierName"    column="supplier_name"    />
+                            <result property="createDate"    column="create_date"    />
+                            <result property="createBy"    column="create_by"    />
+                            <result property="lastUpdateDate"    column="last_update_date"    />
+                            <result property="lastUpdateBy"    column="last_update_by"    />
+                            <result property="wieOpsItemId"    column="wie_ops_item_id"    />
+                            <result property="organizationId"    column="organization_id"    />
+                            <result property="workCenterId"    column="work_center_id"    />
+                            <result property="prioryty"    column="prioryty"    />
+        <result property="usageRateF"    column="usage_rate_f"    />
+        <result property="assignedUnitsF"    column="assigned_units_f"    />
+        <result property="usageRateS"    column="usage_rate_s"    />
+        <result property="assignedUnitsS"    column="assigned_units_s"    />
+        <result property="workCenterCode"    column="work_center_code"    />
+        <result property="isWwFlag"    column="is_ww_flag"    />
+        <result property="supplierSiteId"    column="supplier_site_id"    />
+        <result property="workCenterName"    column="work_center_name"    />
+            </resultMap>
+
+
+    <select id="selectPesWieWorkOrdersOpsItemErpList" parameterType="Long" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            wwop.wie_ops_item_id,
+            wwop.inventory_item_id,
+            wwop.organization_id,
+            wwop.p_item_number,
+            wwop.p_item_description,
+            wwop.osp_item_id,
+            wwop.osp_item_number,
+            wwop.osp_item_description,
+            wwop.supplier_id,
+            wwop.supplier_site_id,
+            wwop.supplier_number,
+            wwop.supplier_name
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_work_orders_ops_item_erp wwop
+        WHERE
+            wwob.pes_work_order_id = #{pesWorkOrderId}
+        AND wwob.organization_id = wwop.organization_id
+        AND wwob.inventory_item_id = wwop.inventory_item_id
+        AND wwob.work_center_id = wwop.work_center_id
+    </select>
+
+    <select id="selectPesWieWorkOrdersOpsItemErpById" parameterType="Long" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            inventory_item_id,
+            p_item_number,
+            p_item_description,
+            osp_item_id,
+            osp_item_number,
+            osp_item_description,
+            supplier_id,
+            supplier_site_id,
+            supplier_number,
+            supplier_name,
+            wie_ops_item_id,
+            organization_id,
+            work_center_id,
+            prioryty,
+            usage_rate_f,
+            assigned_units_f,
+            usage_rate_s,
+            assigned_units_s
+        FROM
+            pes_wie_work_orders_ops_item_erp
+        where wie_ops_item_id = #{wieOpsItemId}
+    </select>
+
+
+    <update id="updatePesWieWorkOrderOperationErp" parameterType="PesWieWorkOrdersOpsItemErp">
+        UPDATE pes_wie_work_order_operation_erp SET osp_item_id = #{ospItemId},osp_item_number = #{ospItemNumber},supplier_id = #{supplierId},supplier_site_id = #{supplierSiteId},supplier_name = #{supplierName},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId} and operation_type = 'SUPPLIER';
+        UPDATE pes_wie_wo_operation_materials_erp
+        SET pes_wie_wo_operation_materials_erp.subinventory_code = (
+            SELECT
+                        pes_wie_work_ww_kou_zhang_cang_list.xian_bian_cang
+                    FROM
+                        pes_wie_work_ww_kou_zhang_cang_list
+                    WHERE
+                        supplier_id = #{supplierId}
+        )
+        WHERE
+            pes_wie_wo_operation_materials_erp.pes_work_order_id = #{pesWorkOrderId}
+        AND pes_wie_wo_operation_materials_erp.material_sequence_number > 0
+    </update>
+
+    <insert id="insertPesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWorkOrdersOpsItemErp">
+        insert into pes_wie_work_submit_erp_infor_list (pes_work_order_id,pes_id,erp_id,count_number,item_number,item_description,erp_type,type,erp_flag,remark,create_by,create_date,last_update_by,last_update_date) values
+        ( #{pesWorkOrderId,jdbcType=BIGINT},#{wieOpsItemId,jdbcType=BIGINT}, 0,0,#{ospItemNumber,jdbcType=VARCHAR},#{ospItemDescription,jdbcType=VARCHAR},0,1,0, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="selectPesWieWorkOrdersOpsItemErpByPesWorkOrderId" parameterType="Long" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            pes_work_order_id,
+            osp_item_id
+        FROM
+            pes_wie_work_order_operation_erp
+        WHERE
+            pes_work_order_id = #{pesWorkOrderId}
+        AND operation_sequence_number = 20
+    </select>
+
+    <select id="getSelectPesWieWorkOrdersOpsItemErpList" parameterType="PesWieWorkOrdersOpsItemErp" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            inventory_item_id,
+            p_item_number,
+            p_item_description,
+            osp_item_id,
+            osp_item_number,
+            osp_item_description,
+            supplier_id,
+            supplier_site_id,
+            supplier_number,
+            supplier_name,
+            wie_ops_item_id,
+            organization_id,
+            work_center_id,
+            prioryty,
+            usage_rate_f,
+            assigned_units_f,
+            usage_rate_s,
+            assigned_units_s
+        FROM
+            pes_wie_work_orders_ops_item_erp
+        where inventory_item_id = #{inventoryItemId}
+        and organization_id = #{organizationId}
+    </select>
+
+    <update id="updatePesWieWorkOrdersOpsItemErp" parameterType="PesWieWorkOrdersOpsItemErp">
+        update pes_wie_work_orders_ops_item_erp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="ospItemId != null">osp_item_id = #{ospItemId},</if>
+            <if test="ospItemNumber != null">osp_item_number = #{ospItemNumber},</if>
+            <if test="ospItemDescription != null">osp_item_description = #{ospItemDescription},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="supplierSiteId != null">supplier_site_id = #{supplierSiteId},</if>
+            <if test="supplierNumber != null">supplier_number = #{supplierNumber},</if>
+            <if test="supplierName != null">supplier_name = #{supplierName},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">last_update_date = #{createDate},</if>
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+            <if test="workCenterId != null">work_center_id = #{workCenterId},</if>
+            <if test="prioryty != null">prioryty = #{prioryty},</if>
+            <if test="usageRateF != null">usage_rate_f = #{usageRateF},</if>
+            <if test="assignedUnitsF != null">assigned_units_f = #{assignedUnitsF},</if>
+            <if test="usageRateS != null">usage_rate_s = #{usageRateS},</if>
+            <if test="assignedUnitsS != null">assigned_units_s = #{assignedUnitsS},</if>
+        </trim>
+        where wie_ops_item_id = #{wieOpsItemId}
+    </update>
+
+    <select id="updatePesWieWorkOrdersOpsItemErpById" parameterType="PesWieWorkOrdersOpsItemErp" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_wie_work_orders_ops_item_erp
+        where inventory_item_id = #{inventoryItemId}
+        and organization_id = #{organizationId}
+        and prioryty = #{prioryty}
+        <if test="wieOpsItemId != null">and wie_ops_item_id != #{wieOpsItemId}</if>
+    </select>
+
+    <select id="selectGetOspSupplierList" parameterType="Long" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            dict_value as supplier_id,
+            remark as supplier_number,
+            dict_label as supplier_name,
+            dict_pes_key as supplier_site_id
+        FROM
+            sys_dict_data
+        WHERE
+            dict_value = #{supplierId}
+        AND dict_type = 'pes_osp_supplier_list'
+        AND status = 0
+    </select>
+
+    <select id="selectGetOspItemDescriptionList" parameterType="PesWieWorkOrdersOpsItemErp" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            INVENTORY_ITEM_ID as osp_item_id,
+            ITEM_NUMBER as osp_item_number,
+            ITEM_DESCRIPTION as osp_item_description
+        FROM
+            sync_items_num_des_list
+        WHERE
+            ORGANIZATION_ID = #{organizationId}
+        AND ITEM_NUMBER = #{ospItemNumber}
+        and item_type = 'OP'
+    </select>
+
+    <insert id="insertPesWieWorkOrdersOpsItemErp" parameterType="PesWieWorkOrdersOpsItemErp">
+        insert into pes_wie_work_orders_ops_item_erp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="pItemNumber != null">p_item_number,</if>
+            <if test="pItemDescription != null">p_item_description,</if>
+            <if test="ospItemId != null">osp_item_id,</if>
+            <if test="ospItemNumber != null">osp_item_number,</if>
+            <if test="ospItemDescription != null">osp_item_description,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="supplierSiteId != null">supplier_site_id,</if>
+            <if test="supplierNumber != null">supplier_number,</if>
+            <if test="supplierName != null">supplier_name,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">last_update_date,</if>
+            <if test="createBy != null">last_update_by,</if>
+            <if test="wieOpsItemId != null">wie_ops_item_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="workCenterId != null">work_center_id,</if>
+            <if test="prioryty != null">prioryty,</if>
+            <if test="usageRateF != null">usage_rate_f,</if>
+            <if test="assignedUnitsF != null">assigned_units_f,</if>
+            <if test="usageRateS != null">usage_rate_s,</if>
+            <if test="assignedUnitsS != null">assigned_units_s,</if>
+            <if test="workCenterCode != null">work_center_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="pItemNumber != null">#{pItemNumber},</if>
+            <if test="pItemDescription != null">#{pItemDescription},</if>
+            <if test="ospItemId != null">#{ospItemId},</if>
+            <if test="ospItemNumber != null">#{ospItemNumber},</if>
+            <if test="ospItemDescription != null">#{ospItemDescription},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="supplierSiteId != null">#{supplierSiteId},</if>
+            <if test="supplierNumber != null">#{supplierNumber},</if>
+            <if test="supplierName != null">#{supplierName},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="wieOpsItemId != null">#{wieOpsItemId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workCenterId != null">#{workCenterId},</if>
+            <if test="prioryty != null">#{prioryty},</if>
+            <if test="usageRateF != null">#{usageRateF},</if>
+            <if test="assignedUnitsF != null">#{assignedUnitsF},</if>
+            <if test="usageRateS != null">#{usageRateS},</if>
+            <if test="assignedUnitsS != null">#{assignedUnitsS},</if>
+            <if test="workCenterCode != null">#{workCenterCode},</if>
+        </trim>
+    </insert>
+
+    <select id="selectGetPItemDescriptionList" parameterType="PesWieWorkOrdersOpsItemErp" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+        ITEM_NUMBER as p_item_number,
+        ITEM_DESCRIPTION as p_item_description
+        FROM
+        sync_items_num_des_list
+        WHERE
+        inventory_item_id = #{inventoryItemId}
+        AND organization_id = #{organizationId}
+    </select>
+
+    <delete id="deletePesWieWorkOrdersOpsItemErpById" parameterType="Long">
+        delete from pes_wie_work_orders_ops_item_erp where wie_ops_item_id = #{wieOpsItemId}
+    </delete>
+
+    <select id="selectWieWorkCenterId" parameterType="PesWieWorkOrdersOpsItemErp" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            work_center_id,
+            is_ww_flag
+        FROM
+            pes_work_center_description_all
+        WHERE
+            organization_id = #{organizationId}
+        AND work_center_code = #{workCenterCode}
+    </select>
+
+
+    <select id="selectOrganizationIdByPesWorkOrderIds" parameterType="Long" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            organization_id
+        FROM
+            pes_wie_work_orders_b_erp
+        WHERE
+            pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+    <select id="selectPesWieWorkByIds" parameterType="Long" resultType="Integer">
+        select count(1) from pes_wie_work_orders_b_erp wwob where 	wwob.work_order_status_id in (10000,10001,10002,10003,10004) and wwob.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+
+    <select id="selectPesWieWorkOrdersOpsItemErpListExport" resultMap="PesWieWorkOrdersOpsItemErpResult">
+        SELECT
+            osp.organization_id,
+            osp.p_item_number,
+            osp.p_item_description,
+            osp.osp_item_number,
+            osp.osp_item_description,
+            osp.supplier_number,
+            osp.supplier_name,
+            (SELECT pwcda.work_center_name FROM pes_work_center_description_all pwcda WHERE pwcda.organization_id = osp.organization_id AND pwcda.work_center_id = osp.work_center_id) AS work_center_name,
+            osp.prioryty,
+            isnull(osp.usage_rate_f,0) as usage_rate_f,
+            isnull(osp.usage_rate_s,0) as usage_rate_s
+        FROM
+            pes_wie_work_orders_ops_item_erp osp
+            order by osp.inventory_item_id
+    </select>
+
+</mapper>

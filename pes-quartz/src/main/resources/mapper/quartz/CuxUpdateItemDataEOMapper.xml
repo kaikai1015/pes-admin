@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.CuxUpdateItemDataEOMapper">
+
+    <resultMap type="CuxUpdateItemDataEO" id="CuxUpdateItemDataEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="wipSupplySubinventory"    column="wip_supply_subinventory"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="usageRateF"    column="usage_rate_f"    />
+        <result property="usageRateS"    column="usage_rate_s"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemType"    column="item_type"    />
+    </resultMap>
+
+    <select id="selectUpdateItemDataList" resultMap="CuxUpdateItemDataEOResult">
+        SELECT
+            esb.ORGANIZATION_ID,
+            esb.INVENTORY_ITEM_ID,
+            esb.WIP_SUPPLY_SUBINVENTORY
+        FROM
+            sync_egp_system_items_b esb,
+            sync_inv_secondary_inventories isi
+        WHERE
+            1 = 1
+            --AND PLANNING_MAKE_BUY_CODE = 1
+            AND esb.ORGANIZATION_ID = 300000004669869
+            AND esb.WIP_SUPPLY_SUBINVENTORY = isi.SECONDARY_INVENTORY_NAME
+            AND esb.ORGANIZATION_ID = isi.ORGANIZATION_ID
+            AND GETDATE() > isnull(isi.DISABLE_DATE, GETDATE())
+            AND esb.WIP_SUPPLY_SUBINVENTORY IS NOT NULL
+    </select>
+
+
+    <select id="selectUpdateItemDataBuyerList" resultMap="CuxUpdateItemDataEOResult">
+        SELECT
+            list.INVENTORY_ITEM_ID,
+            list.ORGANIZATION_ID,
+            list.buyer_name
+        FROM
+            pes_item_num_buyer_list list
+        <where>
+            <if test="startUpdateDate != null and startUpdateDate != ''"> and list.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>
+            <if test="endUpdateDate != null and endUpdateDate != ''"> and list.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>
+        </where>
+    </select>
+
+    <select id="selectUpdateItemDataAttributeList" resultMap="CuxUpdateItemDataEOResult">
+        SELECT
+        osp.inventory_item_id,
+        osp.organization_id,
+        osp.p_item_number as item_number,
+        isnull(osp.usage_rate_f, 0) AS usage_rate_f,
+        isnull(osp.usage_rate_s, 0) AS usage_rate_s,
+        esb.ATTRIBUTE8,
+        esb.ATTRIBUTE9
+        FROM
+        pes_wie_work_orders_ops_item_erp osp
+        LEFT JOIN sync_egp_system_items_b esb ON (
+        osp.organization_id = esb.ORGANIZATION_ID
+        AND osp.inventory_item_id = esb.inventory_item_id
+        )
+        WHERE
+        isnull(osp.usage_rate_f, 0) &gt; 0
+        and isnull(osp.usage_rate_f, 0) &lt;&gt; isnull(esb.ATTRIBUTE8, 0)
+        and osp.organization_id in (300000004669879,300000004669869)
+    </select>
+
+    <select id="selectUpdateItemDataStatusList" resultMap="CuxUpdateItemDataEOResult">
+        SELECT
+            ist.item_number,
+            (case when list.ITEM_TYPE = 'BCP' then 'AA半成品'
+        when list.ITEM_TYPE = 'CHO' then 'AA配置件'
+        when list.ITEM_TYPE = 'FG' then 'AA可售成品'
+        when list.ITEM_TYPE = 'FYWL' and list.item_number like 'A97%' then 'AA外协费用物料'
+        when list.ITEM_TYPE = 'FYWL' and list.item_number not like 'A97%' then 'AA费用物料'
+        when list.ITEM_TYPE = 'OP' then 'AA外协费用物料'
+        when list.ITEM_TYPE = 'P' then 'AA采购件'
+        when list.ITEM_TYPE = 'PLA' then 'AA平台模型物料'
+        when list.ITEM_TYPE = 'RJ' then 'AA内部软件'
+        when list.ITEM_TYPE = 'WBRJ' then 'AA外购软件'
+        when list.ITEM_TYPE = 'WWBCP' then 'AA委外半成品'
+        when list.ITEM_TYPE = 'XSJ' then 'AA虚设件' ELSE null end) as ITEM_TYPE
+
+        FROM
+            item_status_test ist,
+            sync_items_num_des_list list
+        WHERE
+            ist.item_number = list.ITEM_NUMBER
+        AND list.ORGANIZATION_ID = 300000004669869
+        AND list.INVENTORY_ITEM_STATUS_CODE = 'Inactive'
+    </select>
+
+</mapper>

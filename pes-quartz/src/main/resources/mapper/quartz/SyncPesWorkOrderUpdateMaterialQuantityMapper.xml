@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPesWorkOrderUpdateMaterialQuantityMapper">
+
+    <resultMap type="SyncPesWorkOrderUpdateMaterialQuantityEO" id="SyncPesWorkOrderUpdateMaterialQuantityEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="transactionSourceId"    column="transaction_source_id"    />
+        <result property="sumTransactionQuantity"    column="sum_transaction_quantity"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncPesWorkOrderUpdateMaterialQuantityEO">
+        <foreach collection="list" item="item" index="index" separator=";">
+        delete from pes_wie_wo_operation_materials_erp_quantity where
+            INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT}
+            AND transaction_source_id=#{item.transactionSourceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <update id="updateSyncPesWorkOrderUpdateMaterialQuantityEO">
+        <foreach collection="list" item="item" index="index" separator=";">
+            update pes_wie_wo_operation_materials_erp set issued_quantity = (-1)*cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)),last_update_date = #{item.createDate,jdbcType=TIMESTAMP},erp_submit_date = (case when last_update_date > erp_submit_date then erp_submit_date else #{item.createDate,jdbcType=TIMESTAMP} end)
+            where INVENTORY_ITEM_ID = #{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID = #{item.organizationId,jdbcType=BIGINT}
+            AND work_order_id = #{item.transactionSourceId,jdbcType=BIGINT}
+        </foreach>
+    </update>
+
+    <insert id="batchSyncPesWorkOrderUpdateMaterialQuantityEO">
+        insert into pes_wie_wo_operation_materials_erp_quantity( organization_id, inventory_item_id, transaction_source_id, sum_transaction_quantity) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT},#{item.inventoryItemId,jdbcType=BIGINT},#{item.transactionSourceId,jdbcType=BIGINT},cast(#{item.sumTransactionQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+</mapper>

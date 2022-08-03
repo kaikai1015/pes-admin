@@ -1,0 +1,1119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWoOperationMaterialsErpMapper">
+
+    <resultMap type="PesWieWoOperationMaterialsErp" id="PesWieWoOperationMaterialsErpResult">
+        <result property="pesWorkOrderId"    column="pes_work_order_id"    />
+        <result property="pesWorkOrderOperationId"    column="pes_work_order_operation_id"    />
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="workOrderOperationMaterialId"    column="work_order_operation_material_id"    />
+        <result property="materialSequenceNumber"    column="material_sequence_number"    />
+        <result property="requiredDate"    column="required_date"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="quantityPerProduct"    column="quantity_per_product"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="basisType"    column="basis_type"    />
+        <result property="supplyType"    column="supply_type"    />
+        <result property="workOrderOperationId"    column="work_order_operation_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="requiredQuantity"    column="required_quantity"    />
+        <result property="uomCode"    column="uom_code"    />
+        <result property="issuedQuantity"    column="issued_quantity"    />
+        <result property="sunHaoQuantity"    column="sun_hao_quantity"    />
+        <result property="techniquesCode"    column="techniques_code"    />
+        <result property="remark"    column="remark"    />
+        <result property="newInventoryItemId"    column="new_inventory_item_id"    />
+        <result property="newItemNumber"    column="new_item_number"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="pesWorkOrderMaterialId"    column="pes_work_order_material_id"    />
+        <result property="transferedQuantity"    column="transfered_quantity"    />
+        <result property="level"    column="level"    />
+        <result property="countFlag"    column="count_flag"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="workSubId"    column="work_sub_id"    />
+        <result property="newPercentQuantity"    column="new_percent_quantity"    />
+        <result property="newItemDescription"    column="new_item_description"    />
+        <result property="maxMaterialSequenceNumber"    column="max_material_sequence_number"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="workCenterCode"    column="work_center_code"    />
+
+        <result property="customerName"    column="customer_name"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="orderNumberLine"    column="order_number_line"    />
+        <result property="contractNumber"    column="contract_number"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="pItemNumber"    column="p_item_number"    />
+        <result property="pItemDescription"    column="p_item_description"    />
+        <result property="plannedStartDate"    column="planned_start_date"    />
+        <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+        <result property="planName"    column="plan_name"    />
+        <result property="gongSubinventoryCode"    column="gong_subinventory_code"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+        <result property="plannedCompletionDate"    column="planned_completion_date"    />
+
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="diffQuantity"    column="diff_quantity"    />
+        <result property="overQuantity"    column="over_quantity"    />
+        <result property="issuedDiffQuantity"    column="issued_diff_quantity"    />
+        <result property="pSumUnitCost"    column="p_sum_unit_cost"    />
+        <result property="subSumUnitCost"    column="sub_sum_unit_cost"    />
+        <result property="chanPingXian"    column="chan_ping_xian"    />
+        <result property="statusChangeDate"    column="status_change_date"    />
+    </resultMap>
+
+    <sql id="selectPesWieWoOperationMaterialsErpVo">
+        SELECT
+            wwom.pes_work_order_id,
+            wwom.pes_work_order_operation_id,
+            wwom.work_order_id,
+            wwom.organization_id,
+            wwom.work_order_operation_material_id,
+            wwom.material_sequence_number,
+            wwom.required_date,
+            wwom.inventory_item_id,
+            wwom.quantity_per_product,
+            wwom.item_type,
+            wwom.basis_type,
+            wwom.supply_type,
+            wwom.work_order_operation_id,
+            wwom.item_number,
+            wwom.item_description,
+            wwom.required_quantity,
+            wwom.transfered_quantity,
+            wwom.uom_code,
+            wwom.issued_quantity,
+            wwom.sun_hao_quantity,
+            wwom.techniques_code,
+            wwom.remark,
+            wwom.new_inventory_item_id,
+            wwom.new_item_number,
+            wwom.create_date,
+            wwom.create_by,
+            wwom.last_update_date,
+            wwom.last_update_by,
+            wwom.subinventory_code,
+            wwom.pes_work_order_material_id,
+            isnull(sioqnc.quantity,0) as onhand_quantity,
+            wwob.work_order_number,
+            isnull(overqty.over_quantity,0) as over_quantity
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+            left join sync_inv_onhand_quantity_new_code sioqnc
+            on (wwom.inventory_item_id = sioqnc.inventory_item_id
+            and wwom.organization_id = sioqnc.organization_id
+            and wwom.subinventory_code = sioqnc.subinventory_code)
+            left join cux_mes_work_material_all_v overqty
+            on (wwom.work_order_id = overqty.work_order_id
+            and wwom.organization_id = overqty.organization_id
+            and wwom.inventory_item_id = overqty.inventory_item_id)
+    </sql>
+
+    <sql id="selectPesWieWoOperationMaterialsErpImportVo">
+        SELECT
+            wwom.pes_work_order_material_id,
+            wwob.customer_name,
+            wwob.order_number,
+            isnull(eff.chan_ping_xian,0) as chan_ping_xian,
+            wwob.order_number_line,
+            wwob.contract_number,
+            pwcd.work_center_code,
+            wwob.work_order_number,
+            wwob.work_order_status_id,
+            wwob.p_item_number,
+            wwob.p_item_description,
+            wwob.planned_start_date,
+            wwob.planned_completion_date,
+            wwob.planned_start_quantity,
+            wwob.plan_name,
+            wwom.material_sequence_number,
+            wwom.item_number,
+            wwom.item_description,
+            wwom.quantity_per_product,
+            wwom.item_type,
+            wwom.basis_type,
+            wwom.supply_type,
+            wwom.required_quantity,
+            wwom.transfered_quantity,
+            wwom.uom_code,
+            wwom.issued_quantity,
+            wwom.sun_hao_quantity,
+            wwom.techniques_code,
+            wwom.remark,
+            wwom.new_item_number,
+            wwom.required_date,
+            wwom.subinventory_code,
+            isnull(sioqnc.quantity,0) as onhand_quantity,
+            isnull(overqty.over_quantity,0) as over_quantity,
+            wwsh.status_change_date
+        FROM
+            pes_wie_work_orders_b_erp wwob
+            LEFT JOIN sync_wie_wo_status_history wwsh
+            on (wwob.organization_id = wwsh.organization_id
+            AND wwob.work_order_id = wwsh.work_order_id)
+            LEFT JOIN sync_doo_headers_eff_b eff
+            on (wwob.order_number = eff.order_number),
+            pes_work_center_description_all pwcd,
+            pes_wie_wo_operation_materials_erp wwom
+            left join sync_inv_onhand_quantity_new_code sioqnc
+            on (wwom.inventory_item_id = sioqnc.inventory_item_id
+            and wwom.organization_id = sioqnc.organization_id
+            and wwom.subinventory_code = sioqnc.subinventory_code)
+            left join cux_mes_work_material_all_v overqty
+            on (wwom.work_order_id = overqty.work_order_id
+            and wwom.organization_id = overqty.organization_id
+            and wwom.inventory_item_id = overqty.inventory_item_id)
+    </sql>
+
+    <select id="selectPesWieWoOperationMaterialsErpList" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            <if test="itemNumber != null  and itemNumber != ''"> and wwom.item_number = #{itemNumber}</if>
+            <if test="pesWorkOrderId != null "> and wwom.pes_work_order_id = #{pesWorkOrderId}</if>
+            <if test="techniquesCode != null  and techniquesCode != ''"> and wwom.techniques_code = #{techniquesCode}</if>
+        </where>
+        order by wwom.material_sequence_number
+    </select>
+
+    <select id="selectPesWieWoOperationMaterialsErpById" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        where wwom.pes_work_order_material_id = #{pesWorkOrderMaterialId}
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+    </select>
+
+    <select id="getWieOperationMaterialListById" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        where wwom.pes_work_order_id = #{pesWorkOrderId}
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+    </select>
+
+
+    <select id="selectSubmitErpPesOperationMaterialByIds" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            and wwom.work_order_operation_material_id = 0
+            and wwom.work_order_id > 0
+            and wwom.work_order_operation_id > 0
+            --and (wwom.create_date = wwom.last_update_date or wwom.erp_submit_date = wwom.create_date)
+            and wwom.pes_work_order_id = #{pesWorkOrderId}
+            and wwob.work_order_status_id in (10002,10004,10005)
+        </where>
+    </select>
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            and wwom.work_order_operation_material_id = 0
+            and wwom.work_order_id > 0
+            and wwom.work_order_operation_id > 0
+            --and (wwom.create_date = wwom.last_update_date or wwom.erp_submit_date = wwom.create_date)
+            and wwob.work_order_status_id in (10002,10004,10005)
+        </where>
+    </select>
+
+    <insert id="insertPesWieWoOperationMaterialsHeaderErp" parameterType="PesWieWoOperationMaterialsErp">
+        INSERT INTO pes_wie_wo_operation_materials_erp_temp (
+            pes_work_order_id,
+            pes_work_order_operation_id,
+            organization_id,
+            material_sequence_number,
+            LEVEL,
+            required_date,
+            inventory_item_id,
+            quantity_per_product,
+            item_type,
+            basis_type,
+            supply_type,
+            item_number,
+            item_description,
+            plan_type,
+            required_quantity,
+            uom_code,
+            create_date,
+            create_by,
+            last_update_date,
+            last_update_by
+        )(SELECT
+            wwop.pes_work_order_id,
+            wwop.pes_work_order_operation_id,
+            items.ORGANIZATION_ID,
+            0 as material_sequence_number,
+            '0' AS LEVEL,
+            wwob.planned_start_date,
+            items.INVENTORY_ITEM_ID,
+            1 AS biao_component_quantity,
+            items.ITEM_TYPE,
+            0 AS basis_type,
+            items.ATTRIBUTE15,
+            items.ITEM_NUMBER,
+            items.ITEM_DESCRIPTION,
+            (CASE WHEN items.PLANNING_MAKE_BUY_CODE = 1 THEN 'MPS' ELSE 'MRP' END) AS plan_type,
+            wwob.planned_start_quantity,
+            items.PRIMARY_UOM_CODE,
+            DATEADD(s, 1,#{createDate}),
+            #{createBy},
+            DATEADD(s, 1,#{createDate}),
+            #{createBy}
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_work_order_operation_erp wwop,
+            sync_items_num_des_list items
+        WHERE
+            1 = 1
+        AND wwob.ORGANIZATION_ID = items.ORGANIZATION_ID
+        AND wwob.inventory_item_id = items.inventory_item_id
+        AND wwob.pes_work_order_id = wwop.pes_work_order_id
+        AND items.item_type IN ('WWBCP','BCP','P','FG','RJ','INTER_COMPANY_FEE','FYWL')
+        AND wwop.pes_work_order_operation_id = #{pesWorkOrderOperationId})
+    </insert>
+
+    <insert id="insertPesWieWoOperationMaterialsLinesErp" parameterType="PesWieWoOperationMaterialsErp">
+        INSERT INTO pes_wie_wo_operation_materials_erp_temp (
+        pes_work_order_id,
+        pes_work_order_operation_id,
+        organization_id,
+        material_sequence_number,
+        LEVEL,
+        required_date,
+        inventory_item_id,
+        quantity_per_product,
+        item_type,
+        basis_type,
+        supply_type,
+        item_number,
+        item_description,
+        plan_type,
+        required_quantity,
+        uom_code,
+        sun_hao_quantity,
+        techniques_code,
+        subinventory_code,
+        create_date,
+        create_by,
+        last_update_date,
+        last_update_by)
+        (SELECT
+        list.pes_work_order_id,
+        list.pes_work_order_operation_id,
+        subebs.organization_id,
+        10 as material_sequence_number,
+        list.[level] + 1 as level,
+        list.required_date,
+        subebs.inventory_item_id,
+        bom.component_quantity * list.quantity_per_product AS biao_component_quantity,
+        subebs.item_type,
+        1,
+        subebs.ATTRIBUTE15,
+        subebs.ITEM_NUMBER,
+        subebs.ITEM_DESCRIPTION,
+        (CASE WHEN subebs.PLANNING_MAKE_BUY_CODE = 1 THEN	'MPS'	ELSE 'MRP' END) AS plan_type,
+        bom.component_quantity * list.required_quantity AS required_quantity,
+        subebs.PRIMARY_UOM_CODE,
+        <if test="workCenterCode==2 or workCenterCode==3">
+            isnull(pitca.fixed_suo_hao_quantiy,0) as sun_hao_quantity,
+        </if>
+        <if test="workCenterCode==1 or workCenterCode==4">
+            0 as sun_hao_quantity,
+        </if>
+        <if test="workCenterCode==1">
+            pitca.item_work_name_flag,
+            (case when pitca.item_work_name_flag = 4 then '3FCKL001'
+            when pitca.item_work_name_flag = 9 then '3XLXB001'
+            when pitca.item_work_name_flag = 10 then 'DLC' else #{subinventoryCode} end) as subinventory_code,
+        </if>
+        <if test="workCenterCode==3">
+            (case when pitca.item_work_name_flag = 4 then null else pitca.item_work_name_flag end) as item_work_name_flag,
+            #{subinventoryCode} as subinventory_code,
+        </if>
+        <if test="workCenterCode==2">
+            (case when pitca.item_work_name_flag = 4 then null else pitca.item_work_name_flag end) as item_work_name_flag,
+            #{subinventoryCode} as subinventory_code,
+        </if>
+        DATEADD(s, 1,#{createDate}),
+        #{createBy},
+        DATEADD(s, 1,#{createDate}),
+        #{createBy}
+        FROM
+        sync_bom_item_data_list bom,
+        pes_wie_wo_operation_materials_erp_temp list,
+        sync_items_num_des_list subebs
+        left join pes_item_techniques_code_all pitca
+        on (subebs.organization_id = pitca.organization_id
+        and subebs.inventory_item_id = pitca.inventory_item_id)
+        WHERE
+        1 = 1
+        AND bom.inventory_item_id = subebs.inventory_item_id
+        AND bom.organization_id = subebs.organization_id
+        AND bom.disable_date IS NULL
+        AND bom.IMPLEMENTATION_DATE IS NOT NULL
+        AND bom.p_inventory_item_id = list.inventory_item_id
+        AND bom.organization_id = list.organization_id
+        and subebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        AND list.plan_type = 'MPS'
+        <if test="level != 0 ">
+            AND list.item_type = 'XSJ'
+        </if>
+        AND list.LEVEL = #{level}
+        AND list.pes_work_order_operation_id = #{pesWorkOrderOperationId})
+    </insert>
+
+
+    <delete id="deletePesWieWoOperationTempErp" parameterType="Long">
+        INSERT INTO pes_wie_wo_operation_materials_erp (
+                    pes_work_order_id,
+                    pes_work_order_operation_id,
+                    organization_id,
+                    material_sequence_number,
+                    required_date,
+                    inventory_item_id,
+                    quantity_per_product,
+                    item_type,
+                    basis_type,
+                    supply_type,
+                    item_number,
+                    item_description,
+                    required_quantity,
+                    uom_code,
+                    create_date,
+                    create_by,
+                    last_update_date,
+                    last_update_by,
+                    work_order_id,
+                    work_order_operation_id,
+                    work_order_operation_material_id,
+                    erp_submit_date,
+                    subinventory_code,
+                    sun_hao_quantity,
+                    techniques_code)
+                (SELECT
+                    pes_work_order_id,
+                    pes_work_order_operation_id,
+                    organization_id,
+                    ((row_number() over(order by material_sequence_number,ORGANIZATION_ID,INVENTORY_ITEM_ID))-1)* material_sequence_number as material_sequence_number,
+                    required_date,
+                    inventory_item_id,
+                    sum(quantity_per_product) as quantity_per_product,
+                    item_type,
+                    basis_type,
+                    supply_type,
+                    item_number,
+                    item_description,
+                    sum(required_quantity) as required_quantity,
+                    uom_code,
+                    create_date,
+                    create_by,
+                    last_update_date,
+                    last_update_by,
+                    0,
+                    0,
+                    0,
+                    create_date,
+                    subinventory_code,
+                    sun_hao_quantity,
+                    techniques_code
+                FROM
+                    pes_wie_wo_operation_materials_erp_temp
+                where pes_work_order_operation_id = #{pesWorkOrderOperationId}
+                AND item_type IN ('WWBCP','BCP','P','FG','RJ','INTER_COMPANY_FEE','FYWL')
+                GROUP BY
+                        pes_work_order_id,
+                        pes_work_order_operation_id,
+                        organization_id,
+                        material_sequence_number,
+                        required_date,
+                        inventory_item_id,
+                        item_type,
+                        basis_type,
+                        supply_type,
+                        item_number,
+                        item_description,
+                        uom_code,
+                        create_date,
+                        create_by,
+                        last_update_date,
+                        last_update_by,
+                        create_date,
+                        subinventory_code,
+                        sun_hao_quantity,
+                        techniques_code);
+        delete from pes_wie_wo_operation_materials_erp_temp where pes_work_order_operation_id = #{pesWorkOrderOperationId}
+    </delete>
+
+    <select id="getPesWieWoOperationMaterialsErpByItemNumber" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+        list.INVENTORY_ITEM_ID,
+        list.ITEM_DESCRIPTION,
+        list.PRIMARY_UOM_CODE as uom_code,
+        list.ITEM_TYPE,
+        list.ATTRIBUTE15 as supply_type,
+        (case when (SELECT pwcda.work_center_code FROM pes_work_center_description_all pwcda,pes_wie_work_orders_b_erp wwob WHERE pwcda.organization_id = wwob.organization_id AND pwcda.work_center_id = wwob.work_center_id AND wwob.pes_work_order_id = #{pesWorkOrderId}) in (2,3) then isnull(pitca.fixed_suo_hao_quantiy,0) else 0 end) as sun_hao_quantity,
+        pitca.item_work_name_flag as techniques_code,
+        (select max(wwoms.material_sequence_number) + 10 from pes_wie_wo_operation_materials_erp wwoms where wwoms.pes_work_order_id = #{pesWorkOrderId}) as max_material_sequence_number,
+        (select count(1) from pes_wie_wo_operation_materials_erp wwom where wwom.item_number = #{itemNumber} and wwom.ORGANIZATION_ID = #{organizationId} and wwom.pes_work_order_id = #{pesWorkOrderId} and wwom.material_sequence_number > 0) as count_flag
+        FROM
+        sync_items_num_des_list list
+        left join pes_item_techniques_code_all pitca
+        on (list.organization_id = pitca.organization_id
+        and list.inventory_item_id = pitca.inventory_item_id)
+        where list.ITEM_NUMBER = #{itemNumber}
+        and list.ORGANIZATION_ID = #{organizationId}
+        AND list.item_type IN ('WWBCP','BCP','P','FG','RJ','INTER_COMPANY_FEE','FYWL')
+        and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+    </select>
+
+    <select id="getPesWieWoOperationMaterialsErpById" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            wwop.work_order_id,
+            wwop.work_order_operation_id,
+            wwop.pes_work_order_operation_id,
+            wwop.pes_work_order_id
+        FROM
+            pes_wie_work_order_operation_erp wwop
+        where wwop.operation_sequence_number = 10
+        and wwop.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+    <insert id="insertPesWieWoOperationMaterialsErp" parameterType="PesWieWoOperationMaterialsErp" useGeneratedKeys="true" keyProperty="pesWorkOrderMaterialId">
+        insert into pes_wie_wo_operation_materials_erp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pesWorkOrderId != null">pes_work_order_id,</if>
+            <if test="pesWorkOrderOperationId != null">pes_work_order_operation_id,</if>
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="workOrderOperationMaterialId != null">work_order_operation_material_id,</if>
+            <if test="materialSequenceNumber != null">material_sequence_number,</if>
+            <if test="requiredDate != null">required_date,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="quantityPerProduct != null">quantity_per_product,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="basisType != null">basis_type,</if>
+            <if test="supplyType != null">supply_type,</if>
+            <if test="workOrderOperationId != null">work_order_operation_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="requiredQuantity != null">required_quantity,</if>
+            <if test="uomCode != null">uom_code,</if>
+            <if test="issuedQuantity != null">issued_quantity,</if>
+            <if test="sunHaoQuantity != null">sun_hao_quantity,</if>
+            <if test="techniquesCode != null">techniques_code,</if>
+            <if test="remark != null">remark,</if>
+            <if test="newInventoryItemId != null">new_inventory_item_id,</if>
+            <if test="newItemNumber != null">new_item_number,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+            erp_submit_date,
+            <if test="subinventoryCode != null">subinventory_code,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pesWorkOrderId != null">#{pesWorkOrderId},</if>
+            <if test="pesWorkOrderOperationId != null">#{pesWorkOrderOperationId},</if>
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workOrderOperationMaterialId != null">#{workOrderOperationMaterialId},</if>
+            <if test="materialSequenceNumber != null">#{materialSequenceNumber},</if>
+            <if test="requiredDate != null">#{requiredDate},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="quantityPerProduct != null">#{quantityPerProduct},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="basisType != null">#{basisType},</if>
+            <if test="supplyType != null">#{supplyType},</if>
+            <if test="workOrderOperationId != null">#{workOrderOperationId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="requiredQuantity != null">#{requiredQuantity},</if>
+            <if test="uomCode != null">#{uomCode},</if>
+            <if test="issuedQuantity != null">#{issuedQuantity},</if>
+            <if test="sunHaoQuantity != null">#{sunHaoQuantity},</if>
+            <if test="techniquesCode != null">#{techniquesCode},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="newInventoryItemId != null">#{newInventoryItemId},</if>
+            <if test="newItemNumber != null">#{newItemNumber},</if>
+            #{createDate},
+            <if test="createBy != null">#{createBy},</if>
+            #{createDate},
+            <if test="createBy != null">#{createBy},</if>
+            #{createDate},
+            <if test="subinventoryCode != null">#{subinventoryCode},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesWieWoOperationMaterialsErp" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="requiredDate != null">required_date = #{requiredDate},</if>
+            <if test="quantityPerProduct != null">quantity_per_product = #{quantityPerProduct},</if>
+            <if test="basisType != null">basis_type = #{basisType},</if>
+            <if test="supplyType != null">supply_type = #{supplyType},</if>
+            <if test="workOrderOperationId != null">work_order_operation_id = #{workOrderOperationId},</if>
+            <if test="itemNumber != null">item_number = #{itemNumber},</if>
+            <if test="itemDescription != null">item_description = #{itemDescription},</if>
+            <if test="requiredQuantity != null">required_quantity = #{requiredQuantity},</if>
+            <if test="uomCode != null">uom_code = #{uomCode},</if>
+            <if test="issuedQuantity != null">issued_quantity = #{issuedQuantity},</if>
+            <if test="sunHaoQuantity != null">sun_hao_quantity = #{sunHaoQuantity},</if>
+            <if test="techniquesCode != null">techniques_code = #{techniquesCode},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="newInventoryItemId != null">new_inventory_item_id = #{newInventoryItemId},</if>
+            <if test="newItemNumber != null">new_item_number = #{newItemNumber},</if>
+            last_update_date = #{createDate},
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+            <if test="subinventoryCode != null">subinventory_code = #{subinventoryCode},</if>
+        </trim>
+        where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+
+    <select id="deletePesWieWoOperationMaterialsErpByIds" parameterType="PesWieWoOperationMaterialsErp" resultType="Integer">
+        SELECT
+            count(1)
+        FROM
+            pes_wie_wo_operation_materials_erp
+        where pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+
+    <update id="updatePesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set work_order_operation_material_id = #{workOrderOperationMaterialId},last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = (case when work_order_operation_material_id = 0 and basis_type = 2 then erp_submit_date else (case when last_update_date > #{lastUpdateDate} then #{lastUpdateDate} else #{createDate} end) end) where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+    <!--<insert id="insertPesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWoOperationMaterialsErp">-->
+    <!--insert into pes_wie_work_submit_erp_infor_list (pes_work_order_id,pes_id,erp_id,count_number,item_number,item_description,wie_work_date,work_order_status_id,quantity_per_product,quantity,erp_type,type,erp_flag,remark,create_by,create_date,last_update_by,last_update_date) values-->
+    <!--( #{pesWorkOrderId,jdbcType=BIGINT},#{pesWorkOrderMaterialId,jdbcType=BIGINT}, #{workOrderOperationMaterialId,jdbcType=BIGINT},#{materialSequenceNumber,jdbcType=INTEGER},#{itemNumber,jdbcType=VARCHAR},#{itemDescription,jdbcType=VARCHAR},#{requiredDate,jdbcType=TIMESTAMP},#{basisType,jdbcType=INTEGER},#{quantityPerProduct,jdbcType=DECIMAL},#{requiredQuantity,jdbcType=DECIMAL},#{erpType,jdbcType=INTEGER},2,#{erpFlag,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})-->
+    <!--</insert>-->
+
+    <insert id="insertPesWieWorkOrdersBErpByWorkOrderId" parameterType="PesWieWoOperationMaterialsErp">
+                INSERT INTO pes_wie_work_submit_erp_infor_list (
+                    pes_work_order_id,
+                    pes_id,
+                    erp_id,
+                    count_number,
+                    item_number,
+                    item_description,
+                    wie_work_date,
+                    work_order_status_id,
+                    quantity_per_product,
+                    quantity,
+                    erp_type,
+                    type,
+                    erp_flag,
+                    remark,
+                    create_by,
+                    create_date,
+                    last_update_by,
+                    last_update_date
+                ) SELECT
+                    pes_work_order_id,
+                    pes_work_order_material_id,
+                    work_order_operation_material_id,
+                    material_sequence_number,
+                    item_number,
+                    item_description,
+                    required_date,
+                    basis_type,
+                    quantity_per_product,
+                    required_quantity,
+                    #{erpType,jdbcType=INTEGER},
+                    2,
+                    #{erpFlag,jdbcType=VARCHAR},
+                    #{remark,jdbcType=VARCHAR},
+                    #{createBy,jdbcType=VARCHAR},
+                    #{createDate,jdbcType=TIMESTAMP},
+                    #{createBy,jdbcType=VARCHAR},
+                    #{createDate,jdbcType=TIMESTAMP}
+                FROM
+                    pes_wie_wo_operation_materials_erp
+                where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </insert>
+
+    <select id="selectUpdateSubmitErpPesOperationMaterialByIds" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        where wwom.pes_work_order_id = #{pesWorkOrderId}
+        and wwom.work_order_operation_material_id > 0
+        and wwom.last_update_date > wwom.create_date
+        and wwom.last_update_date > wwom.erp_submit_date
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+        and wwob.work_order_status_id in (10002,10004,10005)
+        and wwom.material_sequence_number > 0
+        and wwob.inventory_item_id &lt;> wwom.inventory_item_id
+    </select>
+
+    <select id="updateSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        where 1=1
+        and wwom.work_order_operation_material_id > 0
+        and wwom.last_update_date > wwom.create_date
+        and wwom.last_update_date > wwom.erp_submit_date
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+        and wwob.work_order_status_id in (10002,10004,10005)
+        and wwom.material_sequence_number > 0
+        and wwob.inventory_item_id &lt;> wwom.inventory_item_id
+    </select>
+
+    <select id="selectPesWiegetSubNewItemList" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+        cwsm.work_sub_id,
+        cwsm.inventory_item_id,
+        cwsm.organization_id,
+        wwom.material_sequence_number,
+        (select max(wwoms.material_sequence_number) + 10 from pes_wie_wo_operation_materials_erp wwoms where wwoms.pes_work_order_id = #{pesWorkOrderId}) as max_material_sequence_number,
+        cwsm.item_number,
+        cwsm.item_description,
+        wwom.quantity_per_product,
+        wwom.required_quantity,
+        wwom.basis_type,
+        cwsm.new_inventory_item_id,
+        cwsm.new_item_number,
+        cwsm.new_item_description,
+        cwsm.new_percent_quantity,
+        cwsm.uom as uom_code,
+        wwom.pes_work_order_id,
+        wwom.pes_work_order_operation_id,
+        wwom.pes_work_order_material_id,
+        wwom.work_order_id,
+        wwom.work_order_operation_id,
+        wwom.work_order_operation_material_id,
+        wwom.required_date,
+        list.ITEM_TYPE,
+        list.ATTRIBUTE15 as supply_type,
+        isnull(ioq.quantity,0) as onhand_quantity,
+        (case when (SELECT pwcda.work_center_code FROM pes_work_center_description_all pwcda,pes_wie_work_orders_b_erp wwob WHERE pwcda.organization_id = wwob.organization_id AND pwcda.work_center_id = wwob.work_center_id AND wwob.pes_work_order_id = #{pesWorkOrderId}) in (2,3) then isnull(pitca.fixed_suo_hao_quantiy,0) else 0 end) as sun_hao_quantity,
+        pitca.item_work_name_flag as techniques_code
+        FROM
+        pes_wie_wo_operation_materials_erp wwom,
+        sync_items_num_des_list list,
+        cux_work_substituted_material cwsm
+        LEFT JOIN sync_inv_onhand_quantity_new ioq
+        on (cwsm.organization_id = ioq.organization_id
+        and cwsm.new_inventory_item_id = ioq.inventory_item_id)
+        left join pes_item_techniques_code_all pitca
+        on (cwsm.organization_id = pitca.organization_id
+        and cwsm.new_inventory_item_id = pitca.inventory_item_id)
+        WHERE GETDATE() BETWEEN cwsm.effective_start_date AND cwsm.effective_end_date
+        AND cwsm.delete_flag = 'N'
+        AND wwom.organization_id = cwsm.organization_id
+        AND wwom.inventory_item_id = cwsm.inventory_item_id
+        AND cwsm.organization_id = list.organization_id
+        AND cwsm.new_inventory_item_id = list.inventory_item_id
+        and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and cwsm.organization_id = #{organizationId}
+        AND cwsm.p_inventory_item_id = #{pInventoryItemId}
+        AND wwom.pes_work_order_id = #{pesWorkOrderId}
+        <if test="newItemNumber != null  and newItemNumber != ''"> AND cwsm.new_item_number = #{newItemNumber}</if>
+        <if test="itemNumber != null  and itemNumber != ''"> AND cwsm.item_number = #{itemNumber}</if>
+        <if test="workSubId != null "> and cwsm.work_sub_id = #{workSubId}</if>
+    </select>
+
+    <select id="getPesWieWoOperationMaterialsErpByNewItemNumber" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        WHERE
+        wwom.inventory_item_id = #{newInventoryItemId}
+        AND wwom.organization_id = #{organizationId}
+        AND wwom.pes_work_order_id = #{pesWorkOrderId}
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+    </select>
+
+    <update id="updateSubWieWoOperationMaterialsErp" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set quantity_per_product = (#{quantityPerProduct} + quantity_per_product),required_quantity = (#{requiredQuantity} + required_quantity),last_update_by = #{createBy},last_update_date = #{createDate},new_inventory_item_id = #{newInventoryItemId},new_item_number = #{newItemNumber} where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+    <update id="updateInsertPesWieWoOperationMaterialsErp" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set quantity_per_product = #{quantityPerProduct},required_quantity = #{requiredQuantity},last_update_by = #{createBy},last_update_date = #{createDate},new_inventory_item_id = #{newInventoryItemId},new_item_number = #{newItemNumber} where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+    <select id="selectPesWieWoOperationMaterialsErpByIds" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            wwop.work_order_id,
+            wwop.work_order_operation_id,
+            wwop.pes_work_order_id,
+            wwop.pes_work_order_operation_id,
+            wwop.pes_work_order_material_id,
+            wwop.item_number,
+            wwop.item_description,
+            (select pwcd.work_center_code from pes_work_center_description_all pwcd where pwcd.organization_id = wwob.organization_id and pwcd.work_center_id = wwob.work_center_id) as work_center_code
+        FROM
+            pes_wie_wo_operation_materials_erp wwop,
+            pes_wie_work_orders_b_erp wwob
+        where  wwop.pes_work_order_id = #{pesWorkOrderId}
+        AND wwop.material_sequence_number = 0
+        and wwob.pes_work_order_id = wwop.pes_work_order_id
+    </select>
+
+    <select id="selectNewPesWieWoOperationMaterialsErpList" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        where wwom.create_date = wwom.last_update_date
+        and wwom.last_update_date = wwom.erp_submit_date
+        and wwom.create_date > #{createDate}
+        and wwom.pes_work_order_id = #{pesWorkOrderId}
+        and wwom.pes_work_order_id = wwob.pes_work_order_id
+    </select>
+
+    <update id="updatePesWieWoOperationMaterialsErpByIds" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set quantity_per_product = #{quantityPerProduct},required_quantity = #{requiredQuantity},basis_type = #{basisType},last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId} and inventory_item_id = #{inventoryItemId} and organization_id = #{organizationId} and #{createDate} > create_date
+    </update>
+
+    <delete id="deleteUpdatePesWieWoOperationMaterialsErpByIds" parameterType="Long">
+        delete from pes_wie_wo_operation_materials_erp where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </delete>
+
+    <update id="updatePesWieWoOperationMaterialsErpByMaterialNum" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set material_sequence_number = #{materialSequenceNumber},work_order_id = #{workOrderId},work_order_operation_id = #{workOrderOperationId} where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+    <update id="deleteOthersPesWieWoOperationMaterialsErpByIds" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set quantity_per_product = 0,required_quantity = 0,last_update_by = #{createBy},last_update_date = #{createDate} where pes_work_order_id = #{pesWorkOrderId} and #{createDate} > last_update_date
+    </update>
+
+    <select id="selectPesWiegetSubNewItemListReturn" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+        cwsm.work_sub_id,
+        cwsm.new_inventory_item_id as inventory_item_id,
+        cwsm.organization_id,
+        wwom.material_sequence_number,
+        (select max(wwoms.material_sequence_number) + 10 from pes_wie_wo_operation_materials_erp wwoms where wwoms.pes_work_order_id = #{pesWorkOrderId}) as max_material_sequence_number,
+        cwsm.new_item_number as item_number,
+        cwsm.new_item_description as item_description,
+        wwom.quantity_per_product,
+        wwom.required_quantity,
+        wwom.basis_type,
+        cwsm.inventory_item_id as new_inventory_item_id,
+        cwsm.item_number as new_item_number,
+        cwsm.item_description as new_item_description,
+        cwsm.new_percent_quantity,
+        cwsm.uom as uom_code,
+        wwom.pes_work_order_id,
+        wwom.pes_work_order_operation_id,
+        wwom.pes_work_order_material_id,
+        wwom.work_order_id,
+        wwom.work_order_operation_id,
+        wwom.work_order_operation_material_id,
+        wwom.required_date
+        FROM
+        pes_wie_wo_operation_materials_erp wwom,
+        cux_work_substituted_material cwsm
+        WHERE GETDATE() BETWEEN cwsm.effective_start_date AND cwsm.effective_end_date
+        AND cwsm.delete_flag = 'N'
+        AND wwom.organization_id = cwsm.organization_id
+        AND wwom.inventory_item_id = cwsm.new_inventory_item_id
+        and cwsm.organization_id = #{organizationId}
+        AND cwsm.p_inventory_item_id = #{pInventoryItemId}
+        AND wwom.pes_work_order_id = #{pesWorkOrderId}
+        <if test="workSubId != null "> and cwsm.work_sub_id = #{workSubId}</if>
+    </select>
+
+
+    <select id="selectPesWieWoOperationMaterialsErpListByExport" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpImportVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            AND wwom.work_order_id > 0
+            AND wwom.work_order_operation_material_id > 0
+            AND wwob.organization_id = pwcd.organization_id
+            AND wwob.work_center_id = pwcd.work_center_id
+            <if test="itemNumber != null  and itemNumber != ''"> and wwom.item_number = #{itemNumber}</if>
+            <if test="pesWorkOrderId != null "> and wwom.pes_work_order_id = #{pesWorkOrderId}</if>
+        </where>
+        order by wwom.material_sequence_number
+    </select>
+
+    <select id="selectPesWieWoOperationSupplierById" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+          osp.supplier_id,
+          list.gong_guang_cang AS gong_subinventory_code,
+          list.xian_bian_cang AS subinventory_code
+        FROM
+            pes_wie_work_order_operation_erp wwop,
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_work_orders_ops_item_erp osp
+            LEFT JOIN pes_wie_work_ww_kou_zhang_cang_list list
+          ON (osp.supplier_id = list.supplier_id)
+        WHERE
+            wwop.pes_work_order_operation_id = #{pesWorkOrderOperationId}
+        AND wwob.pes_work_order_id = wwop.pes_work_order_id
+        AND wwob.organization_id = osp.organization_id
+        AND wwob.inventory_item_id = osp.inventory_item_id
+        AND osp.prioryty = 1
+    </select>
+
+    <!--<select id="selectPesWieWoOperationSupplierById" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">-->
+        <!--SELECT-->
+        <!--wwobp.supplier_id,-->
+        <!--list.gong_guang_cang AS gong_subinventory_code,-->
+        <!--list.xian_bian_cang AS subinventory_code-->
+        <!--FROM-->
+        <!--pes_wie_work_order_operation_erp wwop,-->
+        <!--pes_wie_work_order_operation_erp wwobp-->
+        <!--LEFT JOIN pes_wie_work_ww_kou_zhang_cang_list list-->
+        <!--ON (wwobp.supplier_id = list.supplier_id)-->
+        <!--WHERE-->
+        <!--wwop.pes_work_order_operation_id = #{pesWorkOrderOperationId}-->
+        <!--AND wwobp.pes_work_order_id = wwop.pes_work_order_id-->
+        <!--and wwobp.operation_type = 'SUPPLIER'-->
+    <!--</select>-->
+
+
+    <select id="selectPesWieWoOperationMaterialsErpListByImport" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpImportVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            AND wwom.work_order_id > 0
+            AND wwom.work_order_operation_material_id > 0
+            AND wwob.organization_id = pwcd.organization_id
+            AND wwob.work_center_id = pwcd.work_center_id
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wwob.p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="workOrderStatusId != null "> and wwob.work_order_status_id = #{workOrderStatusId}</if>
+            <if test="workCenterCode != null "> and pwcd.work_center_code = #{workCenterCode}</if>
+            <if test="planName != null  and planName != ''"> and wwob.plan_name = #{planName}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and wwob.order_number like (#{orderNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwom.item_number = #{itemNumber}</if>
+            <if test="techniquesCode != null  and techniquesCode != ''"> and wwom.techniques_code = #{techniquesCode}</if>
+            <if test="diffQuantity != null ">
+                and (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0)- wwom.ISSUED_QUANTITY) &gt; #{diffQuantity}
+                and wwom.required_quantity > 0
+            </if>
+            <if test="issuedDiffQuantity != null ">
+                and wwom.ISSUED_QUANTITY - (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0)) &gt; #{issuedDiffQuantity}
+                and wwom.required_quantity > 0
+            </if>
+            <if test="plannedStartDateMonths != null  and plannedStartDateMonths != ''"> and format(wwob.planned_start_date,'yyyyMM') = #{plannedStartDateMonths}</if>
+        </where>
+        order by wwom.pes_work_order_id desc,wwom.material_sequence_number asc
+    </select>
+
+    <update id="handleMaterialUpdateSubmitErpId" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set work_order_id = #{workOrderId},work_order_operation_id = #{workOrderOperationId} where (work_order_id = 0 or work_order_operation_id = 0) and pes_work_order_id = #{pesWorkOrderId}
+    </update>
+
+
+    <select id="getWieMaterialSupplySubinvtoryByPesWorkId" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            osp.supplier_id,
+            pwcd.work_center_code,
+            list.gong_guang_cang AS gong_subinventory_code,
+            list.xian_bian_cang AS subinventory_code
+        FROM
+            pes_wie_work_order_operation_erp wwop,
+            pes_wie_work_orders_b_erp wwob
+            left join pes_wie_work_orders_ops_item_erp osp
+            on (wwob.organization_id = osp.organization_id
+            AND wwob.inventory_item_id = osp.inventory_item_id
+            AND osp.prioryty = 1)
+            LEFT JOIN pes_wie_work_ww_kou_zhang_cang_list list
+            ON (osp.supplier_id = list.supplier_id),
+            pes_work_center_description_all pwcd
+        WHERE
+            wwop.pes_work_order_id = #{pesWorkOrderId}
+        AND wwop.operation_sequence_number = (case when pwcd.work_center_code = 2 then 20 ELSE 10 end)
+        AND wwob.pes_work_order_id = wwop.pes_work_order_id
+        AND pwcd.organization_id = wwob.organization_id
+        AND pwcd.work_center_id = wwob.work_center_id
+    </select>
+
+
+    <select id="handleSubmitErpFcl" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            and isnull(sioqnc.quantity,0) >= (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0) - wwom.issued_quantity)
+            and wwom.required_quantity > 0
+            and isnull(sioqnc.quantity,0) > 0
+            and wwom.work_order_operation_material_id > 0
+            and (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0)) > wwom.issued_quantity
+            and wwom.pes_work_order_material_id in
+            <foreach item="pesWorkOrderMaterialId" collection="array" open="(" separator="," close=")">
+                #{pesWorkOrderMaterialId}
+            </foreach>
+        </where>
+    </select>
+
+    <select id="handleSubmitReturnErpFcl" parameterType="Long" resultMap="PesWieWoOperationMaterialsErpResult">
+        <include refid="selectPesWieWoOperationMaterialsErpVo"/>
+        <where>
+            and wwom.pes_work_order_id = wwob.pes_work_order_id
+            and wwom.material_sequence_number > 0
+            and wwom.work_order_operation_material_id > 0
+            and wwom.issued_quantity > (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0))
+            and wwom.pes_work_order_material_id in
+            <foreach item="pesWorkOrderMaterialId" collection="array" open="(" separator="," close=")">
+                #{pesWorkOrderMaterialId}
+            </foreach>
+        </where>
+    </select>
+
+
+    <select id="getItemNumberLotControalById" parameterType="PesWieWoOperationMaterialsErp" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            esb.LOT_CONTROL_CODE,
+            (select org.ORGANIZATION_CODE from sync_inv_org_parameters org where org.ORGANIZATION_ID = esb.ORGANIZATION_ID) as ORGANIZATION_CODE
+        FROM
+            sync_egp_system_items_b esb
+        WHERE
+            esb.ORGANIZATION_ID = #{organizationId}
+        AND esb.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+
+    <update id="updatePesWieWorkOrdersBErpByPesMaterialId" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set issued_quantity = #{issuedQuantity} where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+    <update id="updatePesWieWorkOrdersBErpByPesMaterialIdReturn" parameterType="PesWieWoOperationMaterialsErp">
+        update pes_wie_wo_operation_materials_erp set issued_quantity = #{issuedQuantity} where pes_work_order_material_id = #{pesWorkOrderMaterialId}
+    </update>
+
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsFCLJob" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            wwom.pes_work_order_material_id,
+            wwob.work_order_number,
+            wwom.item_number,
+            wwom.uom_code,
+            wwom.required_quantity,
+            wwom.sun_hao_quantity,
+            wwom.issued_quantity,
+            wwom.subinventory_code,
+            wwom.organization_id,
+            wwom.inventory_item_id,
+            wwom.material_sequence_number,
+            isnull(overqty.over_quantity,0) as over_quantity
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_work_center_description_all pwcd,
+            pes_wie_wo_operation_materials_erp wwom
+            LEFT JOIN sync_inv_onhand_quantity_new_code sioqnc
+            ON (wwom.inventory_item_id = sioqnc.inventory_item_id
+            AND wwom.organization_id = sioqnc.organization_id
+            AND wwom.subinventory_code = sioqnc.subinventory_code)
+            left join cux_mes_work_material_all_v overqty
+            on (wwom.work_order_id = overqty.work_order_id
+            and wwom.organization_id = overqty.organization_id
+            and wwom.inventory_item_id = overqty.inventory_item_id)
+        WHERE
+            1 = 1
+            AND wwom.pes_work_order_id = wwob.pes_work_order_id
+            AND wwom.material_sequence_number > 0
+            AND wwom.work_order_id > 0
+            AND wwom.work_order_operation_material_id > 0
+            AND wwob.organization_id = pwcd.organization_id
+            AND wwob.work_center_id = pwcd.work_center_id
+            AND pwcd.work_center_code = 1
+            AND wwom.techniques_code = 4
+            AND wwob.completed_quantity > 0
+            AND isnull(sioqnc.quantity, 0) >= (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0))
+            AND wwom.quantity_per_product > 0
+            AND wwob.work_order_status_id IN (10004, 10002)
+            AND (wwom.required_quantity + wwom.sun_hao_quantity + isnull(overqty.over_quantity,0)) > wwom.issued_quantity
+    </select>
+
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsIssuedJob" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            wwom.pes_work_order_material_id,
+            wwob.work_order_number,
+            wwom.item_number,
+            wwom.uom_code,
+            wwom.transfered_quantity as required_quantity,
+            0 as sun_hao_quantity,
+            wwom.issued_quantity,
+            wwom.subinventory_code,
+            wwom.organization_id,
+            wwom.inventory_item_id,
+            wwom.material_sequence_number,
+            isnull(overqty.over_quantity,0) as over_quantity
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+            LEFT JOIN sync_inv_onhand_quantity_new_code sioqnc
+            ON (wwom.inventory_item_id = sioqnc.inventory_item_id
+            AND wwom.organization_id = sioqnc.organization_id
+            AND wwom.subinventory_code = sioqnc.subinventory_code)
+            left join cux_mes_work_material_all_v overqty
+            on (wwom.work_order_id = overqty.work_order_id
+            and wwom.organization_id = overqty.organization_id
+            and wwom.inventory_item_id = overqty.inventory_item_id)
+        WHERE
+            1 = 1
+            AND wwom.pes_work_order_id = wwob.pes_work_order_id
+            AND wwom.material_sequence_number > 0
+            AND wwom.work_order_id > 0
+            AND wwom.work_order_operation_material_id > 0
+            AND wwom.quantity_per_product > 0
+            AND wwob.work_order_status_id IN (10004, 10002)
+			and wwom.transfered_quantity + isnull(overqty.over_quantity,0) > wwom.issued_quantity
+            and isnull(sioqnc.quantity, 0) >= wwom.transfered_quantity
+    </select>
+
+
+    <update id="updateDLCWorkMaterils">
+        UPDATE pes_wie_wo_operation_materials_erp set subinventory_code = 'DLC' WHERE pes_work_order_material_id IN (SELECT
+        wwom.pes_work_order_material_id
+        FROM
+        pes_wie_work_orders_b_erp wwob,
+        pes_wie_wo_operation_materials_erp wwom
+        WHERE
+        wwob.pes_work_order_id = wwom.pes_work_order_id
+        AND wwob.p_item_number LIKE 'B27%'
+        AND wwob.work_order_status_id IN (10002, 10004, 10005))
+        and subinventory_code &lt;&gt; 'DLC'
+    </update>
+
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsDLCJob" resultMap="PesWieWoOperationMaterialsErpResult">
+        SELECT
+            wwom.pes_work_order_material_id,
+            wwob.work_order_number,
+            wwom.item_number,
+            wwom.uom_code,
+            --wwom.required_quantity,
+            (case when isnull(sioqnc.quantity, 0) - (wwom.required_quantity - wwom.issued_quantity) >= 0 then (wwom.required_quantity - wwom.issued_quantity) else isnull(sioqnc.quantity, 0) end) as required_quantity,
+            0 AS sun_hao_quantity,
+            --wwom.issued_quantity,
+            0 as issued_quantity,
+            wwom.subinventory_code,
+            wwom.organization_id,
+            wwom.inventory_item_id,
+            wwom.material_sequence_number,
+            0 AS over_quantity
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_wo_operation_materials_erp wwom
+          LEFT JOIN sync_inv_onhand_quantity_new_code sioqnc ON (
+            wwom.inventory_item_id = sioqnc.inventory_item_id
+            AND wwom.organization_id = sioqnc.organization_id
+            AND wwom.subinventory_code = sioqnc.subinventory_code)
+        WHERE
+            1 = 1
+        AND wwom.pes_work_order_id = wwob.pes_work_order_id
+        AND wwom.material_sequence_number > 0
+        AND wwom.work_order_id > 0
+        AND wwom.work_order_operation_material_id > 0
+        AND wwob.completed_quantity > 0
+        AND wwom.quantity_per_product > 0
+        AND wwob.work_order_status_id IN (10004, 10002)
+        and wwob.p_item_number like 'B27%'
+        AND isnull(sioqnc.quantity, 0) > 0
+        AND wwom.subinventory_code = 'DLC'
+        --AND isnull(sioqnc.quantity, 0) >= wwom.required_quantity - wwom.issued_quantity
+        AND wwom.required_quantity > wwom.issued_quantity
+    </select>
+
+</mapper>

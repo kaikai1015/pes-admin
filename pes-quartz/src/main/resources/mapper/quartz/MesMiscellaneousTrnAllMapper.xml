@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesMiscellaneousTrnAllMapper">
+
+    <resultMap type="MesMiscellaneousTrnAllEO" id="MesMiscellaneousTrnAllEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="uomCode"    column="uom_code"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="sourceCode"    column="source_code"    />
+        <result property="transactionSourceTypeId"    column="transaction_source_type_id"    />
+        <result property="useCurrentCost"    column="use_current_cost"    />
+        <result property="unitCost"    column="unit_cost"    />
+        <result property="costComponentCode"    column="cost_component_code"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="transactionId"    column="transaction_id"    />
+        <result property="endUpdateDate"    column="end_Update_Date"    />
+        <result property="lastUpdateDate"    column="last_Update_Date"    />
+        <result property="transactionSourceId"    column="transaction_Source_Id"    />
+        <result property="transactionTypeId"    column="transaction_type_id"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="contractNumber"    column="contract_number"    />
+        <result property="shProject"    column="sh_project"    />
+        <result property="shEmployee"    column="sh_employee"    />
+        <result property="shDepartment"    column="sh_department"    />
+        <result property="shWwSupplier"    column="sh_ww_supplier"    />
+        <result property="shProductLine"    column="sh_product_line"    />
+        <result property="shTextContractNum"    column="sh_text_contract_num"    />
+        <result property="errorInfor"    column="error_infor"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="chayiQuantity"    column="chayi_quantity"    />
+        <result property="wmsRemarkDescription"    column="wms_remark_description"    />
+    </resultMap>
+
+    <sql id="selectMesMiscellaneousTrnAllVo">
+        SELECT
+            mmt.inventory_item_id,
+            mmt.transaction_type_id,
+            (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = mmt.organization_id
+                AND esb.INVENTORY_ITEM_ID = mmt.INVENTORY_ITEM_ID) AS lot_control_code,
+            mmt.item_number,
+            mmt.organization_id,
+            mmt.transaction_quantity,
+            mmt.uom_code,
+            mmt.transaction_date,
+            mmt.subinventory_code,
+            mmt.source_code,
+            mmt.transaction_source_type_id,
+            mmt.use_current_cost,
+            mmt.unit_cost,
+            mmt.cost_component_code,
+            mmt.remark,
+            mmt.last_update_date,
+            mmt.erp_flag,
+            mmt.erp_flag_date,
+            mmt.transaction_id,
+            mmt.contract_number,
+            mmt.sh_project,
+            mmt.sh_employee,
+            mmt.sh_department,
+            mmt.sh_ww_supplier,
+            mmt.sh_product_line,
+            mmt.sh_text_contract_num,
+            isnull(mmt.wms_remark_description,mmt.remark) as wms_remark_description
+        FROM
+            mes_miscellaneous_trn_all mmt
+    </sql>
+
+    <select id="getMiscellaneousTrnList" parameterType="MesMiscellaneousTrnAllEO" resultMap="MesMiscellaneousTrnAllEOResult">
+        <include refid="selectMesMiscellaneousTrnAllVo"/>
+        <where>
+            and (mmt.ERP_FLAG = 0 or mmt.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and mmt.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and mmt.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by mmt.ERP_FLAG asc
+    </select>
+
+    <select id="selectTransactionSourceId" parameterType="Long" resultMap="MesMiscellaneousTrnAllEOResult">
+        select dict_value as transaction_source_id from sys_dict_data where dict_type = 'erp_account_code_mes' and dict_label = #{organizationId}
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesMiscellaneousTrnAllEO">
+        update mes_miscellaneous_trn_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where transaction_id = #{transactionId}
+    </update>
+
+    <select id="selectMesMiscellaneousTrnAllList" parameterType="MesMiscellaneousTrnAllEO" resultMap="MesMiscellaneousTrnAllEOResult">
+        SELECT
+        mmta.inventory_item_id,
+        mmta.item_number,
+        mmta.organization_id,
+        mmta.transaction_quantity,
+        mmta.uom_code,
+        mmta.transaction_date,
+        mmta.subinventory_code,
+        mmta.source_code,
+        mmta.transaction_source_type_id,
+        mmta.use_current_cost,
+        mmta.unit_cost,
+        mmta.cost_component_code,
+        mmta.remark,
+        mmta.last_update_date,
+        mmta.erp_flag,
+        mmta.erp_flag_date,
+        mmta.transaction_id,
+        mmta.error_infor,
+        isnull(ioqn.quantity,0) AS onhand_quantity,
+        (case when isnull(ioqn.quantity,0) &gt;= abs(mmta.transaction_quantity) then 0 ELSE abs(mmta.transaction_quantity) - isnull(ioqn.quantity,0) end) as chayi_quantity
+        FROM
+        mes_miscellaneous_trn_all mmta
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqn
+        ON (mmta.organization_id = ioqn.organization_id
+        AND mmta.inventory_item_id = ioqn.inventory_item_id
+        AND mmta.SUBINVENTORY_CODE = ioqn.subinventory_code)
+        <where>
+            <if test="erpFlag != null  and erpFlag != ''"> and mmta.erp_flag = #{erpFlag}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and mmta.item_number = #{itemNumber}</if>
+        </where>
+        order by mmta.transaction_id desc
+    </select>
+
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.por.mapper.CuxPorRequisitionLineAllMapper">
+
+    <resultMap type="CuxPorRequisitionLineAll" id="CuxPorRequisitionLineAllResult">
+                    <result property="requisitioningId"    column="requisitioning_id"    />
+                    <result property="lineNumber"    column="line_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="lineTypeId"    column="line_type_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="categoryId"    column="category_id"    />
+                    <result property="uomCode"    column="uom_code"    />
+                    <result property="unitPrice"    column="unit_price"    />
+                    <result property="quantity"    column="quantity"    />
+                    <result property="needByDate"    column="need_by_date"    />
+                    <result property="poHeaderId"    column="po_header_id"    />
+                    <result property="poLineId"    column="po_line_id"    />
+                    <result property="quantityPriceId"    column="quantity_price_id"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="requisitioningLineId"    column="requisitioning_line_id"    />
+        <result property="lineNum"    column="line_num"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="minOrderQuantity"    column="min_order_quantity"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="taxCode"    column="tax_code"    />
+            </resultMap>
+
+    <sql id="selectCuxPorRequisitionLineAllVo">
+        select line_number, inventory_item_id, line_type_id, organization_id, category_id, uom_code, unit_price, quantity, need_by_date, po_header_id, po_line_id, create_by, create_date, requisitioning_line_id, line_num, item_type, buyer_name, min_order_quantity, requisitioning_id, item_number, item_description,tax_code from cux_por_requisition_line_all
+    </sql>
+
+    <select id="selectCuxPorRequisitionLineAllById" parameterType="Long" resultMap="CuxPorRequisitionLineAllResult">
+        SELECT
+        prl.line_num,
+        prl.inventory_item_id,
+        prl.organization_id,
+        prl.item_number,
+        prl.item_description,
+        prl.item_type,
+        prl.buyer_name,
+        prl.uom as uom_code,
+        prl.plan_po_quantity as quantity,
+        prl.plan_po_date as need_by_date,
+        prl.min_order_quantity
+        FROM
+        cux_por_requisition_list prl
+        WHERE
+        1=1
+        and prl.line_num = #{lineNum}
+    </select>
+
+    <select id="selectMaxLine" parameterType="Long" resultMap="CuxPorRequisitionLineAllResult">
+        SELECT
+        MAX (max_line.line_number + 1) AS line_number
+        FROM
+        (SELECT line_number FROM cux_por_requisition_line_all WHERE requisitioning_id = #{requisitioningId}
+        UNION
+        SELECT 0 AS line_number
+        ) max_line
+    </select>
+
+    <insert id="insertCuxPorRequisitionLineAll" parameterType="CuxPorRequisitionLineAll">
+        insert into cux_por_requisition_line_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requisitioningId != null">requisitioning_id,</if>
+            <if test="lineNumber != null">line_number,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="lineTypeId != null">line_type_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="uomCode != null">uom_code,</if>
+            <if test="unitPrice != null">unit_price,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="needByDate != null">need_by_date,</if>
+            <if test="poHeaderId != null">po_header_id,</if>
+            <if test="poLineId != null">po_line_id,</if>
+            <if test="quantityPriceId != null">quantity_price_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="lineNum != null">line_num,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="buyerName != null">buyer_name,</if>
+            <if test="minOrderQuantity != null">min_order_quantity,</if>
+            <if test="taxCode != null">tax_code,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requisitioningId != null">#{requisitioningId},</if>
+            <if test="lineNumber != null">#{lineNumber},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="lineTypeId != null">#{lineTypeId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="uomCode != null">#{uomCode},</if>
+            <if test="unitPrice != null">#{unitPrice},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="needByDate != null">#{needByDate},</if>
+            <if test="poHeaderId != null">#{poHeaderId},</if>
+            <if test="poLineId != null">#{poLineId},</if>
+            <if test="quantityPriceId != null">#{quantityPriceId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="lineNum != null">#{lineNum},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+            <if test="minOrderQuantity != null">#{minOrderQuantity},</if>
+            <if test="taxCode != null">#{taxCode},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <select id="selectCuxPorRequisitionLineAllList" parameterType="CuxPorRequisitionLineAll" resultMap="CuxPorRequisitionLineAllResult">
+        <include refid="selectCuxPorRequisitionLineAllVo"/>
+        <where>
+            <if test="requisitioningId != null "> and requisitioning_id = #{requisitioningId}</if>
+        </where>
+    </select>
+
+    <update id="delCuxPorRequisitionLineAll" parameterType="Long">
+        update cux_por_requisition_list set pr_flag = '1' where line_num = #{lineNum}
+    </update>
+
+</mapper>

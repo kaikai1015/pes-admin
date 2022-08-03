@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.CuxMaterialTransactionsPesMapper">
+
+    <resultMap type="CuxMaterialTransactionsPesEO" id="CuxMaterialTransactionsPesEOResult">
+        <result property="organizationCode"    column="ORGANIZATION_CODE"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="tranctQty"    column="TRANCT_QTY"    />
+        <result property="onhandQuantity"    column="ONHAND_QUANTITY"    />
+        <result property="transactionUomCode"    column="TRANSACTION_UOM_CODE"    />
+        <result property="subinventoryCode"    column="SUBINVENTORY_CODE"    />
+        <result property="lotNumber"    column="LOT_NUMBER"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="countId"    column="COUNT_ID"    />
+        <result property="description"    column="DESCRIPTION"    />
+        <result property="workQuantity"    column="WORK_QUANTITY"    />
+        <result property="id"    column="ID"    />
+        <result property="planStartQuantity"    column="plan_start_quantity"    />
+    </resultMap>
+
+    <sql id="selectCuxMaterialTransactionsPesVo">
+        SELECT
+        ORGANIZATION_CODE,
+        WORK_ORDER_NUMBER,
+        ITEM_NUMBER,
+        WORK_QUANTITY,
+        QUANTITY,
+        ISSUED_QUANTITY,
+        (QUANTITY*#{planStartQuantity})/CAST(SUBSTRING(WORK_QUANTITY,CHARINDEX('（', WORK_QUANTITY, 0) + 1,(CHARINDEX('）', WORK_QUANTITY, 0) - CHARINDEX('（', WORK_QUANTITY, 0) - 1)) as DECIMAL(15,5)) as TRANCT_QTY,
+        isnull(ONHAND_QUANTITY, 0) AS ONHAND_QUANTITY,
+        TRANSACTION_UOM_CODE,
+        SUBINVENTORY_CODE,
+        LOT_NUMBER,
+        LAST_UPDATE_DATE,
+        COUNT_ID,
+        DESCRIPTION,
+        ID
+        FROM
+        cux_material_transactions_pes
+    </sql>
+
+    <select id="selectCuxMaterialTransactionsPesList" parameterType="CuxMaterialTransactionsPesEO" resultMap="CuxMaterialTransactionsPesEOResult">
+        <include refid="selectCuxMaterialTransactionsPesVo"/>
+        <where>
+            and (COUNT_ID = 0 or COUNT_ID = 2)
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER = #{workOrderNumber}</if>
+        </where>
+    </select>
+
+    <select id="selectCuxMaterialTransactionsByPesId" parameterType="Integer" resultMap="CuxMaterialTransactionsPesEOResult">
+        <include refid="selectCuxMaterialTransactionsPesVo"/>
+        where ID = #{id}
+    </select>
+
+    <update id="updateCuxMaterialTransactionsPes" parameterType="CuxMaterialTransactionsPesEO">
+        update cux_material_transactions_pes
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tranctQty != null">TRANCT_QTY = #{tranctQty},</if>
+            <if test="onhandQuantity != null">ONHAND_QUANTITY = #{onhandQuantity},</if>
+            <if test="transactionUomCode != null">TRANSACTION_UOM_CODE = #{transactionUomCode},</if>
+            <if test="subinventoryCode != null">SUBINVENTORY_CODE = #{subinventoryCode},</if>
+            LAST_UPDATE_DATE = getdate(),
+            <if test="lotNumber != null">LOT_NUMBER = #{lotNumber},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+
+    <select id="selectCuxMaterialTransactionsByIds" parameterType="CuxMaterialTransactionsPesEO" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        cux_material_transactions_pes
+        WHERE 1=1
+        and WORK_ORDER_NUMBER = #{workOrderNumber}
+        and (ONHAND_QUANTITY  = 0 or (((QUANTITY*#{planStartQuantity})/CAST(SUBSTRING(WORK_QUANTITY,CHARINDEX('（', WORK_QUANTITY, 0) + 1,(CHARINDEX('）', WORK_QUANTITY, 0) - CHARINDEX('（', WORK_QUANTITY, 0) - 1)) as DECIMAL(15,5))) &gt; ONHAND_QUANTITY) or ((QUANTITY*#{planStartQuantity})/CAST(SUBSTRING(WORK_QUANTITY,CHARINDEX('（', WORK_QUANTITY, 0) + 1,(CHARINDEX('）', WORK_QUANTITY, 0) - CHARINDEX('（', WORK_QUANTITY, 0) - 1)) as DECIMAL(15,5)) + ISSUED_QUANTITY &gt; QUANTITY))
+    </select>
+
+    <update id="updatePesCountId" parameterType="CuxMaterialTransactionsPesEO">
+        update cux_material_transactions_pes
+        <trim prefix="SET" suffixOverrides=",">
+            LAST_UPDATE_DATE = getdate(),
+            <if test="countId != null">count_id = #{countId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+
+
+    <delete id="deleteCuxMaterialTransactionsPesEO">
+        TRUNCATE TABLE cux_material_transactions_pes
+    </delete>
+
+    <insert id="batchCuxMaterialTransactionsPesEO">
+        insert into cux_material_transactions_pes( ORGANIZATION_CODE, WORK_ORDER_NUMBER, ITEM_NUMBER, QUANTITY, ISSUED_QUANTITY, TRANCT_QTY, ONHAND_QUANTITY, TRANSACTION_UOM_CODE, SUBINVENTORY_CODE, LOT_NUMBER, DESCRIPTION, WORK_QUANTITY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationCode,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.itemNumber,jdbcType=VARCHAR}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.issuedQuantity,jdbcType=DECIMAL} as decimal(15,5)),cast(#{item.tranctQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.onhandQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.transactionUomCode,jdbcType=VARCHAR}, #{item.subinventoryCode,jdbcType=VARCHAR}, #{item.lotNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.workQuantity,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

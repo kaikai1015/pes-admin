@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWisWorkDefinionNameBMapper">
+
+    <resultMap type="SyncWisWorkDefinionNameBEO" id="SyncWisWorkDefinionNameBEOResult">
+    </resultMap>
+
+    <delete id="deleteSyncWisWorkDefinionNameEO">
+        delete from sync_wis_work_definition_names_b where WORK_DEFINITION_NAME_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.workDefinitionNameId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncWisWorkDefinionNameEO">
+        insert into sync_wis_work_definition_names_b( WORK_DEFINITION_NAME_ID, WORK_DEFINITION_CODE, WORK_DEFINITION_TYPE, SEEDED_FLAG, USED_IN_PLANNING_FLAG, EFFECTIVE_FROM_DATE, EFFECTIVE_TO_DATE, WORK_DEF_NAME, WORK_DEF_NAME_DESCRIPTION, last_update_date, last_updated_by, creation_date, created_by) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workDefinitionNameId,jdbcType=BIGINT}, #{item.workDefinitionCode,jdbcType=VARCHAR}, #{item.workDefinitionType,jdbcType=VARCHAR}, #{item.seededFlag,jdbcType=VARCHAR},#{item.usedInPlanningFlag,jdbcType=VARCHAR},#{item.effectiveFromDate,jdbcType=TIMESTAMP},#{item.effectiveToDate,jdbcType=TIMESTAMP}, #{item.workDefName,jdbcType=VARCHAR},#{item.workDefNameDescription,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

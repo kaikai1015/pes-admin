@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWoOperationsBMapper">
+
+    <resultMap type="SyncWieWoOperationsBEO" id="SyncWieWoOperationsBEOResult">
+        <result property="woOperationId"    column="WO_OPERATION_ID"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="operationType"    column="OPERATION_TYPE"    />
+        <result property="operationSeqNumber"    column="OPERATION_SEQ_NUMBER"    />
+        <result property="standardOperationId"    column="STANDARD_OPERATION_ID"    />
+        <result property="workCenterId"    column="WORK_CENTER_ID"    />
+        <result property="countPointOperationFlag"    column="COUNT_POINT_OPERATION_FLAG"    />
+        <result property="autoTransactFlag"    column="AUTO_TRANSACT_FLAG"    />
+        <result property="readyQuantity"    column="READY_QUANTITY"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="scrappedQuantity"    column="SCRAPPED_QUANTITY"    />
+        <result property="rejectedQuantity"    column="REJECTED_QUANTITY"    />
+        <result property="plannedStartDate"    column="PLANNED_START_DATE"    />
+        <result property="plannedCompletionDate"    column="PLANNED_COMPLETION_DATE"    />
+        <result property="actualStartDate"    column="ACTUAL_START_DATE"    />
+        <result property="actualCompletionDate"    column="ACTUAL_COMPLETION_DATE"    />
+        <result property="serialTrackingFlag"    column="SERIAL_TRACKING_FLAG"    />
+        <result property="previousCpOpSeqNum"    column="PREVIOUS_CP_OP_SEQ_NUM"    />
+        <result property="nextCpOpSeqNum"    column="NEXT_CP_OP_SEQ_NUM"    />
+        <result property="wdOperationId"    column="WD_OPERATION_ID"    />
+        <result property="shippingDocumentsFlag"    column="SHIPPING_DOCUMENTS_FLAG"    />
+        <result property="ospItemId"    column="OSP_ITEM_ID"    />
+        <result property="supplierId"    column="SUPPLIER_ID"    />
+        <result property="supplierSiteId"    column="SUPPLIER_SITE_ID"    />
+        <result property="leadTimeUom"    column="LEAD_TIME_UOM"    />
+        <result property="fixedLeadTime"    column="FIXED_LEAD_TIME"    />
+        <result property="variableLeadTime"    column="VARIABLE_LEAD_TIME"    />
+        <result property="inProcessQuantity"    column="IN_PROCESS_QUANTITY"    />
+        <result property="poRequestedQuantity"    column="PO_REQUESTED_QUANTITY"    />
+        <result property="poApprovedQuantity"    column="PO_APPROVED_QUANTITY"    />
+        <result property="shippedQuantity"    column="SHIPPED_QUANTITY"    />
+        <result property="receivedQuantity"    column="RECEIVED_QUANTITY"    />
+        <result property="overReceiptQuantity"    column="OVER_RECEIPT_QUANTITY"    />
+        <result property="cumulativeScrapQuantity"    column="CUMULATIVE_SCRAP_QUANTITY"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdateLogin"    column="LAST_UPDATE_LOGIN"    />
+        <result property="objectVersionNumber"    column="OBJECT_VERSION_NUMBER"    />
+        <result property="attributeCategory"    column="ATTRIBUTE_CATEGORY"    />
+        <result property="attributeChar1"    column="ATTRIBUTE_CHAR1"    />
+        <result property="attributeChar2"    column="ATTRIBUTE_CHAR2"    />
+        <result property="attributeChar3"    column="ATTRIBUTE_CHAR3"    />
+        <result property="attributeChar4"    column="ATTRIBUTE_CHAR4"    />
+        <result property="attributeChar5"    column="ATTRIBUTE_CHAR5"    />
+        <result property="requestId"    column="REQUEST_ID"    />
+        <result property="operationName"    column="OPERATION_NAME"    />
+        <result property="operationDescription"    column="OPERATION_DESCRIPTION"    />
+    </resultMap>
+
+    <delete id="deleteSyncWieWoOperationsBEO">
+        delete from sync_wie_wo_operations_b where WO_OPERATION_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.woOperationId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncWieWoOperationsBEO">
+        insert into sync_wie_wo_operations_b( WO_OPERATION_ID, ORGANIZATION_ID, WORK_ORDER_ID, OPERATION_TYPE, OPERATION_SEQ_NUMBER, STANDARD_OPERATION_ID, WORK_CENTER_ID, COUNT_POINT_OPERATION_FLAG, AUTO_TRANSACT_FLAG, READY_QUANTITY, COMPLETED_QUANTITY, SCRAPPED_QUANTITY, REJECTED_QUANTITY, PLANNED_START_DATE, PLANNED_COMPLETION_DATE, ACTUAL_START_DATE, ACTUAL_COMPLETION_DATE, SERIAL_TRACKING_FLAG, PREVIOUS_CP_OP_SEQ_NUM, NEXT_CP_OP_SEQ_NUM, WD_OPERATION_ID, SHIPPING_DOCUMENTS_FLAG, OSP_ITEM_ID, SUPPLIER_ID, SUPPLIER_SITE_ID, LEAD_TIME_UOM, FIXED_LEAD_TIME, VARIABLE_LEAD_TIME, IN_PROCESS_QUANTITY, PO_REQUESTED_QUANTITY, PO_APPROVED_QUANTITY, SHIPPED_QUANTITY, RECEIVED_QUANTITY, OVER_RECEIPT_QUANTITY, CUMULATIVE_SCRAP_QUANTITY, CREATED_BY, CREATION_DATE, LAST_UPDATED_BY, LAST_UPDATE_DATE, LAST_UPDATE_LOGIN, OBJECT_VERSION_NUMBER, ATTRIBUTE_CATEGORY, ATTRIBUTE_CHAR1, ATTRIBUTE_CHAR2, ATTRIBUTE_CHAR3, ATTRIBUTE_CHAR4, ATTRIBUTE_CHAR5, REQUEST_ID, OPERATION_NAME, OPERATION_DESCRIPTION) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.woOperationId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderId,jdbcType=BIGINT}, #{item.operationType,jdbcType=VARCHAR}, cast(#{item.operationSeqNumber,jdbcType=DECIMAL} as decimal(15,5)), #{item.standardOperationId,jdbcType=BIGINT}, #{item.workCenterId,jdbcType=BIGINT}, #{item.countPointOperationFlag,jdbcType=VARCHAR}, #{item.autoTransactFlag,jdbcType=VARCHAR}, cast(#{item.readyQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.completedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.scrappedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.rejectedQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.plannedStartDate,jdbcType=TIMESTAMP}, #{item.plannedCompletionDate,jdbcType=TIMESTAMP}, #{item.actualStartDate,jdbcType=TIMESTAMP}, #{item.actualCompletionDate,jdbcType=TIMESTAMP}, #{item.serialTrackingFlag,jdbcType=VARCHAR}, cast(#{item.previousCpOpSeqNum,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.nextCpOpSeqNum,jdbcType=DECIMAL} as decimal(15,5)), #{item.wdOperationId,jdbcType=BIGINT}, #{item.shippingDocumentsFlag,jdbcType=VARCHAR}, #{item.ospItemId,jdbcType=BIGINT}, #{item.supplierId,jdbcType=BIGINT}, #{item.supplierSiteId,jdbcType=BIGINT}, #{item.leadTimeUom,jdbcType=VARCHAR}, cast(#{item.fixedLeadTime,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.variableLeadTime,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.inProcessQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.poRequestedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.poApprovedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.shippedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.receivedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.overReceiptQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.cumulativeScrapQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.createdBy,jdbcType=VARCHAR}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdateLogin,jdbcType=VARCHAR}, #{item.objectVersionNumber,jdbcType=INTEGER}, #{item.attributeCategory,jdbcType=VARCHAR}, #{item.attributeChar1,jdbcType=VARCHAR}, #{item.attributeChar2,jdbcType=VARCHAR}, #{item.attributeChar3,jdbcType=VARCHAR}, #{item.attributeChar4,jdbcType=VARCHAR}, #{item.attributeChar5,jdbcType=VARCHAR}, #{item.requestId,jdbcType=BIGINT}, #{item.operationName,jdbcType=VARCHAR}, #{item.operationDescription,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

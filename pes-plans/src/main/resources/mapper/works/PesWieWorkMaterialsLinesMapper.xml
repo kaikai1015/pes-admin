@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkMaterialsLinesMapper">
+
+    <resultMap type="PesWieWorkMaterialsLines" id="PesWieWorkMaterialsLinesResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="woOperationId"    column="WO_OPERATION_ID"    />
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+        <result property="materialSeqNumber"    column="MATERIAL_SEQ_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="requiredDate"    column="REQUIRED_DATE"    />
+        <result property="quantityPerProduct"    column="QUANTITY_PER_PRODUCT"    />
+        <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="pItemNumber"    column="P_ITEM_NUMBER"    />
+        <result property="pItemDescription"    column="P_ITEM_DESCRIPTION"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+        <result property="newPercentQuantity"    column="new_percent_quantity"    />
+        <result property="newItemNumber"    column="new_item_number"    />
+        <result property="newItemDescription"    column="new_item_description"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="remainNewQuantity"    column="remain_new_quantity"    />
+        <result property="typeFlag"    column="TYPE_FLAG"    />
+        <result property="newInventoryItemId"    column="new_inventory_item_id"    />
+        <result property="newRequiredQuantity"    column="NEW_REQUIRED_QUANTITY"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="newMaterialSeqNumber"    column="NEW_MATERIAL_SEQ_NUMBER"    />
+        <result property="tidaiId"    column="tidai_id"    />
+    </resultMap>
+
+    <sql id="selectPesWieWorkMaterialsLinesVo">
+        SELECT
+        tidai_id,
+        WORK_ORDER_NUMBER,
+        PLANNED_START_QUANTITY,
+        P_ITEM_NUMBER,
+        P_ITEM_DESCRIPTION,
+        WORK_ORDER_ID,
+        ORGANIZATION_ID,
+        WO_OPERATION_ID,
+        WO_OPERATION_MATERIAL_ID,
+        MATERIAL_SEQ_NUMBER,
+        NEW_MATERIAL_SEQ_NUMBER,
+        ITEM_NUMBER,
+        ITEM_DESCRIPTION,
+        QUANTITY_PER_PRODUCT,
+        REQUIRED_DATE,
+        REQUIRED_QUANTITY,
+        NEW_REQUIRED_QUANTITY,
+        new_item_number,
+        new_item_description,
+        onhand_quantity,
+        new_inventory_item_id,
+        new_percent_quantity
+        erp_flag
+        FROM
+        pes_work_substitued_material_lists
+    </sql>
+
+    <select id="selectPesWieWorkMaterialsLinesList" parameterType="PesWieWorkMaterialsLines" resultMap="PesWieWorkMaterialsLinesResult">
+        <include refid="selectPesWieWorkMaterialsLinesVo"/>
+        <where>
+            AND erp_flag = 0
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER like (#{workOrderNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+    </select>
+
+    <select id="submiPesWieMaterialAll" parameterType="Long" resultMap="PesWieWorkMaterialsLinesResult">
+        <include refid="selectPesWieWorkMaterialsLinesVo"/>
+        <where>
+            AND erp_flag = 0
+            and tidai_id in
+            <foreach item="tidaiId" collection="array" open="(" separator="," close=")">
+                #{tidaiId}
+            </foreach>
+        </where>
+    </select>
+
+    <insert id="insertPesWieWorkMaterialsLines" parameterType="PesWieWorkMaterialsLines">
+        insert into sync_wie_work_materials_lines
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">ORGANIZATION_ID,</if>
+            <if test="workOrderId != null">WORK_ORDER_ID,</if>
+            <if test="woOperationId != null">WO_OPERATION_ID,</if>
+            <if test="woOperationMaterialId != null">WO_OPERATION_MATERIAL_ID,</if>
+            <if test="materialSeqNumber != null">MATERIAL_SEQ_NUMBER,</if>
+            <if test="inventoryItemId != null">INVENTORY_ITEM_ID,</if>
+            <if test="requiredDate != null">REQUIRED_DATE,</if>
+            <if test="quantityPerProduct != null">QUANTITY_PER_PRODUCT,</if>
+            <if test="requiredQuantity != null">REQUIRED_QUANTITY,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="woOperationId != null">#{woOperationId},</if>
+            <if test="woOperationMaterialId != null">#{woOperationMaterialId},</if>
+            <if test="materialSeqNumber != null">#{materialSeqNumber},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="requiredDate != null">#{requiredDate},</if>
+            <if test="quantityPerProduct != null">#{quantityPerProduct},</if>
+            <if test="requiredQuantity != null">#{requiredQuantity},</if>
+        </trim>
+    </insert>
+
+
+
+    <select id="checkUpdateAllowed" parameterType="Long" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        sync_wie_work_materials_lines
+        where WO_OPERATION_MATERIAL_ID = #{woOperationMaterialId}
+        and type_flag = 'D'
+    </select>
+
+    <update id="updatePesWieWorkMaterialsLines" parameterType="PesWieWorkMaterialsLines">
+        update sync_wie_work_materials_lines
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="typeFlag != null  and typeFlag != ''">type_flag = #{typeFlag},</if>
+            <if test="quantityPerProduct != null">QUANTITY_PER_PRODUCT = #{quantityPerProduct},</if>
+        </trim>
+        where WO_OPERATION_MATERIAL_ID = #{woOperationMaterialId}
+    </update>
+
+    <delete id="deletePesWieWorkMaterialsLinesByIds" parameterType="String">
+        UPDATE sync_wie_work_materials_lines set type_flag = 'D' where WO_OPERATION_MATERIAL_ID in
+        <foreach item="woOperationMaterialId" collection="array" open="(" separator="," close=")">
+            #{woOperationMaterialId}
+        </foreach>
+    </delete>
+
+    <delete id="updateErpFlag" parameterType="Long">
+        UPDATE pes_work_substitued_material_lists set erp_flag = '1' where tidai_id = #{tidaiId}
+    </delete>
+
+    <insert id="addWorkLinresErp" parameterType="PesWieWorkMaterialsLines">
+        INSERT INTO cux_work_substituted_material_lines_erp (
+        WORK_ORDER_ID,
+        WORK_ORDER_NUMBER,
+        ITEM_NUMBER,
+        WO_OPERATION_ID,
+        WO_OPERATION_MATERIAL_ID,
+        MATERIAL_SEQ_NUMBER,
+        new_item_number,
+        CREATE_BY,
+        CREATE_DATE,
+        LAST_UPDATE_BY,
+        LAST_UPDATE_DATE)
+        (SELECT
+            #{workOrderId},
+            #{workOrderNumber},
+            #{itemNumber},
+            #{woOperationId},
+            #{woOperationMaterialId},
+            #{newMaterialSeqNumber},
+            #{newItemNumber},
+            #{createBy},
+            getdate(),
+            #{createBy},
+            getdate())
+    </insert>
+
+</mapper>

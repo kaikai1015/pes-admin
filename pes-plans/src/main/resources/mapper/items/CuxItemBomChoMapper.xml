@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxItemBomChoMapper">
+
+    <resultMap type="CuxItemBomCho" id="CuxItemBomChoResult">
+                    <result property="choId"    column="cho_id"    />
+                    <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="componentQuantity"    column="component_quantity"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="errorInfor"    column="error_infor"    />
+                    <result property="delFlag"    column="del_flag"    />
+                    <result property="itemDescription"    column="item_description"    />
+        <result property="orgItemId"    column="org_item_id"    />
+        <result property="rootId"    column="root_id"    />
+        <result property="erpFlag"    column="erp_flag"    />
+            </resultMap>
+
+    <sql id="selectCuxItemBomChoVo">
+        select erp_flag,root_id,cho_id, p_inventory_item_id, organization_id, p_item_number, inventory_item_id, item_number, item_type, component_quantity, create_by, create_date, last_update_by, last_update_date, del_flag, item_description,org_item_id from cux_item_bom_cho
+    </sql>
+
+    <select id="selectCuxItemBomChoList" parameterType="CuxItemBomCho" resultMap="CuxItemBomChoResult">
+        <include refid="selectCuxItemBomChoVo"/>
+        <where>
+            and del_flag = 0
+            <if test="organizationId != null "> and ORGANIZATION_ID = #{organizationId}</if>
+            <if test="pInventoryItemId != null "> and org_item_id = #{orgItemId}</if>
+            <if test="pInventoryItemId != null "> and root_id = #{rootId}</if>
+        </where>
+    </select>
+
+    <select id="selectCuxItemBomChoById" parameterType="Long" resultMap="CuxItemBomChoResult">
+        <include refid="selectCuxItemBomChoVo"/>
+        where cho_id = #{choId}
+    </select>
+
+    <insert id="insertCuxItemBomCho" parameterType="CuxItemBomCho">
+        insert into cux_item_bom_cho
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pInventoryItemId != null">p_inventory_item_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="pItemNumber != null">p_item_number,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="componentQuantity != null">component_quantity,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="orgItemId != null">org_item_id,</if>
+            <if test="rootId != null">root_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pInventoryItemId != null">#{pInventoryItemId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="pItemNumber != null">#{pItemNumber},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="componentQuantity != null">#{componentQuantity},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="orgItemId != null">#{orgItemId},</if>
+            <if test="rootId != null">#{rootId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCuxItemBomCho" parameterType="CuxItemBomCho">
+        update cux_item_bom_cho
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="componentQuantity != null">component_quantity = #{componentQuantity},</if>
+            last_update_date = GETDATE(),
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+        </trim>
+        where inventory_item_id = #{inventoryItemId}
+        and org_item_id = #{orgItemId}
+        and root_id = #{rootId}
+    </update>
+
+    <update id="deleteCuxItemBomChoByIds" parameterType="Long">
+        update cux_item_bom_cho set del_flag = 1 where cho_id = #{choId}
+    </update>
+
+    <select id="selectItemTrees" parameterType="CuxItemBomCho" resultMap="CuxItemBomChoResult">
+        SELECT
+        pitem.inventory_item_id AS p_inventory_item_id,
+        pitem.organization_id,
+        pitem.ITEM_NUMBER AS P_ITEM_NUMBER,
+        item.inventory_item_id,
+        item.ITEM_NUMBER,
+        item.item_description,
+        item.item_type,
+        bomc.component_quantity,
+        #{orgItemId} as org_item_id,
+        #{rootId} as root_id
+        FROM
+        sync_items_num_des_list pitem,
+        sync_egp_structures_b boms,
+        sync_egp_components_b bomc,
+        sync_items_num_des_list item
+        WHERE
+        pitem.inventory_item_id = boms.PK1_VALUE
+        AND pitem.organization_id = boms.PK2_VALUE
+        AND boms.BILL_SEQUENCE_ID = bomc.BILL_SEQUENCE_ID
+        AND boms.PK2_VALUE = bomc.PK2_VALUE
+        AND item.inventory_item_id = bomc.PK1_VALUE
+        AND item.organization_id = bomc.PK2_VALUE
+        AND pitem.ORGANIZATION_ID = item.ORGANIZATION_ID
+        AND bomc.disable_date IS NULL
+        AND bomc.IMPLEMENTATION_DATE IS NOT NULL
+        <if test="pInventoryItemId!=null">
+            and pitem.inventory_item_id=#{pInventoryItemId}
+        </if>
+        <if test="organizationId!=null">
+            and pitem.organization_id=#{organizationId}
+        </if>
+    </select>
+
+    <select id="selectIdTrees" parameterType="Long" resultMap="CuxItemBomChoResult">
+        SELECT
+        ibc.inventory_item_id,
+        ibc.organization_id,
+        ibc.cho_id
+        FROM
+        cux_item_bom_cho ibc
+        WHERE
+        1=1
+        and EXISTS (SELECT
+        ibcsub.p_inventory_item_id,
+        ibcsub.organization_id,
+        ibcsub.cho_id
+        FROM
+        cux_item_bom_cho ibcsub
+        WHERE 1=1
+        and ibc.p_inventory_item_id = ibcsub.inventory_item_id
+        and ibc.organization_id = ibcsub.organization_id
+        and ibcsub.cho_id = #{choId})
+    </select>
+
+    <select id="getSubItemInfor" parameterType="CuxItemBomCho" resultMap="CuxItemBomChoResult">
+        SELECT
+            INVENTORY_ITEM_ID,
+            ITEM_DESCRIPTION,
+            ITEM_TYPE
+        FROM
+            sync_items_num_des_list
+        WHERE
+            ITEM_NUMBER = #{itemNumber}
+        AND ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <select id="checkSubItemNumberUnique" parameterType="CuxItemBomCho" resultType="int">
+        SELECT
+            count(1)
+        FROM
+            cux_item_bom_cho
+        where root_id = #{rootId}
+        and org_item_id = #{orgItemId}
+        and organization_id = #{organizationId}
+        and item_number = #{itemNumber}
+        and del_flag = 0
+    </select>
+
+    <select id="getHeaderList" parameterType="CuxItemBomCho" resultMap="CuxItemBomChoResult">
+        SELECT ITEM_NUMBER FROM sync_items_num_des_list WHERE ORGANIZATION_ID = #{organizationId} AND INVENTORY_ITEM_ID = #{orgItemId}
+    </select>
+
+    <insert id="inertErrorInfor" parameterType="CuxItemBomCho">
+        INSERT INTO cux_item_bom_cho_error (
+            ITEM_NUMBER,
+            ORGANIZATION_CODE,
+            ERROR_INFOR,
+            create_by,
+            create_date,
+            last_update_by,
+            last_update_date
+        ) VALUES
+        (
+        #{itemNumber},
+        #{organizationCode},
+        #{errorInfor},
+        #{createBy},
+        getdate(),
+        #{createBy},
+        getdate()
+        )
+    </insert>
+
+    <update id="updateErpFlag" parameterType="CuxItemBomCho">
+        update cux_item_bom_cho
+        set erp_flag = 1
+        where organization_id = #{organizationId}
+        and org_item_id = #{orgItemId}
+        and root_id = #{rootId}
+    </update>
+
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWoStatusHistoryMapper">
+
+    <resultMap type="SyncWieWoStatusHistoryEO" id="SyncWieWoStatusHistoryEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="statusChangeDate"    column="STATUS_CHANGE_DATE"    />
+        <result property="newStatusId"    column="NEW_STATUS_ID"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncWieWoStatusHistoryEO">
+        delete from sync_wie_wo_status_history where
+        <foreach collection="list" item="item" index="index" separator="or">
+            ( WORK_ORDER_ID=#{item.workOrderId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT} )
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncWieWoStatusHistoryEO">
+        insert into sync_wie_wo_status_history( WORK_ORDER_ID, ORGANIZATION_ID, STATUS_CHANGE_DATE, NEW_STATUS_ID) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workOrderId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.statusChangeDate,jdbcType=TIMESTAMP}, #{item.newStatusId,jdbcType=INTEGER})
+        </foreach>
+    </insert>
+
+</mapper>

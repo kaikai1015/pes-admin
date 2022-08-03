@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdLineDaysLineAllWWMapper">
+
+    <resultMap type="PesProdLineDaysLineAllWW" id="PesProdLineDaysLineAllWWResult">
+                <result property="xianBieFlag"    column="xian_bie_flag"    />
+                <result property="partyId"    column="party_id"    />
+                <result property="partyName"    column="party_name"    />
+                <result property="orderHeaderId"    column="order_header_id"    />
+                <result property="orderNumber"    column="order_number"    />
+                <result property="lineNumberId"    column="line_number_id"    />
+                <result property="lineNumber"    column="line_number"    />
+                <result property="inventoryItemId"    column="inventory_item_id"    />
+                <result property="itemNumber"    column="item_number"    />
+                <result property="itemDescription"    column="item_description"    />
+                <result property="organizationId"    column="organization_id"    />
+                <result property="workOrderId"    column="work_order_id"    />
+                <result property="workOrderNumber"    column="work_order_number"    />
+                <result property="planStartQuantity"    column="plan_start_quantity"    />
+                <result property="workHours"    column="work_hours"    />
+                <result property="wieWorkHours"    column="wie_work_hours"    />
+                <result property="completeDate"    column="complete_date"    />
+                <result property="planCompleteQuantity"    column="plan_complete_quantity"    />
+                <result property="isFlag"    column="is_flag"    />
+                <result property="createDate"    column="create_date"    />
+                <result property="createBy"    column="create_by"    />
+                <result property="lastUpdateDate"    column="last_update_date"    />
+                <result property="lastUpdateBy"    column="last_update_by"    />
+                <result property="remark"    column="remark"    />
+                <result property="id"    column="id"    />
+                <result property="lineId"    column="line_id"    />
+                <result property="plannedCompletionDate"    column="planned_completion_date"    />
+                <result property="completedQuantity"    column="completed_quantity"    />
+                <result property="workPlanQuantity"    column="work_plan_quantity"    />
+                <result property="xianBieFlagName"    column="xian_bie_flag_name"    />
+                <result property="lotNum"    column="lot_num"    />
+                <result property="lotNumDate"    column="lot_num_date"    />
+                <result property="customerPoNumber"    column="customer_po_number"    />
+                <result property="buId"    column="bu_id"    />
+                <result property="plannedStartDate"    column="planned_start_date"    />
+                <result property="baoZhuangQuantity"    column="bao_zhuang_quantity"    />
+                <result property="baoZhuangDate"    column="bao_zhuang_date"    />
+                <result property="laoHuaQuantity"    column="lao_hua_quantity"    />
+                <result property="laoHuaDate"    column="lao_hua_date"    />
+                <result property="testQuantity"    column="test_quantity"    />
+                <result property="testDate"    column="test_date"    />
+                <result property="zuZhuangStartQuantity"    column="zu_zhuang_start_quantity"    />
+                <result property="zuZhuangStartDate"    column="zu_zhuang_start_date"    />
+                <result property="zuZhuangCaiQuantity"    column="zu_zhuang_cai_quantity"    />
+                <result property="zuZhuangCaiDate"    column="zu_zhuang_cai_date"    />
+                <result property="zuZhuangEndQuantity"    column="zu_zhuang_end_quantity"    />
+                <result property="zuZhuangEndDate"    column="zu_zhuang_end_date"    />
+                <result property="qeductionQuantity"    column="qeduction_quantity"    />
+                <result property="qeductionDate"    column="qeduction_date"    />
+                <result property="planLotsId"    column="plan_lots_id"    />
+                <result property="isWwFlag"    column="is_ww_flag"    />
+            </resultMap>
+
+    <sql id="selectPesProdLineDaysLineAllVo">
+        SELECT
+            ppldl.xian_bie_flag,
+            (select sdd.dict_label from sys_dict_data sdd where sdd.dict_type = 'xian_bie_flag' and sdd.dict_value = ppldl.xian_bie_flag) as xian_bie_flag_name,
+            hp.party_name,
+            ppldl.order_number,
+            ppldl.line_number,
+            ppldl.item_number,
+            ppldl.item_description,
+            ppldl.work_order_number,
+            ppldl.organization_id,
+            ppldl.plan_start_quantity,
+            ppldl.work_plan_quantity,
+            isnull(ppldl.work_hours,0) as work_hours,
+            isnull(ppldl.wie_work_hours,0) as wie_work_hours,
+            ppldl.is_flag,
+            ppldl.remark,
+            ppldl.id,
+            ppldl.line_id,
+            ppldl.planned_completion_date,
+	        ppldl.completed_quantity,
+	        ppldhl.lot_num,
+	        ppldhl.lot_num_date,
+	        ppldl.bu_id,
+	        ppldl.customer_po_number,
+	        ppldl.planned_start_date,
+	        isnull(mwwpql.zu_zhuang_start_quantity,0) as zu_zhuang_start_quantity,
+	        mwwpql.zu_zhuang_start_date,
+	        isnull(mwwpql.zu_zhuang_cai_quantity,0) as zu_zhuang_cai_quantity,
+	        mwwpql.zu_zhuang_cai_date,
+	        isnull(mwwpql.zu_zhuang_end_quantity,0) as zu_zhuang_end_quantity,
+	        mwwpql.zu_zhuang_end_date,
+            isnull(mwwpql.lao_hua_quantity,0) as lao_hua_quantity,
+	        mwwpql.lao_hua_date,
+	        isnull(mwwpql.test_quantity,0) as test_quantity,
+	        mwwpql.test_date,
+	        isnull(mwwpql.bao_zhuang_quantity,0) as bao_zhuang_quantity,
+	        mwwpql.bao_zhuang_date,
+	        isnull(mwwpql.complete_quantity,0) as plan_complete_quantity,
+            mwwpql.complete_date,
+--             isnull( mwwpql.qeduction_quantity, 0 ) AS qeduction_quantity,
+-- 	        mwwpql.qeduction_date,
+-- 	        mwwpql.plan_lots_id,
+	        ppldl.create_date
+
+        FROM
+            pes_prod_line_days_header_all_ww ppldhl,
+            pes_prod_line_days_line_all_ww ppldl
+            left join sync_hz_parties hp
+            on (ppldl.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION')
+--             left join mes_wie_work_processing_quantity_list mwwpql
+            left join mes_wie_work_processing_quantity_list mwwpql
+            on (ppldl.work_order_id = mwwpql.work_order_id
+            AND ppldl.organization_id = mwwpql.organization_id),
+            sys_dept d
+    </sql>
+
+    <select id="selectPesProdLineDaysLineAllList" parameterType="PesProdLineDaysLineAllWW" resultMap="PesProdLineDaysLineAllWWResult">
+        <include refid="selectPesProdLineDaysLineAllVo"/>
+        <where>
+            AND ppldl.id = ppldhl.id
+            and ppldhl.prod_line_flag = d.dept_id
+--             <if test="isProcess != null and isProcess  "> and mwwpql.work_order_id is not null  and mwwpql.is_ww_flag = 'Y'</if>
+            <if test="xianBieFlag != null and xianBieFlag != ''"> and ppldl.xian_bie_flag = #{xianBieFlag}</if>
+            <if test="id != null "> and ppldl.id = #{id}</if>
+            <if test="lotNum != null "> and ppldhl.lot_num = #{lotNum}</if>
+            <if test="orderNumber != null  and orderNumber != ''"> and ppldl.order_number like (#{orderNumber} + '%')</if>
+            <if test="customerPoNumber != null  and customerPoNumber != ''"> and ppldl.customer_po_number like (#{customerPoNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and ppldl.item_number like (#{itemNumber} + '%')</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and ppldl.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and hp.party_name like ('%' + #{partyName} + '%')</if>
+            <if test="beginTime != null and beginTime != ''"> and ppldhl.lot_num_date &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and ppldhl.lot_num_date &lt;= #{endTime}</if>
+            <if test="prodLineFlag != null "> and ppldhl.prod_line_flag = #{prodLineFlag}</if>
+            ${params.dataScope}
+        </where>
+        order by ppldl.xian_bie_flag
+    </select>
+
+
+    <select id="getOrderInfor" parameterType="PesProdLineDaysLineAllWW" resultMap="PesProdLineDaysLineAllWWResult">
+        SELECT
+        dha.ORDER_NUMBER AS order_number,
+        dha.HEADER_ID as order_header_id,
+        dha.SOLD_TO_PARTY_ID as party_id,
+        dha.ORG_ID as bu_id,
+        dha.CUSTOMER_PO_NUMBER
+        FROM
+        sync_doo_headers_all dha
+        WHERE
+        dha.SUBMITTED_FLAG = 'Y'
+        <if test="orderNumber != null  and orderNumber != ''"> and dha.ORDER_NUMBER = #{orderNumber}</if>
+    </select>
+
+    <select id="getWorksInfor" parameterType="PesProdLineDaysLineAllWW" resultMap="PesProdLineDaysLineAllWWResult">
+        SELECT
+        wwob.WORK_ORDER_ID,
+        wwob.PLANNED_START_QUANTITY AS plan_start_quantity,
+        wwob.PLANNED_START_DATE,
+        wwob.planned_completion_date,
+        wwob.completed_quantity,
+        wwob.INVENTORY_ITEM_ID,
+        wwob.ORGANIZATION_ID,
+        item.ITEM_NUMBER,
+        item.ITEM_DESCRIPTION
+        FROM
+        pes_wie_work_orders_b_erp wwob,
+        sync_items_num_des_list item
+        WHERE
+        item.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+        AND item.INVENTORY_ITEM_ID = wwob.INVENTORY_ITEM_ID
+        and wwob.WORK_ORDER_STATUS_ID = 10004
+        <if test="organizationId != null  and organizationId != ''"> and wwob.ORGANIZATION_ID = #{organizationId}</if>
+        <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.WORK_ORDER_NUMBER = #{workOrderNumber}</if>
+    </select>
+
+    <select id="selectPesProdLineDaysLineAllById" parameterType="Long" resultMap="PesProdLineDaysLineAllWWResult">
+        <include refid="selectPesProdLineDaysLineAllVo"/>
+        where ppldl.line_id = #{lineId}
+        AND ppldl.id = ppldhl.id
+        and ppldhl.prod_line_flag = d.dept_id
+    </select>
+
+    <insert id="insertPesProdLineDaysLineAll" parameterType="PesProdLineDaysLineAllWW">
+        insert into pes_prod_line_days_line_all_ww
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="xianBieFlag != null">xian_bie_flag,</if>
+            <if test="partyId != null">party_id,</if>
+            <if test="orderHeaderId != null">order_header_id,</if>
+            <if test="orderNumber != null and orderNumber != ''">order_number,</if>
+            <if test="lineNumberId != null">line_number_id,</if>
+            <if test="lineNumber != null">line_number,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="workOrderNumber != null and workOrderNumber != ''">work_order_number,</if>
+            <if test="planStartQuantity != null">plan_start_quantity,</if>
+            <if test="workPlanQuantity != null">work_plan_quantity,</if>
+            <if test="workHours != null">work_hours,</if>
+            <if test="wieWorkHours != null">wie_work_hours,</if>
+            <if test="completeDate != null">complete_date,</if>
+            <if test="planCompleteQuantity != null">plan_complete_quantity,</if>
+            <if test="isFlag != null and isFlag != ''">is_flag,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+            <if test="remark != null">remark,</if>
+            <if test="id != null">id,</if>
+            <if test="plannedCompletionDate != null">planned_completion_date,</if>
+            <if test="completedQuantity != null">completed_quantity,</if>
+            <if test="baoZhuangQuantity != null">bao_zhuang_quantity,</if>
+            <if test="baoZhuangDate != null">bao_zhuang_date,</if>
+            <if test="buId != null">bu_id,</if>
+            <if test="customerPoNumber != null">customer_po_number,</if>
+            <if test="plannedStartDate != null">planned_start_date,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="xianBieFlag != null">#{xianBieFlag},</if>
+            <if test="partyId != null">#{partyId},</if>
+            <if test="orderHeaderId != null">#{orderHeaderId},</if>
+            <if test="orderNumber != null and orderNumber != ''">#{orderNumber},</if>
+            <if test="lineNumberId != null">#{lineNumberId},</if>
+            <if test="lineNumber != null">#{lineNumber},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="workOrderNumber != null and workOrderNumber != ''">#{workOrderNumber},</if>
+            <if test="planStartQuantity != null">#{planStartQuantity},</if>
+            <if test="workPlanQuantity != null">#{workPlanQuantity},</if>
+            <if test="workHours != null">#{workHours},</if>
+            <if test="wieWorkHours != null">#{wieWorkHours},</if>
+            <if test="completeDate != null">#{completeDate},</if>
+            <if test="planCompleteQuantity != null">#{planCompleteQuantity},</if>
+            <if test="isFlag != null and isFlag != ''">#{isFlag},</if>
+           getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="id != null">#{id},</if>
+            <if test="plannedCompletionDate != null">#{plannedCompletionDate},</if>
+            <if test="completedQuantity != null">#{completedQuantity},</if>
+            <if test="baoZhuangQuantity != null">#{baoZhuangQuantity},</if>
+            <if test="baoZhuangDate != null">#{baoZhuangDate},</if>
+            <if test="buId != null">#{buId},</if>
+            <if test="customerPoNumber != null">#{customerPoNumber},</if>
+            <if test="plannedStartDate != null">#{plannedStartDate},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesProdLineDaysLineAll" parameterType="PesProdLineDaysLineAllWW">
+        update pes_prod_line_days_line_all_ww
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="xianBieFlag != null">xian_bie_flag = #{xianBieFlag},</if>
+            <if test="partyId != null">party_id = #{partyId},</if>
+            <if test="orderHeaderId != null">order_header_id = #{orderHeaderId},</if>
+            <if test="orderNumber != null and orderNumber != ''">order_number = #{orderNumber},</if>
+            <if test="lineNumberId != null">line_number_id = #{lineNumberId},</if>
+            <if test="lineNumber != null">line_number = #{lineNumber},</if>
+            <if test="inventoryItemId != null">inventory_item_id = #{inventoryItemId},</if>
+            <if test="itemNumber != null">item_number = #{itemNumber},</if>
+            <if test="itemDescription != null">item_description = #{itemDescription},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="workOrderId != null">work_order_id = #{workOrderId},</if>
+            <if test="workOrderNumber != null and workOrderNumber != ''">work_order_number = #{workOrderNumber},</if>
+            <if test="planStartQuantity != null">plan_start_quantity = #{planStartQuantity},</if>
+            <if test="workPlanQuantity != null">work_plan_quantity = #{workPlanQuantity},</if>
+            <if test="workHours != null">work_hours = #{workHours},</if>
+            <if test="wieWorkHours != null">wie_work_hours = #{wieWorkHours},</if>
+            <if test="completeDate != null">complete_date = #{completeDate},</if>
+            <if test="planCompleteQuantity != null">plan_complete_quantity = #{planCompleteQuantity},</if>
+            <if test="isFlag != null and isFlag != ''">is_flag = #{isFlag},</if>
+            last_update_date = getdate(),
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="plannedCompletionDate != null">planned_completion_date = #{plannedCompletionDate},</if>
+            <if test="completedQuantity != null">completed_quantity = #{completedQuantity},</if>
+            <if test="baoZhuangQuantity != null">bao_zhuang_quantity = #{baoZhuangQuantity},</if>
+            <if test="baoZhuangDate != null">bao_zhuang_date = #{baoZhuangDate},</if>
+        </trim>
+        where line_id = #{lineId}
+    </update>
+
+    <delete id="deletePesProdLineDaysLineAllByIds" parameterType="Long">
+        delete from pes_prod_line_days_line_all_ww where line_id = #{lineId}
+    </delete>
+
+    <select id="selectXianbieflagId" parameterType="Long" resultMap="PesProdLineDaysLineAllWWResult">
+        select remark as xian_bie_flag from sys_dict_data where dict_type = 'weiwei_supplier' and dict_value = (select prod_line_flag from pes_prod_line_days_header_all_ww where id = #{id})
+    </select>
+
+    <delete id="updatedaysProdLinesww" parameterType="Long">
+        UPDATE pes_prod_line_days_header_all_ww set days_prod_flag = '1',last_update_date = getdate()  where id = #{id}
+    </delete>
+
+    <select id="getOrgCode" parameterType="String" resultMap="PesProdLineDaysLineAllWWResult">
+        select ORGANIZATION_ID from sync_inv_org_parameters where ORGANIZATION_CODE = #{organizationCode}
+    </select>
+
+</mapper>

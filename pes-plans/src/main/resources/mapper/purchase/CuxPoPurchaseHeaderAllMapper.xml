@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.purchase.mapper.CuxPoPurchaseHeaderAllMapper">
+
+    <resultMap type="CuxPoPurchaseHeaderAll" id="CuxPoPurchaseHeaderAllResult">
+                    <result property="requisitioningBuId"    column="requisitioning_bu_id"    />
+                    <result property="poBuId"    column="po_bu_id"    />
+                    <result property="legalEntityId"    column="legal_entity_id"    />
+                    <result property="buyerName"    column="buyer_name"    />
+                    <result property="supplierId"    column="supplier_id"    />
+                    <result property="poNumber"    column="po_number"    />
+                    <result property="poDescription"    column="po_description"    />
+                    <result property="poStatus"    column="po_status"    />
+                    <result property="toLocationCode"    column="to_location_code"    />
+                    <result property="currencyCode"    column="currency_code"    />
+                    <result property="currencyType"    column="currency_type"    />
+                    <result property="currencyDate"    column="currency_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="poHeaderId"    column="po_header_id"    />
+        <result property="supplierNumber"    column="supplier_number"    />
+        <result property="supplierName"    column="supplier_name"    />
+            </resultMap>
+
+    <sql id="selectCuxPoPurchaseHeaderAllVo">
+        SELECT
+            pha.requisitioning_bu_id,
+            pha.po_bu_id,
+            pha.legal_entity_id,
+            pha.buyer_name,
+            pha.supplier_id,
+            shl.supplier_number,
+            shl.supplier_name,
+            pha.po_number,
+            pha.po_description,
+            pha.po_status,
+            pha.to_location_code,
+            pha.currency_code,
+            pha.currency_type,
+            pha.currency_date,
+            pha.create_by,
+            pha.create_date,
+            pha.last_update_by,
+            pha.last_update_date,
+            pha.po_header_id
+        FROM
+            cux_po_purchase_header_all pha
+        LEFT JOIN pes_supplier_header_list shl
+         ON (pha.supplier_id = shl.supplier_id)
+    </sql>
+
+    <select id="selectCuxPoPurchaseHeaderAllList" parameterType="CuxPoPurchaseHeaderAll" resultMap="CuxPoPurchaseHeaderAllResult">
+        <include refid="selectCuxPoPurchaseHeaderAllVo"/>
+        <where>
+            <if test="supplierName != null "> and shl.supplier_name like ('%' + #{supplierName} + '%')</if>
+            <if test="poNumber != null  and poNumber != ''"> and pha.po_number = #{poNumber}</if>
+        </where>
+    </select>
+
+    <select id="selectCuxPoPurchaseHeaderAllById" parameterType="Long" resultMap="CuxPoPurchaseHeaderAllResult">
+        <include refid="selectCuxPoPurchaseHeaderAllVo"/>
+        where pha.po_header_id = #{poHeaderId}
+    </select>
+
+    <insert id="insertCuxPoPurchaseHeaderAll" parameterType="CuxPoPurchaseHeaderAll">
+        insert into cux_po_purchase_header_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="requisitioningBuId != null">requisitioning_bu_id,</if>
+            <if test="poBuId != null">po_bu_id,</if>
+            <if test="legalEntityId != null">legal_entity_id,</if>
+            <if test="buyerName != null">buyer_name,</if>
+            <if test="supplierId != null">supplier_id,</if>
+            <if test="poNumber != null">po_number,</if>
+            <if test="poDescription != null">po_description,</if>
+            <if test="poStatus != null">po_status,</if>
+            <if test="toLocationCode != null">to_location_code,</if>
+            <if test="currencyCode != null">currency_code,</if>
+            <if test="currencyType != null">currency_type,</if>
+            <if test="currencyDate != null">currency_date,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="requisitioningBuId != null">#{requisitioningBuId},</if>
+            <if test="poBuId != null">#{poBuId},</if>
+            <if test="legalEntityId != null">#{legalEntityId},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+            <if test="supplierId != null">#{supplierId},</if>
+            <if test="poNumber != null">#{poNumber},</if>
+            <if test="poDescription != null">#{poDescription},</if>
+            <if test="poStatus != null">#{poStatus},</if>
+            <if test="toLocationCode != null">#{toLocationCode},</if>
+            <if test="currencyCode != null">#{currencyCode},</if>
+            <if test="currencyType != null">#{currencyType},</if>
+            <if test="currencyDate != null">#{currencyDate},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updateCuxPoPurchaseHeaderAll" parameterType="CuxPoPurchaseHeaderAll">
+        update cux_po_purchase_header_all
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="requisitioningBuId != null">requisitioning_bu_id = #{requisitioningBuId},</if>
+            <if test="poBuId != null">po_bu_id = #{poBuId},</if>
+            <if test="legalEntityId != null">legal_entity_id = #{legalEntityId},</if>
+            <if test="buyerName != null">buyer_name = #{buyerName},</if>
+            <if test="supplierId != null">supplier_id = #{supplierId},</if>
+            <if test="poNumber != null">po_number = #{poNumber},</if>
+            <if test="poDescription != null">po_description = #{poDescription},</if>
+            <if test="poStatus != null">po_status = #{poStatus},</if>
+            <if test="toLocationCode != null">to_location_code = #{toLocationCode},</if>
+            <if test="currencyCode != null">currency_code = #{currencyCode},</if>
+            <if test="currencyType != null">currency_type = #{currencyType},</if>
+            <if test="currencyDate != null">currency_date = #{currencyDate},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+        </trim>
+        where po_header_id = #{poHeaderId}
+    </update>
+
+    <select id="getLastPoNum" resultMap="CuxPoPurchaseHeaderAllResult">
+        SELECT
+        LEFT(po_number,2) + CAST((RIGHT(po_number,9) + 1) as VARCHAR) AS po_number
+        FROM
+        cux_po_purchase_header_all
+        order by po_header_id desc
+        OFFSET 0 ROWS FETCH next 1 rows only
+    </select>
+
+</mapper>

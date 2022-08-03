@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWoDemandVWMapper">
+
+    <resultMap type="SyncWieWoDemandVWEO" id="SyncWieWoDemandVWEOResult">
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+        <result property="materialSeqNumber"    column="MATERIAL_SEQ_NUMBER"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="requiredQuantity"    column="REQUIRED_QUANTITY"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+    </resultMap>
+
+    <delete id="deleteSyncWieWoDemandVWTempEO">
+        TRUNCATE TABLE sync_wie_wo_demand_v_w_temp
+    </delete>
+
+    <insert id="batchSyncWieWoDemandVWTempEO">
+        insert into sync_wie_wo_demand_v_w_temp( ORGANIZATION_ID, WORK_ORDER_ID, WO_OPERATION_MATERIAL_ID, MATERIAL_SEQ_NUMBER, INVENTORY_ITEM_ID, REQUIRED_QUANTITY, ISSUED_QUANTITY,QUANTITY_PER_PRODUCT) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationId,jdbcType=BIGINT}, #{item.workOrderId,jdbcType=BIGINT}, #{item.woOperationMaterialId,jdbcType=BIGINT}, #{item.materialSeqNumber,jdbcType=INTEGER}, #{item.inventoryItemId,jdbcType=BIGINT},cast(#{item.requiredQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.issuedQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityPerProduct,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="deleteSyncWieWoDemandVWEO">
+        TRUNCATE TABLE sync_wie_wo_demand_v_w;
+        INSERT INTO sync_wie_wo_demand_v_w (
+        ORGANIZATION_ID,
+        WORK_ORDER_ID,
+        WO_OPERATION_MATERIAL_ID,
+        MATERIAL_SEQ_NUMBER,
+        INVENTORY_ITEM_ID,
+        REQUIRED_QUANTITY,
+        ISSUED_QUANTITY,
+        QUANTITY_PER_PRODUCT
+        ) SELECT
+        ORGANIZATION_ID,
+        WORK_ORDER_ID,
+        WO_OPERATION_MATERIAL_ID,
+        MATERIAL_SEQ_NUMBER,
+        INVENTORY_ITEM_ID,
+        REQUIRED_QUANTITY,
+        ISSUED_QUANTITY,
+        QUANTITY_PER_PRODUCT
+        FROM
+        sync_wie_wo_demand_v_w_temp
+    </delete>
+
+</mapper>

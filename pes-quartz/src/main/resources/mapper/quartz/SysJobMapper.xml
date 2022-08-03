@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SysJobMapper">
+
+	<resultMap type="SysJob" id="SysJobResult">
+		<id     property="jobId"          column="job_id"          />
+		<result property="jobName"        column="job_name"        />
+		<result property="jobGroup"       column="job_group"       />
+		<result property="invokeTarget"   column="invoke_target"   />
+		<result property="cronExpression" column="cron_expression" />
+		<result property="misfirePolicy"  column="misfire_policy"  />
+		<result property="concurrent"     column="concurrent"      />
+		<result property="status"         column="status"          />
+		<result property="createBy"       column="create_by"       />
+		<result property="createTime"     column="create_time"     />
+		<result property="updateBy"       column="update_by"       />
+		<result property="updateTime"     column="update_time"     />
+		<result property="remark"         column="remark"          />
+		<result property="jobDesc"         column="job_desc"          />
+		<result property="jobStatus"         column="job_status"          />
+		<result property="email"         column="email"          />
+		<result property="jobStartTime"         column="job_start_time"          />
+		<result property="reStartId"         column="re_start_id"          />
+	</resultMap>
+
+	<sql id="selectJobVo">
+		SELECT
+			sj.re_start_id as job_id,
+			sj.job_name,
+			sj.job_group,
+			sj.invoke_target,
+			sj.cron_expression,
+			sj.misfire_policy,
+			sj.concurrent,
+			sj.status,
+			sj.create_by,
+			sj.create_time,
+			sj.remark,
+			sj.job_desc,
+			sj.email,
+			sj.re_start_id,
+		(select sjl.start_time from sys_job_log sjl where sjl.job_name = sj.job_name order by sjl.job_log_id desc offset 0 ROWS FETCH NEXT 1 ROWS ONLY) as job_start_time,
+		(select sjl.status from sys_job_log sjl where sjl.job_name = sj.job_name order by sjl.job_log_id desc offset 0 ROWS FETCH NEXT 1 ROWS ONLY) as job_status
+		FROM
+			sys_job sj
+	</sql>
+
+	<select id="selectJobList" parameterType="SysJob" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+		<where>
+			<if test="jobName != null and jobName != ''">
+				AND sj.job_name like ('%' + #{jobName} + '%')
+			</if>
+			<if test="jobGroup != null and jobGroup != ''">
+				AND sj.job_group = #{jobGroup}
+			</if>
+			<if test="status != null and status != ''">
+				AND sj.status = #{status}
+			</if>
+			<if test="invokeTarget != null and invokeTarget != ''">
+				AND sj.invoke_target like ('%' + #{invokeTarget} + '%')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectJobAll" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+	</select>
+
+	<select id="selectJobById" parameterType="Long" resultMap="SysJobResult">
+		<include refid="selectJobVo"/>
+		where sj.re_start_id = #{jobId}
+	</select>
+
+	<delete id="deleteJobById" parameterType="Long">
+		delete from sys_job where re_start_id = #{jobId}
+	</delete>
+
+	<delete id="deleteJobByIds" parameterType="Long">
+		delete from sys_job where re_start_id in
+		<foreach collection="array" item="jobId" open="(" separator="," close=")">
+			#{jobId}
+		</foreach>
+	</delete>
+
+	<update id="updateJob" parameterType="SysJob">
+		update sys_job
+		<set>
+			<if test="jobName != null and jobName != ''">job_name = #{jobName},</if>
+			<if test="jobGroup != null and jobGroup != ''">job_group = #{jobGroup},</if>
+			<if test="invokeTarget != null and invokeTarget != ''">invoke_target = #{invokeTarget},</if>
+			<if test="cronExpression != null and cronExpression != ''">cron_expression = #{cronExpression},</if>
+			<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy = #{misfirePolicy},</if>
+			<if test="concurrent != null and concurrent != ''">concurrent = #{concurrent},</if>
+			<if test="status !=null">status = #{status},</if>
+			<if test="remark != null and remark != ''">remark = #{remark},</if>
+			<if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+			<if test="jobDesc != null and jobDesc != ''">job_desc = #{jobDesc},</if>
+			<if test="email != null and email != ''">email = #{email},</if>
+			update_time = GETDATE()
+		</set>
+		where re_start_id = #{jobId}
+	</update>
+
+	<insert id="insertJob" parameterType="SysJob" useGeneratedKeys="true" keyProperty="jobId">
+		insert into sys_job(
+		<if test="reStartId != null and reStartId != 0">re_start_id,</if>
+		<if test="jobId != null and jobId != 0">job_id,</if>
+		<if test="jobName != null and jobName != ''">job_name,</if>
+		<if test="jobGroup != null and jobGroup != ''">job_group,</if>
+		<if test="invokeTarget != null and invokeTarget != ''">invoke_target,</if>
+		<if test="cronExpression != null and cronExpression != ''">cron_expression,</if>
+		<if test="misfirePolicy != null and misfirePolicy != ''">misfire_policy,</if>
+		<if test="concurrent != null and concurrent != ''">concurrent,</if>
+		<if test="status != null and status != ''">status,</if>
+		<if test="remark != null and remark != ''">remark,</if>
+		<if test="createBy != null and createBy != ''">create_by,</if>
+		<if test="jobDesc != null and jobDesc != ''">job_desc,</if>
+		<if test="email != null and email != ''">email,</if>
+		create_time
+		)values(
+		<if test="reStartId != null and reStartId != 0">#{reStartId},</if>
+		<if test="jobId != null and jobId != 0">#{jobId},</if>
+		<if test="jobName != null and jobName != ''">#{jobName},</if>
+		<if test="jobGroup != null and jobGroup != ''">#{jobGroup},</if>
+		<if test="invokeTarget != null and invokeTarget != ''">#{invokeTarget},</if>
+		<if test="cronExpression != null and cronExpression != ''">#{cronExpression},</if>
+		<if test="misfirePolicy != null and misfirePolicy != ''">#{misfirePolicy},</if>
+		<if test="concurrent != null and concurrent != ''">#{concurrent},</if>
+		<if test="status != null and status != ''">#{status},</if>
+		<if test="remark != null and remark != ''">#{remark},</if>
+		<if test="createBy != null and createBy != ''">#{createBy},</if>
+		<if test="jobDesc != null and jobDesc != ''">#{jobDesc},</if>
+		<if test="email != null and email != ''">#{email},</if>
+		GETDATE()
+		)
+	</insert>
+
+	<delete id="updateJobAll" parameterType="Long">
+		UPDATE sys_job set re_start_id = #{reStartId} + job_id
+	</delete>
+
+</mapper>

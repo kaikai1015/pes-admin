@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncWieWoOperationsBIDMapper">
+
+    <resultMap type="SyncWieWoOperationsBIDEO" id="SyncWieWoOperationsBIDEOResult">
+        <result property="woOperationId"    column="WO_OPERATION_ID"    />
+    </resultMap>
+
+    <delete id="deleteSyncWieWoOperationsBIdTempEO">
+        truncate table sync_wie_wo_operations_b_id_temp
+    </delete>
+
+    <insert id="batchSyncWieWoOperationsBIdTempEO">
+        insert into sync_wie_wo_operations_b_id_temp(WO_OPERATION_ID) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.woOperationId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+
+    <delete id="batchSyncWieWoOperationsBIdEO">
+        TRUNCATE TABLE sync_wie_wo_operations_b_id;
+        INSERT INTO sync_wie_wo_operations_b_id (
+        WO_OPERATION_ID
+        ) SELECT
+        WO_OPERATION_ID
+        FROM
+        sync_wie_wo_operations_b_id_temp
+    </delete>
+
+</mapper>

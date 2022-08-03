@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesWieWorkProcessingLineMapper">
+
+    <resultMap type="PesWieWorkProcessingLine" id="PesWieWorkProcessingLineResult">
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="type"    column="type"    />
+        <result property="mesId"    column="mes_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="id"    column="id"    />
+    </resultMap>
+
+    <sql id="selectPesWieWorkProcessingLineVo">
+        select work_order_id, organization_id, work_order_number, create_by, create_date, type, mes_id, quantity, id from pes_wie_work_processing_line
+    </sql>
+
+    <select id="selectPesWieWorkProcessingLineList" parameterType="PesWieWorkProcessingLine" resultMap="PesWieWorkProcessingLineResult">
+        <include refid="selectPesWieWorkProcessingLineVo"/>
+        <where>
+            <if test="workOrderId != null "> and work_order_id = #{workOrderId}</if>
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and work_order_number = #{workOrderNumber}</if>
+            <if test="createDate != null "> and create_date = #{createDate}</if>
+            <if test="type != null  and type != ''"> and type = #{type}</if>
+            <if test="mesId != null  and mesId != ''"> and mes_id = #{mesId}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+        </where>
+    </select>
+
+    <select id="selectPesWieWorkProcessingLineById" parameterType="Long" resultMap="PesWieWorkProcessingLineResult">
+        <include refid="selectPesWieWorkProcessingLineVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertPesWieWorkProcessingLine" parameterType="PesWieWorkProcessingLine">
+        insert into pes_wie_work_processing_line
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="workOrderNumber != null">work_order_number,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="type != null">type,</if>
+            <if test="mesId != null">mes_id,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="id != null">id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="workOrderNumber != null">#{workOrderNumber},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="type != null">#{type},</if>
+            <if test="mesId != null">#{mesId},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="id != null">#{id},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesWieWorkProcessingLine" parameterType="PesWieWorkProcessingLine">
+        update pes_wie_work_processing_line
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="workOrderId != null">work_order_id = #{workOrderId},</if>
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="workOrderNumber != null">work_order_number = #{workOrderNumber},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="mesId != null">mes_id = #{mesId},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deletePesWieWorkProcessingLineById" parameterType="Long">
+        delete from pes_wie_work_processing_line where id = #{id}
+    </delete>
+
+    <delete id="deletePesWieWorkProcessingLineByIds" parameterType="String">
+        delete from pes_wie_work_processing_line where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <insert id="batchPesWieWorkProcessingLine">
+        insert into pes_wie_work_processing_line( work_order_id, organization_id, work_order_number, create_by, create_date, type, mes_id, quantity, id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.workOrderId,jdbcType=工单id}, #{item.organizationId,jdbcType=组织id}, #{item.workOrderNumber,jdbcType=工单号}, #{item.createBy,jdbcType=扫描者}, #{item.createDate,jdbcType=扫描时间}, #{item.type,jdbcType=类型：COMPLETE-完工入库；AGEING-老化；TES}, #{item.mesId,jdbcType=mesid}, #{item.quantity,jdbcType=数量}, #{item.id,jdbcType=$column.columnComment})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPoLineLocationsAllMapper">
+
+    <resultMap type="SyncPoLineLocationsAllEO" id="SyncPoLineLocationsAllEOResult">
+        <result property="lineLocationId"    column="LINE_LOCATION_ID"    />
+        <result property="prcBuId"    column="PRC_BU_ID"    />
+        <result property="inputTaxClassificationCode"    column="INPUT_TAX_CLASSIFICATION_CODE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+        <result property="poHeaderId"    column="PO_HEADER_ID"    />
+        <result property="poLineId"    column="PO_LINE_ID"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="quantityReceived"    column="QUANTITY_RECEIVED"    />
+        <result property="quantityAccepted"    column="QUANTITY_ACCEPTED"    />
+        <result property="quantityRejected"    column="QUANTITY_REJECTED"    />
+        <result property="quantityBilled"    column="QUANTITY_BILLED"    />
+        <result property="quantityCancelled"    column="QUANTITY_CANCELLED"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="shipToLocationId"    column="SHIP_TO_LOCATION_ID"    />
+        <result property="needByDate"    column="NEED_BY_DATE"    />
+        <result property="cancelFlag"    column="CANCEL_FLAG"    />
+        <result property="cancelledBy"    column="CANCELLED_BY"    />
+        <result property="cancelDate"    column="CANCEL_DATE"    />
+        <result property="cancelReason"    column="CANCEL_REASON"    />
+        <result property="inspectionRequiredFlag"    column="INSPECTION_REQUIRED_FLAG"    />
+        <result property="shipToOrganizationId"    column="SHIP_TO_ORGANIZATION_ID"    />
+        <result property="quantityShipped"    column="QUANTITY_SHIPPED"    />
+        <result property="priceOverride"    column="price_override"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="scheduleStatus"    column="SCHEDULE_STATUS"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncPoLinesLocationAllEO">
+        delete from sync_po_line_locations_all where LINE_LOCATION_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.lineLocationId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPoLinesLocationAllEO">
+        insert into sync_po_line_locations_all( LINE_LOCATION_ID, PRC_BU_ID, INPUT_TAX_CLASSIFICATION_CODE, LAST_UPDATE_DATE, LAST_UPDATED_BY, PO_HEADER_ID, PO_LINE_ID, CREATION_DATE, CREATED_BY, QUANTITY, QUANTITY_RECEIVED, QUANTITY_ACCEPTED, QUANTITY_REJECTED, QUANTITY_BILLED, QUANTITY_CANCELLED, UOM_CODE, SHIP_TO_LOCATION_ID, NEED_BY_DATE, CANCEL_FLAG, CANCELLED_BY, CANCEL_DATE, CANCEL_REASON, INSPECTION_REQUIRED_FLAG, SHIP_TO_ORGANIZATION_ID, QUANTITY_SHIPPED, price_override, WORK_ORDER_ID, WORK_ORDER_NUMBER,SCHEDULE_STATUS) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.lineLocationId,jdbcType=BIGINT}, #{item.prcBuId,jdbcType=BIGINT}, #{item.inputTaxClassificationCode,jdbcType=VARCHAR}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.poHeaderId,jdbcType=BIGINT}, #{item.poLineId,jdbcType=BIGINT}, #{item.creationDate,jdbcType=TIMESTAMP}, #{item.createdBy,jdbcType=VARCHAR}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityReceived,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityAccepted,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityRejected,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityBilled,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.quantityCancelled,jdbcType=DECIMAL} as decimal(15,5)), #{item.uomCode,jdbcType=VARCHAR}, #{item.shipToLocationId,jdbcType=BIGINT}, #{item.needByDate,jdbcType=TIMESTAMP}, #{item.cancelFlag,jdbcType=VARCHAR}, #{item.cancelledBy,jdbcType=VARCHAR}, #{item.cancelDate,jdbcType=TIMESTAMP}, #{item.cancelReason,jdbcType=VARCHAR}, #{item.inspectionRequiredFlag,jdbcType=VARCHAR}, #{item.shipToOrganizationId,jdbcType=BIGINT}, cast(#{item.quantityShipped,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.priceOverride,jdbcType=DECIMAL} as decimal(15,5)), #{item.workOrderId,jdbcType=BIGINT}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.scheduleStatus,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

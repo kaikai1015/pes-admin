@@ -1,0 +1,10 @@
+package sinexcel.items.service;
+
+import sinexcel.items.domain.CuxInvSupplyDemandMaterialSumQuantityAllEO;
+
+import java.util.List;
+
+public interface ICuxInvSupplyDemandMaterialSumQuantityAllService {
+
+    public List<CuxInvSupplyDemandMaterialSumQuantityAllEO> selectCuxInvSupplyDemandMaterialSumQuantityAllList(CuxInvSupplyDemandMaterialSumQuantityAllEO cuxInvSupplyDemandMaterialSumQuantityAllEO);
+}

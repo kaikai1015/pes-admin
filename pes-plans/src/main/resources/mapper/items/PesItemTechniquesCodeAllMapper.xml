@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesItemTechniquesCodeAllMapper">
+
+    <resultMap type="PesItemTechniquesCodeAll" id="PesItemTechniquesCodeAllResult">
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+                    <result property="fixedSuoHaoQuantiy"    column="fixed_suo_hao_quantiy"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="techniquesCodeId"    column="techniques_code_id"    />
+            </resultMap>
+
+    <sql id="selectPesItemTechniquesCodeAllVo">
+        SELECT
+            inventory_item_id,
+            organization_id,
+            item_number,
+            item_description,
+            item_type,
+            item_work_name_flag,
+            isnull(fixed_suo_hao_quantiy,0) as fixed_suo_hao_quantiy,
+            create_by,
+            create_date,
+            last_update_by,
+            last_update_date,
+            techniques_code_id
+        FROM
+            pes_item_techniques_code_all
+    </sql>
+
+    <select id="selectPesItemTechniquesCodeAllList" parameterType="PesItemTechniquesCodeAll" resultMap="PesItemTechniquesCodeAllResult">
+        <include refid="selectPesItemTechniquesCodeAllVo"/>
+        <where>
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and item_number like (#{itemNumber} + '%')</if>
+            <if test="itemWorkNameFlag != null  and itemWorkNameFlag != ''"> and item_work_name_flag = #{itemWorkNameFlag}</if>
+        </where>
+    </select>
+
+    <select id="selectPesItemTechniquesCodeAllById" parameterType="Long" resultMap="PesItemTechniquesCodeAllResult">
+        <include refid="selectPesItemTechniquesCodeAllVo"/>
+        where techniques_code_id = #{techniquesCodeId}
+    </select>
+
+    <select id="checkAddAllowed" parameterType="PesItemTechniquesCodeAll" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        pes_item_techniques_code_all
+        where organization_id = #{organizationId}
+        and item_number = #{itemNumber}
+    </select>
+
+    <select id="selectOrgCodeNameId" parameterType="String" resultMap="PesItemTechniquesCodeAllResult">
+        select org.ORGANIZATION_ID from sync_inv_org_parameters org where org.ORGANIZATION_CODE = #{organizationCode}
+    </select>
+
+    <select id="selectItemDescriptionInfor" parameterType="PesItemTechniquesCodeAll" resultMap="PesItemTechniquesCodeAllResult">
+        SELECT
+        list.INVENTORY_ITEM_ID,
+        list.ITEM_DESCRIPTION,
+        ITEM_TYPE
+        FROM
+        sync_items_num_des_list list
+        where list.ORGANIZATION_ID = #{organizationId}
+        and list.item_number = #{itemNumber}
+        and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+    </select>
+
+    <insert id="insertPesItemTechniquesCodeAll" parameterType="PesItemTechniquesCodeAll">
+        insert into pes_item_techniques_code_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="organizationId != null">organization_id,</if>
+            <if test="itemNumber != null">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="itemType != null">item_type,</if>
+            <if test="itemWorkNameFlag != null">item_work_name_flag,</if>
+            <if test="fixedSuoHaoQuantiy != null">fixed_suo_hao_quantiy,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="itemNumber != null">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="itemType != null">#{itemType},</if>
+            <if test="itemWorkNameFlag != null">#{itemWorkNameFlag},</if>
+            <if test="fixedSuoHaoQuantiy != null">#{fixedSuoHaoQuantiy},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesItemTechniquesCodeAll" parameterType="PesItemTechniquesCodeAll">
+        update pes_item_techniques_code_all
+        set item_work_name_flag = #{itemWorkNameFlag},
+            fixed_suo_hao_quantiy = #{fixedSuoHaoQuantiy},
+            last_update_date = getdate(),
+            last_update_by = #{createBy}
+        where techniques_code_id = #{techniquesCodeId}
+    </update>
+
+    <delete id="deletePesItemTechniquesCodeAllByIds" parameterType="String">
+        delete from pes_item_techniques_code_all where techniques_code_id in
+        <foreach item="techniquesCodeId" collection="array" open="(" separator="," close=")">
+            #{techniquesCodeId}
+        </foreach>
+    </delete>
+
+    <insert id="batchPesItemTechniquesCodeAll">
+        insert into pes_item_techniques_code_all( inventory_item_id, organization_id, item_number, item_description, item_type, item_work_name_flag, fixed_suo_hao_quantiy, create_by, create_date, last_update_by, last_update_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.itemType,jdbcType=VARCHAR}, #{item.itemWorkNameFlag,jdbcType=VARCHAR}, #{item.fixedSuoHaoQuantiy,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},getdate(), #{item.createBy,jdbcType=VARCHAR}, getdate())
+        </foreach>
+    </insert>
+
+</mapper>

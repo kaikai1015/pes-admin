@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.invOnhandMaterialSumQuantitySubinventoryListMapper">
+
+    <resultMap type="invOnhandMaterialSumQuantitySubinventoryList" id="invOnhandMaterialSumQuantitySubinventoryListResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+    </resultMap>
+
+    <delete id="deleteWeekInsertDeleteSyncInvMaterialTxnsEO">
+        delete from cux_inv_onhand_material_sum_quantity_subinventory_list where
+        <foreach collection="list" item="item" index="index" separator="or">
+            (INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+            AND ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT}
+            AND subinventory_code=#{item.subinventoryCode,jdbcType=VARCHAR})
+        </foreach>
+        and transaction_year=FORMAT (getdate(),'yyyy')
+    </delete>
+
+
+    <insert id="batchWeekInsertDeleteSyncInvMaterialTxnsEO">
+        INSERT INTO cux_inv_onhand_material_sum_quantity_subinventory_list(
+                organization_id,
+                inventory_item_id,
+                transaction_year,
+                subinventory_code,
+                one_quantity,
+                two_quantity,
+                three_quantity,
+                four_quantity,
+                five_quantity,
+                six_quantity,
+                seven_quantity,
+                eight_quantity,
+                nine_quantity,
+                ten_quantity,
+                eleven_quantity,
+                twelve_quantity,
+                thirteen_quantity,
+                fourteen_quantity,
+                fifteen_quantity,
+                sixteen_quantity,
+                seventeen_quantity,
+                eighteen_quantity,
+                nineteen_quantity,
+                twenty_quantity,
+                twenty_one_quantity,
+                twenty_two_quantity,
+                twenty_three_quantity,
+                twenty_four_quantity,
+                twenty_five_quantity,
+                twenty_six_quantity,
+                twenty_seven_quantity,
+                twenty_eight_quantity,
+                twenty_nine_quantity,
+                thirty_quantity,
+                thirty_one_quantity,
+                thirty_two_quantity,
+                thirty_three_quantity,
+                thirty_four_quantity,
+                thirty_five_quantity,
+                thirty_six_quantity,
+                thirty_seven_quantity,
+                thirty_eight_quantity,
+                thirty_nine_quantity,
+                forty_quantity,
+                forty_one_quantity,
+                forty_two_quantity,
+                forty_three_quantity,
+                forty_four_quantity,
+                forty_five_quantity,
+                forty_six_quantity,
+                forty_seven_quantity,
+                forty_eight_quantity,
+                forty_nine_quantity,
+                fifty_quantity,
+                fifty_one_quantity,
+                fifty_two_quantity,
+                fifty_three_quantity)
+                (SELECT
+                imt.organization_id,
+                imt.inventory_item_id,
+                FORMAT (getdate(),'yyyy') AS transaction_year,
+                imt.subinventory_code,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '1' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '1' then imt.transaction_quantity else 0 end) end) else 0 end) as one_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '2' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '2' then imt.transaction_quantity else 0 end) end) else 0 end) as two_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '3' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '3' then imt.transaction_quantity else 0 end) end) else 0 end) as three_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '4' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '4' then imt.transaction_quantity else 0 end) end) else 0 end) as four_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '5' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '5' then imt.transaction_quantity else 0 end) end) else 0 end) as five_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '6' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '6' then imt.transaction_quantity else 0 end) end) else 0 end) as six_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '7' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '7' then imt.transaction_quantity else 0 end) end) else 0 end) as seven_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '8' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '8' then imt.transaction_quantity else 0 end) end) else 0 end) as eight_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '9' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '9' then imt.transaction_quantity else 0 end) end) else 0 end) as nine_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '10' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '10' then imt.transaction_quantity else 0 end) end) else 0 end) as ten_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '11' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '11' then imt.transaction_quantity else 0 end) end) else 0 end) as eleven_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '12' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '12' then imt.transaction_quantity else 0 end) end) else 0 end) as twelve_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '13' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '13' then imt.transaction_quantity else 0 end) end) else 0 end) as thirteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '14' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '14' then imt.transaction_quantity else 0 end) end) else 0 end) as fourteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '15' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '15' then imt.transaction_quantity else 0 end) end) else 0 end) as fifteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '16' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '16' then imt.transaction_quantity else 0 end) end) else 0 end) as sixteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '17' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '17' then imt.transaction_quantity else 0 end) end) else 0 end) as seventeen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '18' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '18' then imt.transaction_quantity else 0 end) end) else 0 end) as eighteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '19' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '19' then imt.transaction_quantity else 0 end) end) else 0 end) as nineteen_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '20' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '20' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '21' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '21' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_one_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '22' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '22' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_two_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '23' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '23' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_three_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '24' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '24' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_four_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '25' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '25' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_five_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '26' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '26' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_six_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '27' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '27' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_seven_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '28' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '28' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_eight_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '29' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '29' then imt.transaction_quantity else 0 end) end) else 0 end) as twenty_nine_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '30' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '30' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '31' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '31' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_one_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '32' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '32' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_two_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '33' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '33' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_three_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '34' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '34' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_four_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '35' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '35' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_five_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '36' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '36' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_six_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '37' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '37' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_seven_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '38' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '38' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_eight_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '39' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '39' then imt.transaction_quantity else 0 end) end) else 0 end) as thirty_nine_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '40' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '40' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '41' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '41' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_one_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '42' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '42' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_two_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '43' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '43' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_three_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '44' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '44' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_four_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '45' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '45' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_five_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '46' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '46' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_six_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '47' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '47' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_seven_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '48' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '48' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_eight_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '49' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '49' then imt.transaction_quantity else 0 end) end) else 0 end) as forty_nine_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '50' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '50' then imt.transaction_quantity else 0 end) end) else 0 end) as fifty_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '51' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '51' then imt.transaction_quantity else 0 end) end) else 0 end) as fifty_one_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '52' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '52' then imt.transaction_quantity else 0 end) end) else 0 end) as fifty_two_quantity,
+                SUM(case when DATEPART(WK, getdate()) &gt;= '53' then (case when FORMAT (imt.transaction_date,'yyyy') &lt; FORMAT (getdate(),'yyyy') then imt.transaction_quantity else (case when DATEPART(WK, imt.transaction_date) &lt;= '53' then imt.transaction_quantity else 0 end) end) else 0 end) as fifty_three_quantity
+                FROM
+                sync_inv_material_txns imt
+                WHERE
+                <foreach collection="list" item="item" index="index" separator="or">
+                    ( imt.INVENTORY_ITEM_ID=#{item.inventoryItemId,jdbcType=BIGINT}
+                    AND imt.ORGANIZATION_ID=#{item.organizationId,jdbcType=BIGINT}
+                    AND imt.subinventory_code=#{item.subinventoryCode,jdbcType=VARCHAR})
+                </foreach>
+                and FORMAT (imt.transaction_date,'yyyy') &lt;= FORMAT (getdate(),'yyyy')
+                GROUP BY
+                imt.organization_id,
+                imt.inventory_item_id,
+                imt.subinventory_code)
+    </insert>
+
+        <delete id="deleteWeekInsertDeleteSyncInvMaterialTxnsByZerio">
+                delete from cux_inv_onhand_material_sum_quantity_subinventory_list where one_quantity + two_quantity + three_quantity + four_quantity + five_quantity + six_quantity + seven_quantity + eight_quantity + nine_quantity + ten_quantity + eleven_quantity + twelve_quantity + thirteen_quantity + fourteen_quantity + fifteen_quantity + sixteen_quantity + seventeen_quantity + eighteen_quantity + nineteen_quantity + twenty_quantity + twenty_one_quantity + twenty_two_quantity + twenty_three_quantity + twenty_four_quantity + twenty_five_quantity + twenty_six_quantity + twenty_seven_quantity + twenty_eight_quantity + twenty_nine_quantity + thirty_quantity + thirty_one_quantity + thirty_two_quantity + thirty_three_quantity + thirty_four_quantity + thirty_five_quantity + thirty_six_quantity + thirty_seven_quantity + thirty_eight_quantity + thirty_nine_quantity + forty_quantity + forty_one_quantity + forty_two_quantity + forty_three_quantity + forty_four_quantity + forty_five_quantity + forty_six_quantity + forty_seven_quantity + forty_eight_quantity + forty_nine_quantity + fifty_quantity + fifty_one_quantity + fifty_two_quantity + fifty_three_quantity = 0
+        </delete>
+
+</mapper>

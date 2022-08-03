@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.supplier.mapper.PesSupplierHeaderListMapper">
+
+    <resultMap type="PesSupplierHeaderList" id="PesSupplierHeaderListResult">
+                    <result property="supplierId"    column="supplier_id"    />
+                    <result property="supplierName"    column="supplier_name"    />
+                    <result property="supplierNumber"    column="supplier_number"    />
+                    <result property="businessRelationship"    column="business_relationship"    />
+                    <result property="taxOrganizationType"    column="tax_organization_type"    />
+                    <result property="taxCountry"    column="tax_country"    />
+                    <result property="taxRegistrationNumber"    column="tax_registration_number"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="supplierType"    column="supplier_type"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="inactiveDate"    column="inactive_date"    />
+        <result property="remark"    column="remark"    />
+            </resultMap>
+
+    <sql id="selectPesSupplierHeaderListVo">
+        select supplier_id, supplier_name, supplier_number, business_relationship, tax_organization_type, tax_country, tax_registration_number, inactive_date,buyer_name,supplier_type,remark,create_date, create_by, last_update_date, last_update_by from pes_supplier_header_list
+    </sql>
+
+    <select id="selectPesSupplierHeaderListList" parameterType="PesSupplierHeaderList" resultMap="PesSupplierHeaderListResult">
+        <include refid="selectPesSupplierHeaderListVo"/>
+        <where>
+            <if test="supplierName != null  and supplierName != ''"> and supplier_name like ('%' + #{supplierName} + '%')</if>
+        </where>
+    </select>
+
+    <insert id="insertPesSupplierHeaderList" parameterType="PesSupplierHeaderList">
+        insert into pes_supplier_header_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                                                <if test="supplierId != null">supplier_id,</if>
+                                                                <if test="supplierName != null and supplierName != ''">supplier_name,</if>
+                                                                <if test="supplierNumber != null and supplierNumber != ''">supplier_number,</if>
+                                                                <if test="businessRelationship != null and businessRelationship != ''">business_relationship,</if>
+                                                                <if test="taxOrganizationType != null and taxOrganizationType != ''">tax_organization_type,</if>
+                                                                <if test="taxCountry != null and taxCountry != ''">tax_country,</if>
+                                                                <if test="taxRegistrationNumber != null and taxRegistrationNumber != ''">tax_registration_number,</if>
+            create_date,
+            <if test="createBy != null and createBy != ''">create_by,</if>
+            last_update_date,
+            <if test="createBy != null and createBy != ''">last_update_by,</if>
+                                    </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                                                <if test="supplierId != null">#{supplierId},</if>
+                                                                <if test="supplierName != null and supplierName != ''">#{supplierName},</if>
+                                                                <if test="supplierNumber != null and supplierNumber != ''">#{supplierNumber},</if>
+                                                                <if test="businessRelationship != null and businessRelationship != ''">#{businessRelationship},</if>
+                                                                <if test="taxOrganizationType != null and taxOrganizationType != ''">#{taxOrganizationType},</if>
+                                                                <if test="taxCountry != null and taxCountry != ''">#{taxCountry},</if>
+                                                                <if test="taxRegistrationNumber != null and taxRegistrationNumber != ''">#{taxRegistrationNumber},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+            GETDATE(),
+            <if test="createBy != null and createBy != ''">#{createBy},</if>
+                                    </trim>
+    </insert>
+
+    <update id="updatePesSupplierHeaderList" parameterType="PesSupplierHeaderList">
+        update pes_supplier_header_list
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="supplierName != null and supplierName != ''">supplier_name = #{supplierName},</if>
+            <if test="supplierNumber != null and supplierNumber != ''">supplier_number = #{supplierNumber},</if>
+            <if test="businessRelationship != null and businessRelationship != ''">business_relationship = #{businessRelationship},</if>
+            <if test="taxOrganizationType != null and taxOrganizationType != ''">tax_organization_type = #{taxOrganizationType},</if>
+            <if test="taxCountry != null and taxCountry != ''">tax_country = #{taxCountry},</if>
+            <if test="taxRegistrationNumber != null and taxRegistrationNumber != ''">tax_registration_number = #{taxRegistrationNumber},</if>
+            last_update_date = GETDATE(),
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="buyerName != null">buyer_name = #{buyerName},</if>
+            <if test="supplierType != null">supplier_type = #{supplierType},</if>
+            <if test="inactiveDate != null">inactive_date = #{inactiveDate},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where supplier_id = #{supplierId}
+    </update>
+
+    <select id="checkSupplierNumberUnique" parameterType="String" resultType="int">
+        select count(1) from pes_supplier_header_list where supplier_number = #{supplierNumber}
+    </select>
+
+    <select id="selectPesSupplierHeaderListById" parameterType="Long" resultMap="PesSupplierHeaderListResult">
+        <include refid="selectPesSupplierHeaderListVo"/>
+        where supplier_id = #{supplierId}
+    </select>
+
+    <select id="getAllSupplier" resultMap="PesSupplierHeaderListResult">
+        SELECT
+            supplier_id,
+            supplier_name,
+            supplier_number
+        FROM
+            pes_supplier_header_list
+        where isnull(inactive_date,GETDATE()) &gt;= GETDATE()
+    </select>
+
+</mapper>

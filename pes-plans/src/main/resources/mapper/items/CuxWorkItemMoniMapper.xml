@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxWorkItemMoniMapper">
+
+    <resultMap type="CuxWorkItemMoni" id="CuxWorkItemMoniResult">
+                    <result property="id"    column="id"    />
+                    <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="level"    column="level"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemType"    column="item_type"    />
+                    <result property="componentQuantity"    column="component_quantity"    />
+                    <result property="quantity"    column="quantity"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+                    <result property="wieHQuantity"    column="wie_h_quantity"    />
+                    <result property="wieLQuantity"    column="wie_l_quantity"    />
+                    <result property="soQuantity"    column="so_quantity"    />
+                    <result property="poQuantity"    column="po_quantity"    />
+                    <result property="prQuantity"    column="pr_quantity"    />
+                    <result property="totalDays"    column="total_days"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+        <result property="currenctQuantity"    column="currenct_quantity"    />
+        <result property="pSumUnitCost"    column="p_sum_unit_cost"    />
+        <result property="sumUnitCost"    column="sum_unit_cost"    />
+            </resultMap>
+
+    <select id="selectCuxWorkItemMoniList" parameterType="CuxWorkItemMoni" resultMap="CuxWorkItemMoniResult">
+        SELECT
+            wim.organization_id,
+            wim.p_item_number,
+            wim.item_description,
+            wim. LEVEL,
+            wim.item_number,
+            wim.item_type,
+            wim.component_quantity,
+            wim.quantity,
+            (isnull(ioq.quantity, 0) - wim.quantity) as currenct_quantity,
+            (isnull(plt.pr_date,0) + isnull(plt.po_date,0) + isnull(plt.supplier_date,0) + isnull(plt.logist_date,0) + isnull(plt.rcv_date,0) + isnull(plt.exp_prod_date,0)) AS total_days,
+            isnull(ioq.quantity, 0) AS onhand_quantity,
+            isnull(sdq.wie_s, 0) AS wie_h_quantity,
+            isnull(sdq.wie_d, 0) AS wie_l_quantity,
+            isnull(sdq.pr_s, 0) AS pr_quantity,
+            isnull(sdq.po_s, 0) AS po_quantity,
+            isnull(sdq.doo_d, 0) AS so_quantity,
+            --isnull(pricep.sum_unit_cost,0) as p_sum_unit_cost,
+            --isnull(price.sum_unit_cost,0) as sum_unit_cost,
+            wim.create_date
+        FROM
+            cux_work_item_moni wim
+            LEFT JOIN pes_item_supply_demand_quantity sdq
+            ON (wim.organization_id = sdq.ORGANIZATION_ID
+            AND wim.inventory_item_id = sdq.INVENTORY_ITEM_ID)
+            LEFT JOIN sync_inv_onhand_quantity_new ioq
+            ON (wim.organization_id = ioq.ORGANIZATION_ID
+            AND wim.inventory_item_id = ioq.INVENTORY_ITEM_ID)
+            LEFT JOIN cux_po_lead_time_list plt
+            ON (wim.organization_id = plt.organization_id
+            AND wim.inventory_item_id = plt.inventory_item_id)
+            LEFT JOIN sync_cst_costed_vu_costs_v_unit_price price
+            on (wim.organization_id = price.organization_id
+            and wim.inventory_item_id = price.inventory_item_id)
+			LEFT JOIN sync_cst_costed_vu_costs_v_unit_price pricep
+            on (wim.organization_id = pricep.organization_id
+            and wim.p_inventory_item_id = pricep.inventory_item_id)
+    </select>
+
+    <delete id="deleteCuxWorkItemMoniByIds">
+        TRUNCATE TABLE cux_work_item_moni
+    </delete>
+
+    <select id="selectItemTrees" parameterType="CuxWorkItemMoni" resultMap="CuxWorkItemMoniResult">
+        SELECT
+        bom.p_inventory_item_id,
+        bom.organization_id,
+        ebs.ITEM_NUMBER AS p_item_number,
+        subebs.inventory_item_id,
+        subebs.ITEM_NUMBER,
+        subebs.ITEM_DESCRIPTION,
+        subebs.ITEM_TYPE,
+        bom.component_quantity,
+        bom.component_quantity*#{quantity} as quantity,
+        #{level} + 1 as level,
+        #{createBy} as create_by
+        FROM
+        sync_items_num_des_list ebs,
+        sync_bom_item_data_list bom,
+        sync_items_num_des_list subebs
+        WHERE
+        1 = 1
+        AND bom.p_inventory_item_id = ebs.inventory_item_id
+        AND bom.organization_id = ebs.organization_id
+        AND bom.inventory_item_id = subebs.inventory_item_id
+        AND bom.organization_id = subebs.organization_id
+        AND bom.disable_date IS NULL
+        AND bom.IMPLEMENTATION_DATE IS NOT NULL
+        and ebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and subebs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        <if test="pItemNumber!=null">
+            and ebs.ITEM_NUMBER = #{pItemNumber}
+        </if>
+        <if test="organizationId!=null">
+            and ebs.organization_id=#{organizationId}
+        </if>
+    </select>
+
+    <insert id="batchCuxWorkItemMoni">
+        insert into cux_work_item_moni(p_inventory_item_id, organization_id, p_item_number, item_description, level, inventory_item_id, item_number, item_type, component_quantity, quantity, create_by, last_update_by) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.pInventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.pItemNumber,jdbcType=VARCHAR}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.level,jdbcType=INTEGER}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.itemType,jdbcType=VARCHAR}, #{item.componentQuantity,jdbcType=DECIMAL}, #{item.quantity,jdbcType=DECIMAL}, #{item.createBy,jdbcType=VARCHAR},#{item.createBy,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesWieWoCompleteAllDKMapper">
+
+    <resultMap type="MesWieWoCompleteAllDKEO" id="MesWieWoCompleteAllDKEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="woCompleteId"    column="wo_complete_id"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="woOperationSequenceNumber"    column="wo_operation_sequence_number"    />
+        <result property="uomCode"    column="uom_code"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="errorInfor"    column="error_infor"    />
+        <result property="wieLineId"    column="wie_line_id"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="errorInfor"    column="error_infor"    />
+        <result property="requiredQuantity"    column="required_quantity"    />
+        <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+        <result property="basisType"    column="BASIS_TYPE"    />
+        <result property="plannedStartQuantity"    column="PLANNED_START_QUANTITY"    />
+        <result property="completedQuantity"    column="COMPLETED_QUANTITY"    />
+        <result property="chayiQuantity"    column="chayi_quantity"    />
+    </resultMap>
+
+    <sql id="selectMesWieWoCompleteAllDkVo">
+        SELECT
+            wwca.inventory_item_id,
+            wwca.organization_id,
+            (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = wwca.organization_id
+                AND esb.INVENTORY_ITEM_ID = wwca.INVENTORY_ITEM_ID) AS lot_control_code,
+            wwca.transaction_quantity,
+            wwca.transaction_date,
+            wwca.uom_code,
+            wwca.subinventory_code,
+            wwca.work_order_id,
+            wwca.work_order_number,
+            wwca.remark,
+            wwca.last_update_date,
+            wwca.erp_flag,
+            wwca.erp_flag_date,
+            wwca.wo_complete_id
+        FROM
+            mes_wie_wo_complete_all wwca
+    </sql>
+
+    <select id="getWieWoCompleteList" parameterType="MesWieWoCompleteAllDKEO" resultMap="MesWieWoCompleteAllDKEOResult">
+        <include refid="selectMesWieWoCompleteAllDkVo"/>
+        <where>
+            and (wwca.erp_flag = 0 or wwca.erp_flag = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and wwca.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and wwca.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by wwca.erp_flag asc
+    </select>
+
+    <select id="getWorkDemandLists" parameterType="MesWieWoCompleteAllDKEO" resultMap="MesWieWoCompleteAllDKEOResult">
+        SELECT
+            wwcl.WORK_ORDER_ID,
+            wwcl.ORGANIZATION_ID,
+            wwcl.INVENTORY_ITEM_ID,
+            wwcl.work_order_number,
+            wwcl.ITEM_NUMBER,
+            wwcl.UOM_CODE,
+            #{transactionDate} as transaction_date,
+            (wwcl.QUANTITY_PER_PRODUCT * #{transactionQuantity}) as transaction_quantity,
+            (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = wwcl.organization_id
+                AND esb.INVENTORY_ITEM_ID = wwcl.INVENTORY_ITEM_ID) AS lot_control_code,
+            #{remark} as remark,
+            wwcl.wie_line_id,
+            wwcl.subinventory_code,
+            isnull(pitc.item_work_name_flag,0) as item_work_name_flag
+        FROM
+            mes_wie_wo_complete_lines_all wwcl
+            LEFT JOIN pes_item_techniques_code_all pitc
+        ON (wwcl.ORGANIZATION_ID = pitc.organization_id
+        AND wwcl.INVENTORY_ITEM_ID = pitc.inventory_item_id)
+        WHERE 1=1
+        and (wwcl.erp_flag = 0 or wwcl.erp_flag = 2)
+        AND wwcl.WORK_ORDER_ID = #{workOrderId}
+        AND wwcl.ORGANIZATION_ID = #{organizationId}
+        AND wwcl.remark = #{remark}
+    </select>
+
+    <select id="selectOrgnazationCode" parameterType="Long" resultMap="MesWieWoCompleteAllDKEOResult">
+        select ORGANIZATION_CODE from sync_inv_org_parameters where ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <update id="updateLineErpFlag" parameterType="MesWieWoCompleteAllDKEO">
+        update mes_wie_wo_complete_lines_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="transactionQuantity != null">transaction_quantity = #{transactionQuantity},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where wie_line_id = #{wieLineId}
+    </update>
+
+    <select id="selectOperSequenceNumber" parameterType="Long" resultMap="MesWieWoCompleteAllDKEOResult">
+        SELECT
+        wwop.OPERATION_SEQ_NUMBER AS wo_operation_sequence_number
+        FROM
+        sync_wie_wo_operations_b wwop
+        WHERE
+        wwop.WORK_ORDER_ID = #{workOrderId}
+        AND wwop.AUTO_TRANSACT_FLAG = 'N'
+        ORDER BY
+        wwop.OPERATION_SEQ_NUMBER ASC
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesWieWoCompleteAllDKEO">
+        update mes_wie_wo_complete_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where wo_complete_id = #{woCompleteId}
+    </update>
+
+    <select id="getAllErpFlag" parameterType="MesWieWoCompleteAllDKEO" resultType="Integer">
+        SELECT
+            count(1)
+        FROM
+            mes_wie_wo_complete_lines_all wwcl
+        WHERE
+            1 = 1
+        AND (wwcl.erp_flag = 1 or wwcl.erp_flag = 3)
+        AND wwcl.WORK_ORDER_ID = #{workOrderId}
+        AND wwcl.ORGANIZATION_ID = #{organizationId}
+        AND wwcl.remark = #{remark}
+    </select>
+
+    <select id="getIsDetails" parameterType="MesWieWoCompleteAllDKEO" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        mes_wie_wo_complete_lines_all wwcl
+        WHERE
+        1 = 1
+        AND wwcl.WORK_ORDER_ID = #{workOrderId}
+        AND wwcl.ORGANIZATION_ID = #{organizationId}
+        AND wwcl.remark = #{remark}
+    </select>
+
+    <select id="getTranQuantity" parameterType="MesWieWoCompleteAllDKEO" resultMap="MesWieWoCompleteAllDKEOResult">
+        SELECT
+            (isnull(wwob.COMPLETED_QUANTITY,0) * wwd.QUANTITY_PER_PRODUCT) AS COMPLETED_QUANTITY,
+            isnull(wwd.ISSUED_QUANTITY,0) - isnull(sumWie.transaction_quantity,0) as ISSUED_QUANTITY,
+            (case when wwd.BASIS_TYPE = '2' then wwd.REQUIRED_QUANTITY - wwd.ISSUED_QUANTITY ELSE wwd.REQUIRED_QUANTITY end) as REQUIRED_QUANTITY,
+            wwd.BASIS_TYPE
+        FROM
+            sync_wie_work_orders_b wwob,
+            sync_wie_wo_demand_v wwd
+            LEFT JOIN (SELECT
+							mwma.work_order_id,
+							mwma.inventory_item_id,
+							mwma.ORGANIZATION_ID,
+							SUM (mwma.transaction_quantity) AS transaction_quantity
+						FROM
+							mes_work_material_all mwma
+						GROUP BY
+							mwma.work_order_id,
+							mwma.inventory_item_id,
+							mwma.ORGANIZATION_ID) sumWie
+					on (wwd.ORGANIZATION_ID = sumWie.ORGANIZATION_ID
+					and wwd.work_order_id = sumWie.work_order_id
+					and	wwd.inventory_item_id = sumWie.inventory_item_id)
+        WHERE
+            wwob.WORK_ORDER_ID = wwd.WORK_ORDER_ID
+        AND wwob.ORGANIZATION_ID = wwd.ORGANIZATION_ID
+        and wwd.WORK_ORDER_ID = #{workOrderId}
+        and wwd.inventory_item_id = #{inventoryItemId}
+    </select>
+
+    <select id="selectMesWieWoCompleteAllList" parameterType="MesWieWoCompleteAllDKEO" resultMap="MesWieWoCompleteAllDKEOResult">
+        SELECT
+        list.ITEM_NUMBER,
+        wwca.inventory_item_id,
+        wwca.organization_id,
+        wwca.transaction_quantity,
+        wwca.transaction_date,
+        wwca.uom_code,
+        wwca.subinventory_code,
+        wwca.work_order_id,
+        wwca.work_order_number,
+        wwob.PLANNED_START_QUANTITY,
+        isnull(wwob.COMPLETED_QUANTITY,0) as COMPLETED_QUANTITY,
+        wwob.PLANNED_START_QUANTITY - isnull(wwob.COMPLETED_QUANTITY,0) as chayi_quantity,
+        wwca.remark,
+        wwca.last_update_date,
+        wwca.erp_flag,
+        wwca.erp_flag_date,
+        wwca.wo_complete_id,
+        wwca.error_infor
+        FROM
+        mes_wie_wo_complete_all wwca,
+        sync_items_num_des_list list,
+        sync_wie_work_orders_b wwob
+        <where>
+            AND wwca.organization_id = list.ORGANIZATION_ID
+            AND wwca.inventory_item_id = list.INVENTORY_ITEM_ID
+            and wwca.organization_id = wwob.ORGANIZATION_ID
+            and wwca.work_order_id = wwob.WORK_ORDER_ID
+            <if test="erpFlag != null  and erpFlag != ''"> and wwca.erp_flag = #{erpFlag}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwca.work_order_number = #{workOrderNumber}</if>
+        </where>
+        order by wwca.wo_complete_id desc
+    </select>
+
+</mapper>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxWieProdLineListMapper">
+
+    <resultMap type="CuxWieProdLineList" id="CuxWieProdLineListResult">
+                    <result property="workCenterCode"    column="work_center_code"    />
+                    <result property="workCenter"    column="work_center"    />
+                    <result property="workDate"    column="work_date"    />
+                    <result property="workProductivityQty"    column="work_productivity_qty"    />
+                    <result property="remark"    column="remark"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="wieProdLineId"    column="wie_prod_line_id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createDate"    column="create_date"    />
+            </resultMap>
+
+    <sql id="selectCuxWieProdLineListVo">
+        SELECT
+            work_center_code,
+            work_center,
+            work_date,
+            work_productivity_qty,
+            remark,
+            wie_prod_line_id,
+            create_by,
+            create_date
+        FROM
+            cux_wie_prod_line_list
+    </sql>
+
+    <select id="selectCuxWieProdLineListList" parameterType="CuxWieProdLineList" resultMap="CuxWieProdLineListResult">
+        <include refid="selectCuxWieProdLineListVo"/>
+        <where>
+            <if test="workCenterCode != null  and workCenterCode != ''"> and work_center_code like (#{workCenterCode} + '%')</if>
+            <if test="workCenter != null  and workCenter != ''"> and work_center like (#{workCenter} + '%')</if>
+        </where>
+        ORDER BY work_center_code,work_date
+    </select>
+
+    <insert id="insertCuxWieProdLineList" parameterType="CuxWieProdLineList">
+        insert into cux_wie_prod_line_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="workCenterCode != null and workCenterCode != ''">work_center_code,</if>
+            <if test="workCenter != null and workCenter != ''">work_center,</if>
+            <if test="workDate != null">work_date,</if>
+            <if test="workProductivityQty != null">work_productivity_qty,</if>
+            <if test="remark != null and remark != ''">remark,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="workCenterCode != null and workCenterCode != ''">#{workCenterCode},</if>
+            <if test="workCenter != null and workCenter != ''">#{workCenter},</if>
+            <if test="workDate != null">#{workDate},</if>
+            <if test="workProductivityQty != null">#{workProductivityQty},</if>
+            <if test="remark != null and remark != ''">#{remark},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+        </trim>
+    </insert>
+
+</mapper>

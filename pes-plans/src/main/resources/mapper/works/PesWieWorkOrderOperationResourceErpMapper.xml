@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.PesWieWorkOrderOperationResourceErpMapper">
+
+    <resultMap type="PesWieWorkOrderOperationResourceErp" id="PesWieWorkOrderOperationResourceErpResult">
+        <result property="pesWorkOrderId"    column="pes_work_order_id"    />
+        <result property="pesWorkOrderOperationId"    column="pes_work_order_operation_id"    />
+        <result property="usageRate"    column="usage_rate"    />
+        <result property="assignedUnits"    column="assigned_units"    />
+        <result property="createDate"    column="create_date"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdateBy"    column="last_update_by"    />
+        <result property="erpSubmitDate"    column="erp_submit_date"    />
+        <result property="workOrderOperationResourceId"    column="work_order_operation_resource_id"    />
+        <result property="resourceRequenceNumber"    column="resource_requence_number"    />
+        <result property="resourceCode"    column="resource_code"    />
+        <result property="resourceName"    column="resource_name"    />
+        <result property="pesWorkOrderOperationResourceId"    column="pes_work_order_operation_resource_id"    />
+        <result property="usageRateF"    column="usage_rate_f"    />
+        <result property="assignedUnitsF"    column="assigned_units_f"    />
+        <result property="usageRateS"    column="usage_rate_s"    />
+        <result property="assignedUnitsS"    column="assigned_units_s"    />
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="workOrderOperationId"    column="work_order_operation_id"    />
+        <result property="workOrderTypeId"    column="work_order_type_id"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+    </resultMap>
+
+    <sql id="selectPesWieWorkOrderOperationResourceErpVo">
+            SELECT
+                pes_work_order_id,
+                pes_work_order_operation_id,
+                work_order_id,
+                work_order_operation_id,
+                usage_rate,
+                assigned_units,
+                work_order_operation_resource_id,
+                resource_requence_number,
+                resource_code,
+                resource_name,
+                pes_work_order_operation_resource_id,
+                last_update_date
+            FROM
+                pes_wie_work_order_operation_resource_erp
+    </sql>
+
+    <select id="handleSubmitErpPesOperationMaterialResourceByIds" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        <include refid="selectPesWieWorkOrderOperationResourceErpVo"/>
+        where pes_work_order_operation_id = #{pesWorkOrderOperationId}
+    </select>
+
+    <select id="getHandleSubmitErpPesOperationMaterialResourceByIds" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        <include refid="selectPesWieWorkOrderOperationResourceErpVo"/>
+        where pes_work_order_operation_id = #{pesWorkOrderOperationId}
+        and usage_rate IS NOT NULL
+    </select>
+
+    <select id="selectPesWieWorkOrderOperationResourceErpByIds" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        <include refid="selectPesWieWorkOrderOperationResourceErpVo"/>
+        where pes_work_order_operation_resource_id = #{pesWorkOrderOperationResourceId}
+    </select>
+
+
+    <select id="handleSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        SELECT
+                DISTINCT
+                pes_work_order_operation_id
+            FROM
+                pes_wie_work_order_operation_resource_erp
+        where (create_date = last_update_date or erp_submit_date = create_date)
+        and work_order_operation_resource_id = 0
+        and work_order_operation_id > 0
+    </select>
+
+    <select id="selectPesWieWorkOrderOperationResourceErpById" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        SELECT
+            wwob.pes_work_order_id,
+            osp.usage_rate_f,
+            osp.assigned_units_f,
+            osp.usage_rate_s,
+            osp.assigned_units_s
+        FROM
+            pes_wie_work_orders_b_erp wwob,
+            pes_wie_work_orders_ops_item_erp osp
+        WHERE
+            wwob.work_center_id = osp.work_center_id
+        AND wwob.organization_id = osp.organization_id
+        AND wwob.inventory_item_id = osp.inventory_item_id
+        AND osp.prioryty = 1
+        AND wwob.pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+    <insert id="insertResourcePesWieWorkOrderOperationErpByOperationId" parameterType="PesWieWorkOrderOperationResourceErp">
+        insert into pes_wie_work_order_operation_resource_erp
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="pesWorkOrderId != null">pes_work_order_id,</if>
+            <if test="pesWorkOrderOperationId != null">pes_work_order_operation_id,</if>
+            <if test="usageRate != null">usage_rate,</if>
+            <if test="assignedUnits != null">assigned_units,</if>
+            <if test="createDate != null">create_date,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createDate != null">last_update_date,</if>
+            <if test="createBy != null">last_update_by,</if>
+            <if test="createDate != null">erp_submit_date,</if>
+            <if test="resourceRequenceNumber != null">resource_requence_number,</if>
+            <if test="resourceCode != null">resource_code,</if>
+            <if test="resourceName != null">resource_name,</if>
+            <if test="workOrderOperationResourceId != null">work_order_operation_resource_id,</if>
+            <if test="workOrderId != null">work_order_id,</if>
+            <if test="workOrderOperationId != null">work_order_operation_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="pesWorkOrderId != null">#{pesWorkOrderId},</if>
+            <if test="pesWorkOrderOperationId != null">#{pesWorkOrderOperationId},</if>
+            <if test="usageRate != null">#{usageRate},</if>
+            <if test="assignedUnits != null">#{assignedUnits},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createDate != null">#{createDate},</if>
+            <if test="resourceRequenceNumber != null">#{resourceRequenceNumber},</if>
+            <if test="resourceCode != null">#{resourceCode},</if>
+            <if test="resourceName != null">#{resourceName},</if>
+            <if test="workOrderOperationResourceId != null">#{workOrderOperationResourceId},</if>
+            <if test="workOrderId != null">#{workOrderId},</if>
+            <if test="workOrderOperationId != null">#{workOrderOperationId},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePesWieWorkOrdersResourceErpByWorkOrderId" parameterType="PesWieWorkOrderOperationResourceErp">
+        update pes_wie_work_order_operation_resource_erp set work_order_operation_resource_id = #{workOrderOperationResourceId},last_update_by = #{createBy},last_update_date = #{createDate},erp_submit_date = (case when last_update_date > #{lastUpdateDate} then #{lastUpdateDate} else #{createDate} end) where pes_work_order_operation_resource_id = #{pesWorkOrderOperationResourceId}
+    </update>
+
+    <insert id="insertPesWieWorkOrdersResourceErpByWorkOrderId" parameterType="PesWieWorkOrderOperationResourceErp">
+        insert into pes_wie_work_submit_erp_infor_list (pes_work_order_id,pes_id,erp_id,count_number,item_number,item_description,quantity_per_product,quantity,erp_type,type,erp_flag,remark,create_by,create_date,last_update_by,last_update_date) values
+        ( #{pesWorkOrderId,jdbcType=BIGINT},#{pesWorkOrderOperationResourceId,jdbcType=BIGINT}, #{workOrderOperationResourceId,jdbcType=BIGINT},#{resourceRequenceNumber,jdbcType=INTEGER},#{resourceCode,jdbcType=VARCHAR},#{resourceName,jdbcType=VARCHAR},#{assignedUnits,jdbcType=DECIMAL},#{usageRate,jdbcType=DECIMAL},#{erpType,jdbcType=INTEGER},1,#{erpFlag,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP})
+    </insert>
+
+    <select id="updateSubmitErpPesWieWorkOrdersBErpByIdsJob" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        <include refid="selectPesWieWorkOrderOperationResourceErpVo"/>
+        where last_update_date > erp_submit_date
+        and work_order_operation_resource_id > 0
+    </select>
+
+    <update id="updatePesWieWorkOrderOperationResourceErp" parameterType="PesWieWorkOrderOperationResourceErp">
+        update pes_wie_work_order_operation_resource_erp
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="usageRate != null">usage_rate = #{usageRate},</if>
+            <if test="assignedUnits != null">assigned_units = #{assignedUnits},</if>
+            <if test="createDate != null">last_update_date = #{createDate},</if>
+            <if test="createBy != null">last_update_by = #{createBy},</if>
+        </trim>
+        where pes_work_order_operation_resource_id = #{pesWorkOrderOperationResourceId}
+    </update>
+
+    <select id="selectPesWieWorkOrderStatusIdByIds" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        SELECT
+            work_order_type_id,
+	        work_order_status_id
+        FROM
+            pes_wie_work_orders_b_erp
+        WHERE pes_work_order_id = #{pesWorkOrderId}
+    </select>
+
+
+    <select id="selectResourcePesWieWorkOrderOperationErpByOperationId" parameterType="Long" resultMap="PesWieWorkOrderOperationResourceErpResult">
+        SELECT
+            work_order_id,
+            work_order_operation_id,
+            pes_work_order_id,
+            pes_work_order_operation_id
+        FROM
+            pes_wie_work_order_operation_erp
+        where pes_work_order_operation_id = #{pesWorkOrderOperationId}
+    </select>
+
+</mapper>

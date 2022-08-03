@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncEgpStructuresBMapper">
+
+    <resultMap type="SyncEgpStructuresB" id="SyncEgpStructuresBResult">
+        <result property="alternateBomDesignator"    column="ALTERNATE_BOM_DESIGNATOR"    />
+        <result property="commonBillSequenceId"    column="COMMON_BILL_SEQUENCE_ID"    />
+        <result property="billSequenceId"    column="BILL_SEQUENCE_ID"    />
+        <result property="requestId"    column="REQUEST_ID"    />
+        <result property="structureTypeId"    column="STRUCTURE_TYPE_ID"    />
+        <result property="originalSystemReference"    column="ORIGINAL_SYSTEM_REFERENCE"    />
+        <result property="objName"    column="OBJ_NAME"    />
+        <result property="pk1Value"    column="PK1_VALUE"    />
+        <result property="pk2Value"    column="PK2_VALUE"    />
+        <result property="effectivityControl"    column="EFFECTIVITY_CONTROL"    />
+        <result property="sourceBillSequenceId"    column="SOURCE_BILL_SEQUENCE_ID"    />
+        <result property="changeId"    column="CHANGE_ID"    />
+        <result property="attributeCategory"    column="ATTRIBUTE_CATEGORY"    />
+        <result property="attribute1"    column="ATTRIBUTE1"    />
+        <result property="attribute2"    column="ATTRIBUTE2"    />
+        <result property="attribute3"    column="ATTRIBUTE3"    />
+        <result property="attribute4"    column="ATTRIBUTE4"    />
+        <result property="attribute5"    column="ATTRIBUTE5"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="creationDate"    column="CREATION_DATE"    />
+        <result property="createdBy"    column="CREATED_BY"    />
+        <result property="lastUpdatedBy"    column="LAST_UPDATED_BY"    />
+    </resultMap>
+
+    <delete id="deleteSyncEgpStructuresBByIds">
+        delete from sync_egp_structures_b where BILL_SEQUENCE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.billSequenceId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncEgpStructuresB">
+        insert into sync_egp_structures_b( ALTERNATE_BOM_DESIGNATOR, COMMON_BILL_SEQUENCE_ID, BILL_SEQUENCE_ID, REQUEST_ID, STRUCTURE_TYPE_ID, ORIGINAL_SYSTEM_REFERENCE, OBJ_NAME, PK1_VALUE, PK2_VALUE, EFFECTIVITY_CONTROL, SOURCE_BILL_SEQUENCE_ID, CHANGE_ID, ATTRIBUTE_CATEGORY, ATTRIBUTE1, ATTRIBUTE2, ATTRIBUTE3, ATTRIBUTE4, ATTRIBUTE5, LAST_UPDATE_DATE, CREATION_DATE, CREATED_BY, LAST_UPDATED_BY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.alternateBomDesignator}, #{item.commonBillSequenceId}, #{item.billSequenceId}, #{item.requestId}, #{item.structureTypeId}, #{item.originalSystemReference}, #{item.objName}, #{item.pk1Value}, #{item.pk2Value}, #{item.effectivityControl}, #{item.sourceBillSequenceId}, #{item.changeId}, #{item.attributeCategory}, #{item.attribute1}, #{item.attribute2}, #{item.attribute3}, #{item.attribute4}, #{item.attribute5}, #{item.lastUpdateDate}, #{item.creationDate}, #{item.createdBy}, #{item.lastUpdatedBy})
+        </foreach>
+    </insert>
+
+</mapper>

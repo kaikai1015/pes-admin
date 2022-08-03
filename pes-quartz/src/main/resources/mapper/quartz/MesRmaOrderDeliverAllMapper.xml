@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesRmaOrderDeliverAllMapper">
+
+    <resultMap type="MesRmaOrderDeliverAllEO" id="MesRmaOrderDeliverAllEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="customerId"    column="customer_id"    />
+        <result property="buId"    column="bu_id"    />
+        <result property="employeeId"    column="employee_id"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="transactionUom"    column="transaction_uom"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="rmaOrderNumber"    column="rma_order_number"    />
+        <result property="rmaOrderLineNumber"    column="rma_order_line_number"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlag"    column="erp_flag"    />
+        <result property="erpFlagDate"    column="erp_flag_date"    />
+        <result property="rmaId"    column="rma_id"    />
+        <result property="remark"    column="REMARK"    />
+        <result property="startUpdateDate"    column="START_UPDATE_DATE"    />
+        <result property="endUpdateDate"    column="END_UPDATE_DATE"    />
+        <result property="lotControlCode"    column="LOT_CONTROL_CODE"    />
+        <result property="shipmentLineId"    column="SHIPMENT_LINE_ID"    />
+        <result property="shipmentHeaderId"    column="SHIPMENT_HEADER_ID"    />
+    </resultMap>
+
+    <sql id="selectMesRmaOrderDeliverAllVo">
+        SELECT
+            rod.organization_id,
+            rod.inventory_item_id,
+            rod.item_number,
+            rod.customer_id,
+            (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = rod.organization_id
+                AND esb.INVENTORY_ITEM_ID = rod.INVENTORY_ITEM_ID) AS LOT_CONTROL_CODE,
+            rod.bu_id,
+            rod.employee_id,
+            rod.transaction_date,
+            rod.transaction_quantity,
+            rod.transaction_uom,
+            rod.subinventory_code,
+            rod.rma_order_number,
+            rod.rma_order_line_number,
+            rod.remark,
+            rod.last_update_date,
+            rod.erp_flag,
+            rod.erp_flag_date,
+            rod.rma_id
+        FROM
+            mes_rma_order_deliver_all rod
+    </sql>
+
+    <select id="getRmaOrderDeliverLists" parameterType="MesRmaOrderDeliverAllEO" resultMap="MesRmaOrderDeliverAllEOResult">
+        <include refid="selectMesRmaOrderDeliverAllVo"/>
+        <where>
+            and (rod.ERP_FLAG = 0 or rod.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and rod.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and rod.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+    </select>
+
+    <select id="getReceiptAdviceID" parameterType="MesRmaOrderDeliverAllEO" resultMap="MesRmaOrderDeliverAllEOResult">
+        SELECT
+            SHIPMENT_HEADER_ID,
+            SHIPMENT_LINE_ID
+        FROM
+            sync_rcv_shipment_lines
+        WHERE
+            source_document_code = 'RMA'
+        AND ra_doo_header_number = #{rmaOrderNumber}
+        AND ra_document_line_number = #{rmaOrderLineNumber}
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesRmaOrderDeliverAllEO">
+        update mes_rma_order_deliver_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where rma_id = #{rmaId}
+    </update>
+
+
+    <!--<update id="updateErrorInfor" parameterType="String">-->
+        <!--update mes_erp_job_error_infor_all set last_update_date = getdate(),error_infor = #{errorInfor} where erp_job_name = 'MesRmaOrderDeliverAllJob'-->
+    <!--</update>-->
+
+</mapper>

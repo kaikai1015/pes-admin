@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.SyncItemsNumDesWieListMapper">
+
+    <resultMap type="SyncItemsNumDesWieList" id="SyncItemsNumDesWieListResult">
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+                    <result property="creationDate"    column="CREATION_DATE"    />
+                    <result property="itemType"    column="ITEM_TYPE"    />
+                    <result property="planningMakeBuyCode"    column="PLANNING_MAKE_BUY_CODE"    />
+                    <result property="primaryUomCode"    column="PRIMARY_UOM_CODE"    />
+            </resultMap>
+
+    <sql id="SyncItemsNumDesWieListVo">
+        SELECT
+            list.ORGANIZATION_ID,
+            list.INVENTORY_ITEM_ID,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.ITEM_TYPE,
+            list.PLANNING_MAKE_BUY_CODE,
+            list.PRIMARY_UOM_CODE
+        FROM
+            sync_items_num_des_list list
+    </sql>
+
+    <select id="selectSyncItemsNumDesWieListList" parameterType="SyncItemsNumDesWieList" resultMap="SyncItemsNumDesWieListResult">
+        <include refid="SyncItemsNumDesWieListVo"/>
+        <where>
+            and list.PLANNING_MAKE_BUY_CODE = 1
+            and list.ITEM_TYPE in ('BCP','WWBCP','FG')
+            and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            <if test="organizationId != null "> and list.ORGANIZATION_ID = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+    </select>
+
+</mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.works.mapper.CuxFinWorkMonthsEndHeadsMapper">
+
+    <resultMap type="CuxFinWorkMonthsEndHeads" id="CuxFinWorkMonthsEndHeadsResult">
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="monthsFlag"    column="months_flag"    />
+                    <result property="years"    column="years"    />
+                    <result property="months"    column="months"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="monthsFlagStstus"    column="months_flag_ststus"    />
+            </resultMap>
+
+    <sql id="selectCuxFinWorkMonthsEndHeadsVo">
+        select lot_num, months_flag, years, months, create_by, create_date, last_update_by, last_update_date from cux_fin_work_months_end_heads
+    </sql>
+
+    <select id="selectCuxFinWorkMonthsEndHeadsList" parameterType="CuxFinWorkMonthsEndHeads" resultMap="CuxFinWorkMonthsEndHeadsResult">
+        <include refid="selectCuxFinWorkMonthsEndHeadsVo"/>
+        <where>
+            <if test="lotNum != null "> and lot_num = #{lotNum}</if>
+            <if test="monthsFlag != null  and monthsFlag != ''"> and months_flag = #{monthsFlag}</if>
+            <if test="years != null "> and years = #{years}</if>
+            <if test="months != null "> and months = #{months}</if>
+        </where>
+        ORDER BY create_date DESC
+    </select>
+
+
+    <insert id="insertCuxFinWorkMonthsEndHeads" parameterType="CuxFinWorkMonthsEndHeads">
+        insert into cux_fin_work_months_end_heads
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="lotNum != null">lot_num,</if>
+            <if test="monthsFlag != null">months_flag,</if>
+            <if test="years != null">years,</if>
+            <if test="months != null">months,</if>
+            <if test="createBy != null">create_by,</if>
+            create_date,
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+            <if test="monthsFlagStstus != null">months_flag_ststus,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="lotNum != null">#{lotNum},</if>
+            <if test="monthsFlag != null">#{monthsFlag},</if>
+            <if test="years != null">#{years},</if>
+            <if test="months != null">#{months},</if>
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            <if test="monthsFlagStstus != null">#{monthsFlagStstus},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteCuxFinWorkMonthsEndHeadsByIds" parameterType="String">
+        delete from cux_fin_work_months_end_heads where lot_num = #{lotNum}
+    </delete>
+
+    <select id="checkAddAllowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        cux_fin_work_months_end_heads
+        WHERE
+        1 = 1
+        AND lot_num = #{lotNum}
+    </select>
+
+    <select id="checkDeletellowed" resultType="Integer">
+        SELECT
+        count(1)
+        FROM
+        cux_fin_work_months_end_list
+        WHERE
+        1 = 1
+        AND lot_num = #{lotNum}
+        AND erp_flag &gt; 0
+    </select>
+
+</mapper>

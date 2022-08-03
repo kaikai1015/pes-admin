@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPoInboundRcvQtyMapper">
+
+    <resultMap type="SyncPoInboundRcvQtyEO" id="SyncPoInboundRcvQtyEOResult">
+        <result property="itemId"    column="ITEM_ID"    />
+        <result property="shipToOrganizationId"    column="SHIP_TO_ORGANIZATION_ID"    />
+        <result property="receiveQuantity"    column="RECEIVE_QUANTITY"    />
+        <result property="inboundQuantity"    column="inbound_quantity"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncPoInboundRcvQtyEO">
+        TRUNCATE TABLE sync_po_inbound_rcv_qty
+    </delete>
+
+    <insert id="batchSyncPoInboundRcvQtyEO">
+        insert into sync_po_inbound_rcv_qty( ITEM_ID, SHIP_TO_ORGANIZATION_ID, RECEIVE_QUANTITY, inbound_quantity) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.itemId,jdbcType=BIGINT}, #{item.shipToOrganizationId,jdbcType=BIGINT},cast(#{item.receiveQuantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.inboundQuantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+</mapper>

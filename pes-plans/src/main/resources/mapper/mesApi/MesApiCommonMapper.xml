@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.mesApi.mapper.MesApiCommonMapper">
+    <resultMap type="MesWarehouseInoutVo" id="MesWarehouseInoutVoResult">
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+    </resultMap>
+
+    <select id="pushTransferOrder" parameterType="java.lang.String" statementType="CALLABLE"  resultType="java.lang.Integer">
+        { call dbo.test(#{dataJson,mode = IN,jdbcType = VARCHAR },1)}
+    </select>
+    <!--<select id="getMesWarehouseInoutList"  statementType="CALLABLE"  resultType="sinexcel.mesApi.domain.MesWarehouseInoutVo">-->
+        <!--{ call  Warehouse_InoutSum_QueryDoMethod_wms ('','2021-06-01 00:00:00.000','2021-06-02 00:00:00.000')}-->
+    <!--</select>-->
+
+    <select id="getMesWarehouseInoutList" resultType="Integer">
+        select count(*) from sync_inv_onhand_quantity_new_test
+    </select>
+
+
+    <!--<insert id="getMesWarehouseInoutList" parameterType="java.lang.Long">-->
+        <!--insert into sync_inv_onhand_quantity_new_test( inventory_item_id) values ( #{inventoryItemId,jdbcType=BIGINT})-->
+    <!--</insert>-->
+
+
+</mapper>

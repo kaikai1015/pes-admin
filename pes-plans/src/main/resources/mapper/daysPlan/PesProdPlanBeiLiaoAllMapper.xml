@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.PesProdPlanBeiLiaoAllMapper">
+
+    <resultMap type="PesProdPlanBeiLiaoAll" id="PesProdPlanBeiLiaoAllResult">
+                    <result property="beiLiaoId"    column="bei_liao_id"    />
+                    <result property="lotNumDate"    column="lot_num_date"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="planName"    column="plan_name"    />
+                    <result property="prodLineFlag"    column="prod_line_flag"    />
+                    <result property="lineId"    column="line_id"    />
+                    <result property="partyName"    column="party_name"    />
+                    <result property="orderNumber"    column="order_number"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="workPlanQuantity"    column="work_plan_quantity"    />
+                    <result property="plannedCompletionDate"    column="planned_completion_date"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="requiredQuantity"    column="required_quantity"    />
+                    <result property="issuedQuantity"    column="issued_quantity"    />
+                    <result property="suoHaoQuantity"    column="suo_hao_quantity"    />
+                    <result property="transferedFlag"    column="transfered_flag"    />
+                    <result property="transferedQuantity"    column="transfered_quantity"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+                    <result property="receiveQuantity"    column="receive_quantity"    />
+                    <result property="beiLiaoQuantity"    column="bei_liao_quantity"    />
+                    <result property="id"    column="id"    />
+                    <result property="xianBieFlag"    column="xian_bie_flag"    />
+        <result property="itemWorkNameFlag"    column="item_work_name_flag"    />
+        <result property="untransferQuantity"    column="untransfer_quantity"    />
+        <result property="qianliaoQuantity"    column="qianliao_quantity"    />
+            </resultMap>
+
+    <sql id="selectPesProdPlanBeiLiaoAllVo">
+        SELECT
+            ppbla.bei_liao_id,
+            pldh.lot_num_date,
+            pldh.lot_num,
+            pldh.create_by as plan_name,
+            pldl.xian_bie_flag,
+            pldl.line_id,
+            hp.PARTY_NAME,
+            pldl.order_number,
+            pldl.item_number AS p_item_number,
+            pldl.item_description AS p_item_description,
+            pldl.work_order_number,
+            pldl.work_plan_quantity,
+            pldl.planned_completion_date,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            ppbla.required_quantity,
+            ppbla.issued_quantity,
+            ppbla.UNTRANSFER_QUANTITY,
+            ppbla.qianliao_quantity,
+            isnull(pitca.fixed_suo_hao_quantiy,0) as suo_hao_quantity,
+            pitca.item_work_name_flag,
+            isnull(ppbla.transfered_quantity,0)as transfered_quantity,
+            isnull(ppbla.onhand_quantity,0)as onhand_quantity,
+            isnull(ppbla.receive_quantity,0) as receive_quantity,
+            ppbla.bei_liao_quantity,
+            ppbla.transfered_flag
+        FROM
+            pes_prod_line_days_header_all pldh,
+            pes_prod_line_days_line_all pldl
+            left join sync_hz_parties hp
+            on (pldl.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION'),
+            sync_items_num_des_list list,
+            pes_prod_plan_bei_liao_all ppbla
+            left join pes_item_techniques_code_all pitca
+            on (ppbla.organization_id = pitca.organization_id
+            AND ppbla.inventory_item_id = pitca.inventory_item_id)
+    </sql>
+
+    <select id="selectPesProdPlanBeiLiaoAllList" parameterType="PesProdPlanBeiLiaoAll" resultMap="PesProdPlanBeiLiaoAllResult">
+        <include refid="selectPesProdPlanBeiLiaoAllVo"/>
+        <where>
+            and pldh.id = pldl.id
+            AND pldl.line_id = ppbla.line_id
+            AND ppbla.organization_id = list.ORGANIZATION_ID
+            AND ppbla.inventory_item_id = list.INVENTORY_ITEM_ID
+            and pldh.id = #{id}
+            <if test="workOrderNumber != null "> and pldl.work_order_number like (#{workOrderNumber} + '%')</if>
+            <if test="itemNumber != null "> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+            <if test="transferedFlag != null  and transferedFlag != ''"> and ppbla.transfered_flag = #{transferedFlag}</if>
+        </where>
+    </select>
+
+    <delete id="deletePesProdPlanBeiLiaoAllByIds" parameterType="Long">
+        delete from pes_prod_plan_bei_liao_all where id = #{id};
+        TRUNCATE TABLE pes_mes_wie_subinventory_transfer_all;
+        INSERT INTO pes_mes_wie_subinventory_transfer_all (
+            work_order_id,
+            FROM_ORGANIZATION_ID,
+            INVENTORY_ITEM_ID,
+            TRANSFER_QUANTITY)
+            (SELECT
+                msta.work_order_id,
+                msta.FROM_ORGANIZATION_ID,
+                msta.INVENTORY_ITEM_ID,
+                SUM (msta.QUANTITY) AS TRANSFER_QUANTITY
+            FROM
+                mes_subinventory_transfer_all msta
+            WHERE
+                msta.work_order_id IS NOT NULL
+            AND msta.ERP_FLAG = 1
+            GROUP BY
+                msta.work_order_id,
+                msta.FROM_ORGANIZATION_ID,
+                msta.INVENTORY_ITEM_ID)
+    </delete>
+
+    <insert id="insertPesProdPlanBeiLiaoAll" parameterType="PesProdPlanBeiLiaoAll">
+        INSERT INTO pes_prod_plan_bei_liao_all(
+        WORK_ORDER_ID,
+        organization_id,
+        inventory_item_id,
+        required_quantity,
+        issued_quantity,
+        transfered_quantity,
+        UNTRANSFER_QUANTITY,
+        onhand_quantity,
+        receive_quantity,
+        bei_liao_quantity,
+        qianliao_quantity,
+        line_id,
+        id,
+        create_by,
+        create_date,
+        last_update_by,
+        last_update_date
+        )
+        (SELECT
+        blqqs.WORK_ORDER_ID,
+        blqqs.ORGANIZATION_ID,
+        blqqs.INVENTORY_ITEM_ID,
+        blqqs.net_quantity,
+        blqqs.ISSUED_QUANTITY,
+        blqqs.TRANSFER_QUANTITY,
+        blqqs.UNTRANSFER_QUANTITY,
+        blqqs.onhand_quantity,
+        blqqs.recived_quantity,
+        blqqs.bei_liao_quantity,
+        (blqqs.UNTRANSFER_QUANTITY - isnull(blqqs.bei_liao_quantity,0)) as qianliao_quantity,
+        blqqs.line_id,
+        blqqs.id,
+        #{createBy},
+        getdate(),
+        #{createBy},
+        getdate()
+        FROM
+        (SELECT
+        blqq.WORK_ORDER_ID,
+        blqq.ORGANIZATION_ID,
+        blqq.INVENTORY_ITEM_ID,
+        blqq.net_quantity,
+        blqq.ISSUED_QUANTITY,
+        blqq.TRANSFER_QUANTITY,
+        blqq.UNTRANSFER_QUANTITY,
+        blqq.onhand_quantity,
+        blqq.recived_quantity,
+        (CASE WHEN (blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY) &lt; 0 THEN 0 ELSE
+        (CASE WHEN (blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY) &gt;= blqq.UNTRANSFER_QUANTITY THEN blqq.UNTRANSFER_QUANTITY ELSE
+        (blqq.avaliable_quantity - blqq.sum_net_quantity + blqq.UNTRANSFER_QUANTITY) END) END) AS bei_liao_quantity,
+        blqq.line_id,
+        blqq.id
+        FROM
+        (select
+        blq.WORK_ORDER_ID,
+        blq.ORGANIZATION_ID,
+        blq.INVENTORY_ITEM_ID,
+        blq.net_quantity,
+        blq.ISSUED_QUANTITY,
+        blq.TRANSFER_QUANTITY,
+        (blq.net_quantity - blq.qichu_quantity - blq.TRANSFER_QUANTITY) as UNTRANSFER_QUANTITY,
+        blq.onhand_quantity,
+        blq.recived_quantity,
+        sum((blq.net_quantity - blq.qichu_quantity - blq.TRANSFER_QUANTITY)) over(partition by blq.ORGANIZATION_ID,blq.INVENTORY_ITEM_ID order by blq.line_id asc) as sum_net_quantity,
+        isnull(blq.onhand_quantity,0) + blq.recived_quantity as avaliable_quantity,
+        blq.line_id,
+        blq.id
+        from
+        (SELECT
+        wwom.WORK_ORDER_ID,
+        wwom.ORGANIZATION_ID,
+        wwom.INVENTORY_ITEM_ID,
+        wwom.ISSUED_QUANTITY,
+        isnull(pmwsa.TRANSFER_QUANTITY,0) as TRANSFER_QUANTITY,
+		isnull(qichu.transaction_quantity,0) as qichu_quantity,
+        (pldl.work_plan_quantity * wwom.QUANTITY_PER_PRODUCT) AS net_quantity,
+        ioqn.quantity AS onhand_quantity,
+        isnull(iqsl.deliverying_quantity,0) + isnull(iqsl.checked_unconfirmed_quantity,0) + isnull(iqsl.receipt_confirmed_quantity,0) + isnull(iqsl.unrcv_quantity,0) AS recived_quantity,
+        pldl.line_id,
+        pldl.id
+        FROM
+        pes_prod_line_days_line_all pldl,
+        sync_wie_wo_demand_v_w wwom
+        LEFT JOIN (SELECT
+        ionc.inventory_item_id,
+        ionc.organization_id,
+        SUM (ionc.quantity) AS quantity
+        FROM
+        sync_inv_onhand_quantity_new_code ionc
+        WHERE
+        (ionc.subinventory_code &lt;&gt; 'XBC' and ionc.subinventory_code &lt;&gt; '4BL001' and ionc.subinventory_code not like '3%')
+        GROUP BY
+        ionc.inventory_item_id,
+        ionc.organization_id) ioqn
+        ON (wwom.ORGANIZATION_ID = ioqn.organization_id
+        AND wwom.INVENTORY_ITEM_ID = ioqn.INVENTORY_ITEM_ID)
+        LEFT JOIN mes_item_quantity_status_list iqsl
+        ON (wwom.ORGANIZATION_ID = iqsl.organization_id
+        AND wwom.INVENTORY_ITEM_ID = iqsl.INVENTORY_ITEM_ID)
+        LEFT JOIN pes_mes_wie_subinventory_transfer_all pmwsa
+		on (wwom.work_order_id = pmwsa.work_order_id
+		and wwom.organization_id = pmwsa.FROM_ORGANIZATION_ID
+		and wwom.inventory_item_id = pmwsa.inventory_item_id)
+		LEFT JOIN pes_erp_wie_work_material_qichu_all qichu
+		on (wwom.work_order_id = qichu.transaction_source_id
+		and wwom.organization_id = qichu.organization_id
+		and wwom.inventory_item_id = qichu.inventory_item_id)
+        WHERE
+        1=1
+        AND pldl.id = #{id}
+        AND pldl.work_order_id = wwom.WORK_ORDER_ID
+        AND pldl.organization_id = wwom.organization_id) blq) blqq) blqqs)
+    </insert>
+
+    <delete id="updateResetDataFlag" parameterType="Long">
+        UPDATE pes_prod_line_days_header_all set reset_data_flag = '1' where id = #{id}
+    </delete>
+
+</mapper>

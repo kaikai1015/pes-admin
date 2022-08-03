@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.SyncItemsNumDesBuyerListMapper">
+
+    <resultMap type="SyncItemsNumDesBuyerList" id="SyncItemsNumDesBuyerListResult">
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+                    <result property="creationDate"    column="CREATION_DATE"    />
+                    <result property="itemType"    column="ITEM_TYPE"    />
+                    <result property="planningMakeBuyCode"    column="PLANNING_MAKE_BUY_CODE"    />
+                    <result property="primaryUomCode"    column="PRIMARY_UOM_CODE"    />
+        <result property="buyerName"    column="buyer_name"    />
+        <result property="buyerNumber"    column="buyer_number"    />
+        <result property="buyerId"    column="buyer_id"    />
+            </resultMap>
+
+    <sql id="selectSyncItemsNumDesBuyerListVo">
+        SELECT
+            list.ORGANIZATION_ID,
+            list.INVENTORY_ITEM_ID,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.ITEM_TYPE,
+            list.PLANNING_MAKE_BUY_CODE,
+            list.PRIMARY_UOM_CODE,
+            buyer.buyer_number,
+            buyer.buyer_name,
+            isnull(buyer.buyer_id,0) as buyer_id
+        FROM
+            sync_items_num_des_list list
+            LEFT JOIN pes_item_num_buyer_list buyer
+            ON (list.ORGANIZATION_ID = buyer.ORGANIZATION_ID
+            AND list.INVENTORY_ITEM_ID = buyer.INVENTORY_ITEM_ID)
+    </sql>
+
+    <select id="selectSyncItemsNumDesBuyerListList" parameterType="SyncItemsNumDesBuyerList" resultMap="SyncItemsNumDesBuyerListResult">
+        <include refid="selectSyncItemsNumDesBuyerListVo"/>
+        <where>
+            and list.PLANNING_MAKE_BUY_CODE = 2
+            and list.INVENTORY_ITEM_STATUS_CODE = 'Active'
+            <if test="organizationId != null "> and list.ORGANIZATION_ID = #{organizationId}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+    </select>
+
+    <select id="selectSyncItemsNumDesBuyerListById" resultMap="SyncItemsNumDesBuyerListResult">
+        <include refid="selectSyncItemsNumDesBuyerListVo"/>
+        where list.ORGANIZATION_ID = #{organizationId}
+        and list.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+    <select id="getBuyerNameByBuyerNumber" parameterType="String" resultMap="SyncItemsNumDesBuyerListResult">
+        SELECT
+            papf.PERSON_ID as buyer_id,
+            papf.PERSON_NUMBER as buyer_number,
+            ppnf.DISPLAY_NAME as buyer_name
+        FROM
+            sync_per_all_people_f papf,
+            sync_per_person_names_f ppnf
+        WHERE
+            papf.PERSON_ID = ppnf.PERSON_ID
+        AND GETDATE() BETWEEN papf.EFFECTIVE_START_DATE AND papf.EFFECTIVE_END_DATE
+        AND GETDATE() BETWEEN ppnf.EFFECTIVE_START_DATE AND ppnf.EFFECTIVE_END_DATE
+        and papf.PERSON_NUMBER = #{buyerNumber}
+    </select>
+
+    <insert id="insertSyncItemsNumDesBuyerList" parameterType="SyncItemsNumDesBuyerList">
+        insert into pes_item_num_buyer_list
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">ORGANIZATION_ID,</if>
+            <if test="inventoryItemId != null">INVENTORY_ITEM_ID,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="creationDate != null">create_date,</if>
+            <if test="createBy != null">last_update_by,</if>
+            <if test="creationDate != null">last_update_date,</if>
+            <if test="buyerId != null">buyer_id,</if>
+            <if test="buyerNumber != null">buyer_number,</if>
+            <if test="buyerName != null">buyer_name,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="creationDate != null">#{creationDate},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="creationDate != null">#{creationDate},</if>
+            <if test="buyerId != null">#{buyerId},</if>
+            <if test="buyerNumber != null">#{buyerNumber},</if>
+            <if test="buyerName != null">#{buyerName},</if>
+        </trim>
+    </insert>
+
+    <update id="updateSyncItemsNumDesBuyerList" parameterType="SyncItemsNumDesBuyerList">
+        update pes_item_num_buyer_list set buyer_id = #{buyerId},buyer_number = #{buyerNumber},buyer_name = #{buyerName},last_update_by = #{createBy},last_update_date = #{creationDate} where ORGANIZATION_ID = #{organizationId} and INVENTORY_ITEM_ID = #{inventoryItemId}
+    </update>
+
+</mapper>

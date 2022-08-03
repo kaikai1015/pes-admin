@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.PesMonthsSalsePlanLinesMapper">
+
+    <resultMap type="PesMonthsSalsePlanLines" id="PesMonthsSalsePlanLinesResult">
+                    <result property="buId"    column="bu_id"    />
+                    <result property="headerId"    column="header_id"    />
+                    <result property="orderNum"    column="order_num"    />
+                    <result property="lineId"    column="line_id"    />
+                    <result property="lineNum"    column="line_num"    />
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+                    <result property="salseQuantity"    column="SALSE_QUANTITY"    />
+                    <result property="salseDate"    column="SALSE_DATE"    />
+                    <result property="createDate"    column="CREATE_DATE"    />
+                    <result property="createBy"    column="CREATE_BY"    />
+                    <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+                    <result property="lastUpdateBy"    column="LAST_UPDATE_BY"    />
+                    <result property="id"    column="id"    />
+                    <result property="partyId"    column="party_id"    />
+                    <result property="customerPoNumber"    column="customer_po_number"    />
+        <result property="partyNumber"    column="PARTY_NUMBER"    />
+        <result property="partyName"    column="party_name"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="wieS"    column="WIE_S"    />
+        <result property="prS"    column="PR_S"    />
+        <result property="pos"    column="PO_S"    />
+        <result property="orderedQty"    column="ORDERED_QTY"    />
+        <result property="shippedQty"    column="shipped_qty"    />
+        <result property="unitSellingPrice"    column="UNIT_SELLING_PRICE"    />
+        <result property="flag"    column="flag"    />
+        <result property="shippedQtyAmount"    column="shipped_qty_amount"    />
+        <result property="monthsShippedQty"    column="months_shipped_qty"    />
+        <result property="actualShipDate"    column="actual_ship_date"    />
+        <result property="requestShipDate"    column="request_ship_date"    />
+        <result property="actualShipDate"    column="actual_ship_date"    />
+        <result property="orderedDate"    column="ordered_date"    />
+        <result property="completeQuantity"    column="complete_quantity"    />
+        <result property="completeDate"    column="complete_date"    />
+        <result property="lotNum"    column="lot_num"    />
+            </resultMap>
+
+    <sql id="selectPesMonthsSalsePlanLinesVo">
+        SELECT
+            list.lot_num,
+            list.bu_id,
+            list.order_num,
+            list.line_num,
+            list.customer_po_number,
+            hp.PARTY_NUMBER,
+            hp.party_name,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.SALSE_QUANTITY,
+            list.SALSE_DATE,
+            isnull(wie.transaction_quantity,0) as complete_quantity,
+            wie.transaction_date as complete_date
+        FROM
+            sync_hz_parties hp,
+            pes_months_salse_plan_lines list
+            LEFT JOIN (SELECT
+                            wwob.WORK_ORDER_PRIORITY,
+                            wwob.ORGANIZATION_ID,
+                            wwob.INVENTORY_ITEM_ID,
+                            SUM (wca.transaction_quantity) AS transaction_quantity,
+                            MAX (wca.transaction_date) AS transaction_date
+                        FROM
+                            mes_wie_wo_complete_all wca,
+                            sync_wie_work_orders_b wwob
+                        WHERE
+                            wca.work_order_id = wwob.WORK_ORDER_ID
+                        AND wca.organization_id = wwob.organization_id
+                        AND wca.inventory_item_id = wwob.inventory_item_id
+                        and wwob.WORK_ORDER_PRIORITY is not null
+                        AND wca.erp_flag = 1
+                        GROUP BY
+                            wwob.WORK_ORDER_PRIORITY,
+                            wwob.ORGANIZATION_ID,
+                            wwob.INVENTORY_ITEM_ID) wie
+                    on (list.order_num = wie.WORK_ORDER_PRIORITY
+                    and list.ORGANIZATION_ID = wie.ORGANIZATION_ID
+                    and list.INVENTORY_ITEM_ID = wie.INVENTORY_ITEM_ID)
+    </sql>
+
+    <sql id="selectPesMonthsSalsePlanLinesAllVo">
+        SELECT
+            list.lot_num,
+            list.bu_id,
+            list.order_num,
+            list.ordered_date,
+            list.line_num,
+            list.customer_po_number,
+            hp.PARTY_NUMBER,
+            hp.party_name,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.SALSE_QUANTITY,
+            list.SALSE_DATE,
+            list.onhand_quantity,
+            list.WIE_S,
+            list.PR_S,
+            list.PO_S,
+            list.ORDERED_QTY,
+            list.request_ship_date,
+            list.UNIT_SELLING_PRICE,
+            isnull(list.shipped_qty,0) as shipped_qty,
+            isnull(list.months_shipped_qty,0) as months_shipped_qty,
+            list.actual_ship_date,
+            isnull(list.months_shipped_qty,0) * list.UNIT_SELLING_PRICE AS shipped_qty_amount,
+            isnull(wie.transaction_quantity,0) as complete_quantity,
+            wie.transaction_date as complete_date
+        FROM
+            sync_hz_parties hp,
+            pes_months_salse_plan_lines_all list
+            LEFT JOIN (SELECT
+                            wwob.WORK_ORDER_PRIORITY,
+                            wwob.ORGANIZATION_ID,
+                            wwob.INVENTORY_ITEM_ID,
+                            SUM (wca.transaction_quantity) AS transaction_quantity,
+                            MAX (wca.transaction_date) AS transaction_date
+                        FROM
+                            mes_wie_wo_complete_all wca,
+                            sync_wie_work_orders_b wwob
+                        WHERE
+                            wca.work_order_id = wwob.WORK_ORDER_ID
+                        AND wca.organization_id = wwob.organization_id
+                        AND wca.inventory_item_id = wwob.inventory_item_id
+                        and wwob.WORK_ORDER_PRIORITY is not null
+                        AND wca.erp_flag = 1
+                        GROUP BY
+                            wwob.WORK_ORDER_PRIORITY,
+                            wwob.ORGANIZATION_ID,
+                            wwob.INVENTORY_ITEM_ID) wie
+                    on (list.order_num = wie.WORK_ORDER_PRIORITY
+                    and list.ORGANIZATION_ID = wie.ORGANIZATION_ID
+                    and list.INVENTORY_ITEM_ID = wie.INVENTORY_ITEM_ID)
+    </sql>
+
+    <select id="selectPesMonthsSalsePlanLinesList" parameterType="PesMonthsSalsePlanLines" resultMap="PesMonthsSalsePlanLinesResult">
+        <include refid="selectPesMonthsSalsePlanLinesVo"/>
+        <where>
+            and list.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION'
+            <if test="id != null  and id != ''"> and list.id = #{id}</if>
+            <if test="orderNum != null  and orderNum != ''"> and list.order_num = #{orderNum}</if>
+            <if test="lineNum != null  and lineNum != ''"> and list.line_num = #{lineNum}</if>
+            <if test="customerPoNumber != null  and customerPoNumber != ''"> and list.customer_po_number like (#{customerPoNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and hp.party_name like ('%' + #{partyName} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+    </select>
+
+    <select id="selectCount" parameterType="PesMonthsSalsePlanLines" resultMap="PesMonthsSalsePlanLinesResult">
+        <include refid="selectPesMonthsSalsePlanLinesVo"/>
+        <where>
+            and list.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION'
+            <if test="orderNum != null  and orderNum != ''"> and list.order_num = #{orderNum}</if>
+            <if test="lineNum != null"> and list.line_num = #{lineNum}</if>
+            <if test="lineId != null"> and list.line_id = #{lineId}</if>
+            <if test="id != null"> and list.id = #{id}</if>
+            <if test="salseQuantity != null"> and list.salse_quantity = #{salseQuantity}</if>
+            <if test="salseDate != null"> and list.salse_date = #{salseDate}</if>
+        </where>
+    </select>
+
+    <select id="getLotNum" parameterType="String" resultMap="PesMonthsSalsePlanLinesResult">
+        select id from pes_months_salse_plan_headers where lot_num = #{lotNum}
+    </select>
+
+    <select id="getItemDescDatas" parameterType="PesMonthsSalsePlanLines" resultMap="PesMonthsSalsePlanLinesResult">
+        SELECT
+            dha.ORG_ID as bu_id,
+            dha.ORDER_NUMBER AS order_num,
+            dha.ORDERED_DATE,
+            dha.HEADER_ID,
+            dla.DISPLAY_LINE_NUMBER AS line_num,
+            dla.LINE_ID,
+            dla.INVENTORY_ORGANIZATION_ID AS ORGANIZATION_ID,
+            dla.INVENTORY_ITEM_ID,
+            item.ITEM_NUMBER,
+            item.ITEM_DESCRIPTION,
+            dha.customer_po_number,
+            dha.SOLD_TO_PARTY_ID as party_id
+        FROM
+            sync_doo_headers_all dha,
+            sync_doo_lines_all dla,
+            sync_items_num_des_list item
+        WHERE
+        dha.SUBMITTED_FLAG = 'Y'
+        AND dha.HEADER_ID = dla.HEADER_ID
+        AND item.ORGANIZATION_ID = dla.INVENTORY_ORGANIZATION_ID
+        AND item.INVENTORY_ITEM_ID = dla.INVENTORY_ITEM_ID
+        and dla.LINE_ID = #{lineId}
+    </select>
+
+    <insert id="insertPesMonthsSalsePlanLines">
+        insert into pes_months_salse_plan_lines( party_id,bu_id, header_id, order_num,ordered_date,customer_po_number, line_id, line_num, ORGANIZATION_ID, INVENTORY_ITEM_ID, ITEM_NUMBER, ITEM_DESCRIPTION, SALSE_QUANTITY, SALSE_DATE, CREATE_BY, LAST_UPDATE_BY, id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.partyId,jdbcType=BIGINT},#{item.buId,jdbcType=BIGINT}, #{item.headerId,jdbcType=BIGINT}, #{item.orderNum,jdbcType=VARCHAR},#{item.orderedDate,jdbcType=TIMESTAMP}, #{item.customerPoNumber,jdbcType=VARCHAR},#{item.lineId,jdbcType=BIGINT}, #{item.lineNum,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.itemNumber,jdbcType=VARCHAR}, #{item.itemDescription,jdbcType=VARCHAR}, #{item.salseQuantity,jdbcType=DECIMAL}, #{item.salseDate,jdbcType=TIMESTAMP}, #{item.createBy,jdbcType=VARCHAR}, #{item.createBy,jdbcType=VARCHAR}, #{item.id,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <select id="selectPesMonthsSalsePlanLinesListAll" parameterType="PesMonthsSalsePlanLines" resultMap="PesMonthsSalsePlanLinesResult">
+        <include refid="selectPesMonthsSalsePlanLinesAllVo"/>
+        <where>
+            AND list.party_id = hp.party_id
+            AND hp.party_type = 'ORGANIZATION'
+            <if test="id != null  and id != ''"> and list.id = #{id}</if>
+            <if test="orderNum != null  and orderNum != ''"> and list.order_num = #{orderNum}</if>
+            <if test="customerPoNumber != null  and customerPoNumber != ''"> and list.customer_po_number like (#{customerPoNumber} + '%')</if>
+            <if test="partyName != null  and partyName != ''"> and hp.party_name like ('%' + #{partyName} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER like (#{itemNumber} + '%')</if>
+        </where>
+    </select>
+
+    <delete id="deletePesMonthsSalsePlanLinesByIds" parameterType="Long">
+        DELETE FROM pes_months_salse_plan_lines_all where id = #{id}
+    </delete>
+
+    <insert id="insertPesMonthsSalsePlanLinesByIds" parameterType="Long">
+        INSERT INTO pes_months_salse_plan_lines_all (
+            id,
+            lot_num,
+            bu_id,
+            header_id,
+            order_num,
+            ordered_date,
+            party_id,
+            customer_po_number,
+            line_id,
+            line_num,
+            ORGANIZATION_ID,
+            INVENTORY_ITEM_ID,
+            ITEM_NUMBER,
+            ITEM_DESCRIPTION,
+            SALSE_QUANTITY,
+            SALSE_DATE,
+            onhand_quantity,
+            WIE_S,
+            PR_S,
+            PO_S,
+            ORDERED_QTY,
+            UNIT_SELLING_PRICE,
+            months_shipped_qty,
+            actual_ship_date,
+            shipped_qty,
+            request_ship_date,
+            CREATE_DATE,
+            CREATE_BY,
+            LAST_UPDATE_DATE,
+            LAST_UPDATE_BY
+        )
+        (SELECT
+            list.id,
+            listh.lot_num,
+            list.bu_id,
+            list.header_id,
+            list.order_num,
+            list.ordered_date,
+            list.party_id,
+            list.customer_po_number,
+            list.line_id,
+            list.line_num,
+            list.ORGANIZATION_ID,
+            list.INVENTORY_ITEM_ID,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            list.SALSE_QUANTITY,
+            list.SALSE_DATE,
+            isnull(ioq.quantity,0) AS onhand_quantity,
+            isnull(isdq.WIE_S,0) as WIE_S,
+            isnull(isdq.PR_S,0) as PR_S,
+            isnull(isdq.PO_S,0) as PO_S,
+            dla.ORDERED_QTY,
+            dla.UNIT_SELLING_PRICE,
+            (SELECT
+                    SUM (dfll.shipped_qty)
+                FROM
+                    sync_doo_fulfill_lines_all dfll
+                WHERE
+                    dla.HEADER_ID = dfll.header_id
+                AND dla.LINE_ID = dfll.line_id
+                AND datepart(yyyy, dfll.actual_ship_date) = listh.years
+                AND datepart(m, dfll.actual_ship_date) = listh.months
+            ) as months_shipped_qty,
+            (SELECT
+                    max (dfll.actual_ship_date)
+                FROM
+                    sync_doo_fulfill_lines_all dfll
+                WHERE
+                    dla.HEADER_ID = dfll.header_id
+                AND dla.LINE_ID = dfll.line_id
+            ) as actual_ship_date,
+            dflls.shipped_qty,
+	        dflls.request_ship_date,
+            list.CREATE_DATE,
+            list.CREATE_BY,
+            list.LAST_UPDATE_DATE,
+            list.LAST_UPDATE_BY
+        FROM
+            pes_months_salse_plan_headers listh,
+            pes_months_salse_plan_lines list
+        LEFT JOIN sync_inv_onhand_quantity_new ioq ON (
+            list.ORGANIZATION_ID = ioq.organization_id
+            AND list.INVENTORY_ITEM_ID = ioq.inventory_item_id
+        )
+        LEFT JOIN pes_item_supply_demand_quantity isdq ON (
+            list.ORGANIZATION_ID = isdq.organization_id
+            AND list.INVENTORY_ITEM_ID = isdq.inventory_item_id
+        ),
+         sync_doo_lines_all dla,
+         (
+            SELECT
+                dfll.header_id,
+                dfll.line_id,
+                max(dfll.request_ship_date) as request_ship_date,
+                SUM (dfll.shipped_qty) AS shipped_qty
+            FROM
+                sync_doo_fulfill_lines_all dfll
+            GROUP BY
+                dfll.header_id,
+                dfll.line_id
+        ) AS dflls
+        WHERE
+            listh.id = list.id
+        AND list.header_id = dla.HEADER_ID
+        AND list.line_id = dla.LINE_ID
+        AND dla.HEADER_ID = dflls.header_id
+        AND dla.LINE_ID = dflls.line_id
+        AND list.id = #{id})
+    </insert>
+
+
+    <delete id="updateflag" parameterType="Long">
+        UPDATE pes_months_salse_plan_headers set flag = '1' where id = #{id}
+    </delete>
+
+    <select id="getFlags" parameterType="Long" resultMap="PesMonthsSalsePlanLinesResult">
+        select flag from pes_months_salse_plan_headers where id = #{id}
+    </select>
+
+</mapper>

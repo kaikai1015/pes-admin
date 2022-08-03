@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesSubinventoryTransferAllMapper">
+
+    <resultMap type="MesSubinventoryTransferAllEO" id="MesSubinventoryTransferAllEOResult">
+        <result property="fromOrganizationId"    column="FROM_ORGANIZATION_ID"    />
+        <result property="toOrganizationId"    column="TO_ORGANIZATION_ID"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="subinventoryCode"    column="SUBINVENTORY_CODE"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="transactionDate"    column="TRANSACTION_DATE"    />
+        <result property="transferSubinventoryCode"    column="TRANSFER_SUBINVENTORY_CODE"    />
+        <result property="transactionTypeId"    column="TRANSACTION_TYPE_ID"    />
+        <result property="erpFlag"    column="ERP_FLAG"    />
+        <result property="erpFlagDate"    column="ERP_FLAG_DATE"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="transferId"    column="transfer_id"    />
+        <result property="remart"    column="REMART"    />
+        <result property="lotControlCode"    column="LOT_CONTROL_CODE"    />
+        <result property="errorInfor"    column="error_infor"    />
+        <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="chayiQuantity"    column="chayi_quantity"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="transferedQuantity"    column="transfered_quantity"    />
+        <result property="overQuantity"    column="over_quantity"    />
+    </resultMap>
+
+    <sql id="selectMesSubinventoryTransferAllVo">
+        SELECT
+        mst.FROM_ORGANIZATION_ID,
+        (select org.ORGANIZATION_CODE from sync_inv_org_parameters org where org.ORGANIZATION_ID = mst.FROM_ORGANIZATION_ID) AS ORGANIZATION_CODE,
+        mst.TO_ORGANIZATION_ID,
+        mst.INVENTORY_ITEM_ID,
+        (SELECT
+        esb.LOT_CONTROL_CODE
+        FROM
+        sync_egp_system_items_b esb
+        WHERE
+        esb.ORGANIZATION_ID = mst.FROM_ORGANIZATION_ID
+        AND esb.INVENTORY_ITEM_ID = mst.INVENTORY_ITEM_ID) AS LOT_CONTROL_CODE,
+        mst.ITEM_NUMBER,
+        mst.SUBINVENTORY_CODE,
+        mst.QUANTITY,
+        mst.UOM_CODE,
+        mst.TRANSACTION_DATE,
+        mst.TRANSFER_SUBINVENTORY_CODE,
+        mst.REMART,
+        mst.TRANSACTION_TYPE_ID,
+        mst.ERP_FLAG,
+        mst.ERP_FLAG_DATE,
+        mst.LAST_UPDATE_DATE,
+        mst.transfer_id,
+        mst.work_order_id,
+        mst.work_order_number
+        FROM
+        mes_subinventory_transfer_all mst
+    </sql>
+
+    <select id="getSubinvTranferList" parameterType="MesSubinventoryTransferAllEO" resultMap="MesSubinventoryTransferAllEOResult">
+        <include refid="selectMesSubinventoryTransferAllVo"/>
+        <where>
+            and (mst.ERP_FLAG = 0 or mst.ERP_FLAG = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and mst.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and mst.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by mst.ERP_FLAG asc
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesSubinventoryTransferAllEO">
+        update mes_subinventory_transfer_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where transfer_id = #{transferId}
+    </update>
+
+    <select id="selectTransferedQuantity" parameterType="MesSubinventoryTransferAllEO" resultMap="MesSubinventoryTransferAllEOResult">
+        SELECT
+        SUM ((case when msta.SUBINVENTORY_CODE = 'XBC' OR msta.SUBINVENTORY_CODE like '3%' then (-1)*msta.QUANTITY when msta.TRANSFER_SUBINVENTORY_CODE = 'XBC' OR msta.TRANSFER_SUBINVENTORY_CODE like '3%' then msta.QUANTITY else 0 end)) AS transfered_quantity,
+        max(isnull(cmwm.over_quantity,0)) as over_quantity
+        FROM
+        mes_subinventory_transfer_all msta
+        left join cux_mes_work_material_all_v cmwm
+        on (msta.work_order_id = cmwm.work_order_id
+        and msta.FROM_ORGANIZATION_ID = cmwm.organization_id
+        and msta.inventory_item_id = cmwm.inventory_item_id)
+        WHERE
+        msta.work_order_id = #{workOrderId}
+        AND msta.INVENTORY_ITEM_ID = #{inventoryItemId}
+        AND msta.FROM_ORGANIZATION_ID = #{fromOrganizationId}
+        AND msta.erp_flag = 1
+    </select>
+
+    <update id="updateWieItemMaterialsTransferQuantityByIds" parameterType="MesSubinventoryTransferAllEO">
+        update pes_wie_wo_operation_materials_erp
+        set transfered_quantity = #{transferedQuantity},
+          last_update_by = 'INTG_ADMIN'
+          where work_order_id = #{workOrderId}
+          and INVENTORY_ITEM_ID = #{inventoryItemId}
+          and organization_id = #{fromOrganizationId}
+          and material_sequence_number > 0
+    </update>
+
+    <update id="updateWieItemReturnMaterialsTransferQuantityByIds" parameterType="MesSubinventoryTransferAllEO">
+        update pes_wie_wo_operation_materials_erp
+        set transfered_quantity = transfered_quantity - #{transferedQuantity},
+        last_update_by = 'INTG_ADMIN'
+        where work_order_id = #{workOrderId}
+        and INVENTORY_ITEM_ID = #{inventoryItemId}
+        and organization_id = #{fromOrganizationId}
+        and material_sequence_number > 0
+    </update>
+
+    <update id="updateWieItemMaterialsIssuedQuantityByIds" parameterType="MesSubinventoryTransferAllEO">
+        update pes_wie_wo_operation_materials_erp
+        set issued_quantity = #{transferedQuantity} + #{overQuantity},
+        last_update_by = 'INTG_ADMIN'
+        where work_order_id = #{workOrderId}
+        and INVENTORY_ITEM_ID = #{inventoryItemId}
+        and organization_id = #{fromOrganizationId}
+        and material_sequence_number > 0
+    </update>
+
+    <update id="updateWieItemReturnMaterialsIssuedQuantityByIds" parameterType="MesSubinventoryTransferAllEO">
+        update pes_wie_wo_operation_materials_erp
+        set issued_quantity = issued_quantity - #{transferedQuantity},
+        last_update_by = 'INTG_ADMIN'
+        where work_order_id = #{workOrderId}
+        and INVENTORY_ITEM_ID = #{inventoryItemId}
+        and organization_id = #{fromOrganizationId}
+        and material_sequence_number > 0
+    </update>
+
+    <select id="selectMesSubinventoryTransferAllList" parameterType="MesSubinventoryTransferAllEO" resultMap="MesSubinventoryTransferAllEOResult">
+        SELECT
+        msta.FROM_ORGANIZATION_ID,
+        msta.INVENTORY_ITEM_ID,
+        msta.ITEM_NUMBER,
+        msta.SUBINVENTORY_CODE,
+        msta.QUANTITY,
+        msta.UOM_CODE,
+        msta.TRANSACTION_DATE,
+        msta.TRANSFER_SUBINVENTORY_CODE,
+        msta.TRANSACTION_TYPE_ID,
+        msta.ERP_FLAG,
+        msta.ERP_FLAG_DATE,
+        msta.LAST_UPDATE_DATE,
+        msta.transfer_id,
+        msta.REMART,
+        msta.error_infor,
+        msta.work_order_number,
+        isnull(ioqn.quantity,0) AS onhand_quantity,
+        (case when isnull(ioqn.quantity,0) &gt;= msta.QUANTITY then 0 ELSE msta.QUANTITY - isnull(ioqn.quantity,0) end) as chayi_quantity
+        FROM
+        mes_subinventory_transfer_all msta
+        LEFT JOIN sync_inv_onhand_quantity_new_code ioqn
+        ON (msta.FROM_ORGANIZATION_ID = ioqn.organization_id
+        AND msta.inventory_item_id = ioqn.inventory_item_id
+        AND msta.SUBINVENTORY_CODE = ioqn.subinventory_code)
+        <where>
+            <if test="erpFlag != null  and erpFlag != ''"> and msta.erp_flag = #{erpFlag}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and msta.item_number = #{itemNumber}</if>
+        </where>
+        order by msta.transfer_id desc
+    </select>
+
+</mapper>

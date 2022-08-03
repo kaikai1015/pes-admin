@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncPoLinesAllMapper">
+
+    <resultMap type="SyncPoLinesAllEO" id="SyncPoLinesAllEOResult">
+        <result property="poHeaderId"    column="PO_HEADER_ID"    />
+        <result property="poLineId"    column="PO_LINE_ID"    />
+        <result property="prcBuId"    column="PRC_BU_ID"    />
+        <result property="lineNum"    column="LINE_NUM"    />
+        <result property="lineStatus"    column="LINE_STATUS"    />
+        <result property="itemId"    column="ITEM_ID"    />
+        <result property="workOrderId"    column="WORK_ORDER_ID"    />
+        <result property="uomCode"    column="UOM_CODE"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="organizationId"    column="ORGANIZATION_ID"    />
+        <result property="needByDate"    column="NEED_BY_DATE"    />
+    </resultMap>
+
+    <sql id="selectSyncPoLinesAllVo">
+        select PO_HEADER_ID, PO_LINE_ID, PRC_BU_ID, LINE_NUM, LINE_STATUS, ITEM_ID,ORGANIZATION_ID, WORK_ORDER_ID, UOM_CODE, QUANTITY, NEED_BY_DATE,last_update_date from sync_po_lines_all
+    </sql>
+
+    <select id="selectSyncPoLinesAllList" parameterType="SyncPoLinesAllEO" resultMap="SyncPoLinesAllEOResult">
+        <include refid="selectSyncPoLinesAllVo"/>
+        <where>
+            and LINE_STATUS &lt;&gt; 'INCOMPLETE'
+            <if test="poHeaderId != null "> and PO_HEADER_ID = #{poHeaderId}</if>
+            <if test="poLineId != null "> and PO_LINE_ID = #{poLineId}</if>
+            <if test="itemId != null "> and ITEM_ID = #{itemId}</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= DATEADD(MINUTE,-20,#{beginTime})</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+
+    <delete id="deleteSyncPoLinesAllEO">
+        delete from sync_po_lines_all where PO_LINE_ID in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.poLineId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+    <insert id="batchSyncPoLinesAllEO">
+        insert into sync_po_lines_all( PO_HEADER_ID, PO_LINE_ID, PRC_BU_ID, LINE_NUM, LINE_STATUS, ITEM_ID,ORGANIZATION_ID, WORK_ORDER_ID, UOM_CODE, QUANTITY,UNIT_PRICE,NEED_BY_DATE, last_update_date) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.poHeaderId,jdbcType=BIGINT}, #{item.poLineId,jdbcType=BIGINT}, #{item.prcBuId,jdbcType=BIGINT}, #{item.lineNum,jdbcType=INTEGER}, #{item.lineStatus,jdbcType=VARCHAR}, #{item.itemId,jdbcType=BIGINT},#{item.organizationId,jdbcType=BIGINT}, #{item.workOrderId,jdbcType=BIGINT}, #{item.uomCode,jdbcType=VARCHAR}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.unitPrice,jdbcType=DECIMAL} as decimal(15,5)),#{item.needByDate,jdbcType=TIMESTAMP}, #{item.lastUpdateDate,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+</mapper>

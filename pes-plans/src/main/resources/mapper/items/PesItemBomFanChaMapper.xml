@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.PesItemBomFanChaMapper">
+
+    <resultMap type="PesItemBomFanChaEO" id="PesItemBomFanChaEOResult">
+        <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="pItemNumber"    column="p_item_number"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="workOrderStatusId"    column="work_order_status_id"    />
+        <result property="orderNumber"    column="order_number"    />
+        <result property="customerName"    column="customer_name"    />
+        <result property="pItemDescription"    column="p_item_description"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="itemNumber"    column="item_number"    />
+        <result property="itemType"    column="item_type"    />
+        <result property="componentQuantity"    column="component_quantity"    />
+        <result property="itemDescription"    column="item_description"    />
+        <result property="productCatalog"    column="Product_Catalog"    />
+        <result property="itemCatalog"    column="Item_Catalog"    />
+    </resultMap>
+
+
+    <select id="selectPesItemBomFanChaEOListAll" parameterType="PesItemBomFanChaEO" resultMap="PesItemBomFanChaEOResult">
+        SELECT
+        pitem.ITEM_NUMBER AS P_ITEM_NUMBER,
+        wwob.work_order_number,
+        wwob.WORK_ORDER_STATUS_ID,
+        wwob.WORK_ORDER_PRIORITY as order_number,
+        wwob.WORK_ORDER_DESCRIPTION as customer_name,
+        pitem.ITEM_DESCRIPTION AS p_item_description,
+        item.ITEM_NUMBER,
+        item.item_description,
+        item.item_type,
+        bom.component_quantity,
+        (SELECT
+        top 1
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        eic.ORGANIZATION_ID = pitem.ORGANIZATION_ID
+        and eic.inventory_item_id = pitem.inventory_item_id
+        and ecb.CATEGORY_ID = eic.CATEGORY_ID
+        and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+        (SELECT
+        top 1
+        ecb.CATEGORY_NAME
+        FROM
+        sync_egp_categories_b ecb,
+        sync_egp_item_categories eic
+        WHERE
+        eic.ORGANIZATION_ID = pitem.ORGANIZATION_ID
+        and eic.inventory_item_id = pitem.inventory_item_id
+        and ecb.CATEGORY_ID = eic.CATEGORY_ID
+        and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog
+        FROM
+        sync_bom_item_data_list bom,
+        sync_items_num_des_list item,
+        sync_items_num_des_list pitem
+        LEFT JOIN sync_wie_work_orders_b wwob
+        ON (pitem.ORGANIZATION_ID = wwob.organization_id
+        AND pitem.INVENTORY_ITEM_ID = wwob.inventory_item_id)
+        WHERE
+        bom.p_inventory_item_id = pitem.inventory_item_id
+        AND bom.organization_id = pitem.organization_id
+        AND bom.inventory_item_id = item.inventory_item_id
+        AND bom.organization_id = item.organization_id
+        AND bom.disable_date IS NULL
+        AND bom.IMPLEMENTATION_DATE IS NOT NULL
+        AND item.ITEM_NUMBER = #{itemNumber}
+        AND item.organization_id = 300000004669869
+    </select>
+
+
+    <select id="selectPesItemBomFanChaEOList" parameterType="PesItemBomFanChaEO" resultMap="PesItemBomFanChaEOResult">
+        SELECT
+            pitem.ITEM_NUMBER AS P_ITEM_NUMBER,
+            pitem.ITEM_DESCRIPTION AS p_item_description,
+            item.ITEM_NUMBER,
+            item.item_description,
+            item.item_type,
+            bom.component_quantity,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = pitem.ORGANIZATION_ID
+            and eic.inventory_item_id = pitem.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799553) as Product_Catalog,
+            (SELECT
+                    top 1
+                        ecb.CATEGORY_NAME
+                    FROM
+                        sync_egp_categories_b ecb,
+                        sync_egp_item_categories eic
+                    WHERE
+                        eic.ORGANIZATION_ID = pitem.ORGANIZATION_ID
+            and eic.inventory_item_id = pitem.inventory_item_id
+            and ecb.CATEGORY_ID = eic.CATEGORY_ID
+            and eic.CATEGORY_SET_ID = 300000001799581) as Item_Catalog
+        FROM
+            sync_bom_item_data_list bom,
+            sync_items_num_des_list item,
+            sync_items_num_des_list pitem
+        WHERE
+            bom.p_inventory_item_id = pitem.inventory_item_id
+            AND bom.organization_id = pitem.organization_id
+            AND bom.inventory_item_id = item.inventory_item_id
+            AND bom.organization_id = item.organization_id
+            AND bom.disable_date IS NULL
+            AND bom.IMPLEMENTATION_DATE IS NOT NULL
+            AND item.ITEM_NUMBER = #{itemNumber}
+            AND item.organization_id = 300000004669869
+    </select>
+
+</mapper>

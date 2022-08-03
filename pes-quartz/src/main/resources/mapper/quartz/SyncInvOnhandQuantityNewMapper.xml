@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncInvOnhandQuantityNewMapper">
+
+    <resultMap type="SyncInvOnhandQuantityNewEO" id="SyncInvOnhandQuantityNewEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="quantity"    column="quantity"    />
+    </resultMap>
+
+    <delete id="deleteSyncInvOnhandQuantityNewTempEO">
+        TRUNCATE TABLE sync_inv_onhand_quantity_new_temp
+    </delete>
+
+    <insert id="batchSyncInvOnhandQuantityNewTempEO">
+        insert into sync_inv_onhand_quantity_new_temp( inventory_item_id, organization_id, quantity) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT},cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="batchSyncInvOnhandQuantityNewEO">
+        TRUNCATE TABLE sync_inv_onhand_quantity_new;
+        INSERT INTO sync_inv_onhand_quantity_new (
+        inventory_item_id,
+        organization_id,
+        quantity
+        ) SELECT
+        inventory_item_id,
+        organization_id,
+        quantity
+        FROM
+        sync_inv_onhand_quantity_new_temp
+    </delete>
+
+</mapper>

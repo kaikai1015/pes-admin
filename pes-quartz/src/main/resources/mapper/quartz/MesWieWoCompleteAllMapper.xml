@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesWieWoCompleteAllMapper">
+
+    <resultMap type="MesWieWoCompleteAllEO" id="MesWieWoCompleteAllEOResult">
+        <result property="organizationId"    column="organization_id"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="workOrderId"    column="work_order_id"    />
+        <result property="workOrderNumber"    column="work_order_number"    />
+        <result property="remark"    column="remark"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="erpFlagWork"    column="erp_flag_Work"    />
+        <result property="erpFlagWorkDate"    column="erp_flag_work_date"    />
+        <result property="woCompleteId"    column="wo_complete_id"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="organizationCode"    column="organization_code"    />
+        <result property="woOperationSequenceNumber"    column="wo_operation_sequence_number"    />
+        <result property="uomCode"    column="uom_code"    />
+    </resultMap>
+
+    <sql id="selectMesWieWoCompleteAllVo">
+        SELECT
+            mpr.ORGANIZATION_ID,
+            mpr.QUANTITY as transaction_quantity,
+            spla.WORK_ORDER_ID,
+            (SELECT esb.LOT_CONTROL_CODE FROM sync_egp_system_items_b esb WHERE esb.ORGANIZATION_ID = wwob.ORGANIZATION_ID AND esb.INVENTORY_ITEM_ID = wwob.INVENTORY_ITEM_ID) AS LOT_CONTROL_CODE,
+            mpr.UOM_CODE,
+            mpr.SUBINVENTORY_CODE,
+            mpr.ERP_FLAG_WORK,
+            mpr.ERP_FLAG_WORK_DATE,
+            mpr.RCV_ID as wo_complete_id,
+            mpr.REMART as remark,
+            getdate() as transaction_date,
+            mpr.LAST_UPDATE_DATE,
+            wwob.WORK_ORDER_NUMBER
+        FROM
+            mes_purchae_rcv_all mpr,
+            sync_po_lines_all spla,
+            sync_wie_work_orders_b wwob
+    </sql>
+
+    <select id="getWieWoCompleteList" resultMap="MesWieWoCompleteAllEOResult">
+        <include refid="selectMesWieWoCompleteAllVo"/>
+        <where>
+            and (mpr.ERP_FLAG_WORK = 0 or mpr.ERP_FLAG_WORK = 2)
+            and mpr.ERP_FLAG = 1
+            and mpr.DOCUMENT_ID = spla.PO_HEADER_ID
+            and mpr.DOCUMENT_LINE_ID = spla.PO_LINE_ID
+            and spla.WORK_ORDER_ID = wwob.WORK_ORDER_ID
+            and spla.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+            and isnull(spla.WORK_ORDER_ID,0) &gt; 0
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and mpr.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and mpr.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by mpr.ERP_FLAG_WORK asc
+    </select>
+
+    <select id="selectOrgnazationCode" parameterType="Long" resultMap="MesWieWoCompleteAllEOResult">
+        select ORGANIZATION_CODE from sync_inv_org_parameters where ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <!--<select id="selectOperSequenceNumber" parameterType="MesWieWoCompleteAllEO" resultMap="MesWieWoCompleteAllEOResult">-->
+    <!--SELECT-->
+    <!--wwop.OPERATION_SEQ_NUMBER AS wo_operation_sequence_number-->
+    <!--FROM-->
+    <!--sync_wie_wo_operations_b wwop,-->
+    <!--pes_wie_work_orders_b_erp wwob-->
+    <!--WHERE-->
+    <!--wwop.WORK_ORDER_ID = #{workOrderId}-->
+    <!--AND wwop.AUTO_TRANSACT_FLAG = 'N'-->
+    <!--AND wwob.WORK_ORDER_ID = wwop.WORK_ORDER_ID-->
+    <!--AND wwob.ORGANIZATION_ID = wwop.ORGANIZATION_ID-->
+    <!--and wwob.planned_start_quantity > isnull(wwop.COMPLETED_QUANTITY,0)-->
+    <!--and wwob.planned_start_quantity >= isnull(wwop.READY_QUANTITY,0)-->
+    <!--and wwob.planned_start_quantity - isnull(wwop.COMPLETED_QUANTITY,0) >= #{transactionQuantity}-->
+    <!--and (case when wwop.OPERATION_TYPE = 'SUPPLIER' then isnull(wwop.RECEIVED_QUANTITY,0) else #{transactionQuantity} end) >= #{transactionQuantity}-->
+    <!--ORDER BY-->
+    <!--wwop.OPERATION_SEQ_NUMBER ASC-->
+    <!--</select>-->
+
+    <select id="selectOperSequenceNumber" parameterType="MesWieWoCompleteAllEO" resultMap="MesWieWoCompleteAllEOResult">
+        SELECT
+        wwop.OPERATION_SEQ_NUMBER AS wo_operation_sequence_number
+        FROM
+        sync_wie_wo_operations_b wwop
+        WHERE
+        wwop.WORK_ORDER_ID = #{workOrderId}
+        AND wwop.COUNT_POINT_OPERATION_FLAG = 'Y'
+        and wwop.OPERATION_TYPE = 'IN_HOUSE'
+        ORDER BY
+        wwop.OPERATION_SEQ_NUMBER ASC
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesWieWoCompleteAllEO">
+        update mes_purchae_rcv_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_WORK_DATE = getdate(),
+            <if test="erpFlagWork != null">ERP_FLAG_WORK = #{erpFlagWork},</if>
+            <if test="workOrderNumber != null">work_order_number = #{workOrderNumber},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where RCV_ID = #{woCompleteId}
+    </update>
+
+</mapper>

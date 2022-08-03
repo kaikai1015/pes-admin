@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncInvMaterialTxnsMapper">
+
+    <resultMap type="SyncInvMaterialTxnsEO" id="SyncInvMaterialTxnsEOResult">
+        <result property="transactionId"    column="transaction_id"    />
+        <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="lastUpdatedBy"    column="last_updated_by"    />
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="transactionTypeId"    column="transaction_type_id"    />
+        <result property="transactionActionId"    column="transaction_action_id"    />
+        <result property="transactionSourceTypeId"    column="transaction_source_type_id"    />
+        <result property="transactionSourceId"    column="transaction_source_id"    />
+        <result property="transactionSourceName"    column="transaction_source_name"    />
+        <result property="transactionQuantity"    column="transaction_quantity"    />
+        <result property="transactionUom"    column="transaction_uom"    />
+        <result property="primaryQuantity"    column="primary_quantity"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="transactionReference"    column="transaction_reference"    />
+        <result property="distributionAccountId"    column="distribution_account_id"    />
+        <result property="costedFlag"    column="costed_flag"    />
+        <result property="currencyCode"    column="currency_code"    />
+        <result property="currencyConversionRate"    column="currency_conversion_rate"    />
+        <result property="currencyConversionType"    column="currency_conversion_type"    />
+        <result property="currencyConversionDate"    column="currency_conversion_date"    />
+        <result property="pickingLineId"    column="PICKING_LINE_ID"    />
+        <result property="trxSourceLineId"    column="trx_source_line_id"    />
+        <result property="trxSourceDeliveryId"    column="trx_source_delivery_id"    />
+        <result property="rmaLineId"    column="rma_line_id"    />
+        <result property="transferTransactionId"    column="transfer_transaction_id"    />
+        <result property="transactionSetId"    column="transaction_set_id"    />
+        <result property="rcvTransactionId"    column="rcv_transaction_id"    />
+        <result property="sourceCode"    column="source_code"    />
+        <result property="sourceLineId"    column="source_line_id"    />
+        <result property="transferOrganizationId"    column="transfer_organization_id"    />
+        <result property="transferSubinventory"    column="transfer_subinventory"    />
+        <result property="shipmentNumber"    column="shipment_number"    />
+        <result property="attribute1"    column="attribute1"    />
+        <result property="attribute2"    column="attribute2"    />
+        <result property="attribute3"    column="attribute3"    />
+        <result property="attribute4"    column="attribute4"    />
+        <result property="attribute5"    column="attribute5"    />
+        <result property="attribute6"    column="attribute6"    />
+        <result property="attribute7"    column="attribute7"    />
+        <result property="attribute8"    column="attribute8"    />
+        <result property="attribute9"    column="attribute9"    />
+        <result property="attribute10"    column="attribute10"    />
+        <result property="owningOrganizationId"    column="owning_organization_id"    />
+        <result property="owningTpType"    column="owning_tp_type"    />
+        <result property="xfrOwningOrganizationId"    column="xfr_owning_organization_id"    />
+        <result property="transferOwningTpType"    column="transfer_owning_tp_type"    />
+        <result property="planningOrganizationId"    column="planning_organization_id"    />
+        <result property="planningTpType"    column="planning_tp_type"    />
+        <result property="xfrPlanningOrganizationId"    column="xfr_planning_organization_id"    />
+        <result property="transferPlanningTpType"    column="transfer_planning_tp_type"    />
+        <result property="shipToLocationId"    column="ship_to_location_id"    />
+        <result property="transactionMode"    column="transaction_mode"    />
+        <result property="transactionBatchId"    column="transaction_batch_id"    />
+        <result property="originalTransactionTempId"    column="original_transaction_temp_id"    />
+        <result property="productType"    column="product_type"    />
+        <result property="taxClassificationCode"    column="tax_classification_code"    />
+        <result property="shipFromLocationId"    column="ship_from_location_id"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+    </resultMap>
+
+    <sql id="selectSyncInvMaterialTxnsVo">
+        select transaction_id, last_update_date, last_updated_by, inventory_item_id, organization_id, subinventory_code, transaction_type_id, transaction_action_id, transaction_source_type_id, transaction_source_id, transaction_source_name, transaction_quantity, transaction_uom, primary_quantity, transaction_date, transaction_reference, distribution_account_id, costed_flag, currency_code, currency_conversion_rate, currency_conversion_type, currency_conversion_date, PICKING_LINE_ID, trx_source_line_id, trx_source_delivery_id, rma_line_id, transfer_transaction_id, transaction_set_id, rcv_transaction_id, source_code, source_line_id, transfer_organization_id, transfer_subinventory, shipment_number, attribute1, attribute2, attribute3, attribute4, attribute5, attribute6, attribute7, attribute8, attribute9, attribute10, owning_organization_id, owning_tp_type, xfr_owning_organization_id, transfer_owning_tp_type, planning_organization_id, planning_tp_type, xfr_planning_organization_id, transfer_planning_tp_type, ship_to_location_id, transaction_mode, transaction_batch_id, original_transaction_temp_id, product_type, tax_classification_code, ship_from_location_id from sync_inv_material_txns
+    </sql>
+
+    <select id="selectSyncInvMaterialTxnsList" parameterType="SyncInvMaterialTxnsEO" resultMap="SyncInvMaterialTxnsEOResult">
+        <include refid="selectSyncInvMaterialTxnsVo"/>
+        <where>
+            and transaction_type_id = 43
+            <if test="inventoryItemId != null "> and inventory_item_id = #{inventoryItemId}</if>
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+            <if test="transactionSourceTypeId != null "> and transaction_source_id = #{transactionSourceId}</if>
+            <if test="transactionSourceName != null  and transactionSourceName != ''"> and transaction_source_name like ('%' + #{transactionSourceName} + '%')</if>
+            <if test="beginTime != null and beginTime != ''"> and LAST_UPDATE_DATE &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and LAST_UPDATE_DATE &lt; #{endTime}</if>
+        </where>
+    </select>
+
+    <delete id="deleteSyncInvMaterialTxnsEO">
+        delete from sync_inv_material_txns where transaction_id in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item.transactionId,jdbcType=BIGINT}
+        </foreach>
+    </delete>
+
+
+    <insert id="batchSyncInvMaterialTxnsEO">
+        insert into sync_inv_material_txns( transaction_id, last_update_date, last_updated_by, inventory_item_id, organization_id, subinventory_code, transaction_type_id, transaction_action_id, transaction_source_type_id, transaction_source_id, transaction_source_name, transaction_quantity, transaction_uom, primary_quantity, transaction_date, transaction_reference, distribution_account_id, costed_flag, currency_code, currency_conversion_rate, currency_conversion_type, currency_conversion_date, PICKING_LINE_ID, trx_source_line_id, trx_source_delivery_id, rma_line_id, transfer_transaction_id, transaction_set_id, rcv_transaction_id, source_code, source_line_id, transfer_organization_id, transfer_subinventory, shipment_number, attribute1, attribute2, attribute3, attribute4, attribute5, attribute6, attribute7, attribute8, attribute9, attribute10, owning_organization_id, owning_tp_type, xfr_owning_organization_id, transfer_owning_tp_type, planning_organization_id, planning_tp_type, xfr_planning_organization_id, transfer_planning_tp_type, ship_to_location_id, transaction_mode, transaction_batch_id, original_transaction_temp_id, product_type, tax_classification_code, ship_from_location_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.transactionId,jdbcType=BIGINT}, #{item.lastUpdateDate,jdbcType=TIMESTAMP}, #{item.lastUpdatedBy,jdbcType=VARCHAR}, #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.subinventoryCode,jdbcType=VARCHAR}, #{item.transactionTypeId,jdbcType=BIGINT}, #{item.transactionActionId,jdbcType=VARCHAR}, #{item.transactionSourceTypeId,jdbcType=BIGINT}, #{item.transactionSourceId,jdbcType=BIGINT}, #{item.transactionSourceName,jdbcType=VARCHAR}, cast(#{item.transactionQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.transactionUom,jdbcType=VARCHAR}, cast(#{item.primaryQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.transactionDate,jdbcType=TIMESTAMP}, #{item.transactionReference,jdbcType=VARCHAR}, #{item.distributionAccountId,jdbcType=BIGINT}, #{item.costedFlag,jdbcType=VARCHAR}, #{item.currencyCode,jdbcType=VARCHAR}, cast(#{item.currencyConversionRate,jdbcType=DECIMAL} as decimal(15,5)), #{item.currencyConversionType,jdbcType=VARCHAR}, #{item.currencyConversionDate,jdbcType=TIMESTAMP}, #{item.pickingLineId,jdbcType=BIGINT}, #{item.trxSourceLineId,jdbcType=BIGINT}, #{item.trxSourceDeliveryId,jdbcType=BIGINT}, #{item.rmaLineId,jdbcType=BIGINT}, #{item.transferTransactionId,jdbcType=BIGINT}, #{item.transactionSetId,jdbcType=BIGINT}, #{item.rcvTransactionId,jdbcType=BIGINT}, #{item.sourceCode,jdbcType=VARCHAR}, #{item.sourceLineId,jdbcType=BIGINT}, #{item.transferOrganizationId,jdbcType=BIGINT}, #{item.transferSubinventory,jdbcType=VARCHAR}, #{item.shipmentNumber,jdbcType=VARCHAR}, #{item.attribute1,jdbcType=VARCHAR}, #{item.attribute2,jdbcType=VARCHAR}, #{item.attribute3,jdbcType=VARCHAR}, #{item.attribute4,jdbcType=VARCHAR}, #{item.attribute5,jdbcType=VARCHAR}, #{item.attribute6,jdbcType=VARCHAR}, #{item.attribute7,jdbcType=VARCHAR}, #{item.attribute8,jdbcType=VARCHAR}, #{item.attribute9,jdbcType=VARCHAR}, #{item.attribute10,jdbcType=VARCHAR}, #{item.owningOrganizationId,jdbcType=BIGINT}, #{item.owningTpType,jdbcType=BIGINT}, #{item.xfrOwningOrganizationId,jdbcType=BIGINT}, #{item.transferOwningTpType,jdbcType=BIGINT}, #{item.planningOrganizationId,jdbcType=BIGINT}, #{item.planningTpType,jdbcType=BIGINT}, #{item.xfrPlanningOrganizationId,jdbcType=BIGINT}, #{item.transferPlanningTpType,jdbcType=BIGINT}, #{item.shipToLocationId,jdbcType=BIGINT}, #{item.transactionMode,jdbcType=BIGINT}, #{item.transactionBatchId,jdbcType=BIGINT}, #{item.originalTransactionTempId,jdbcType=BIGINT}, #{item.productType,jdbcType=VARCHAR}, #{item.taxClassificationCode,jdbcType=VARCHAR}, #{item.shipFromLocationId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <select id="selectSyncInvMaterialTxnsListErp" parameterType="SyncInvMaterialTxnsEO" resultMap="SyncInvMaterialTxnsEOResult">
+        SELECT
+            imt.transaction_id,
+            imt.inventory_item_id,
+            imt.organization_id,
+            imt.subinventory_code,
+            imt.transaction_type_id,
+            imt.transaction_source_type_id,
+            imt.transaction_source_id,
+            imt.transaction_source_name,
+            imt.transaction_quantity,
+            imt.transaction_uom,
+            imt.primary_quantity,
+            imt.transaction_date,
+            imt.transaction_reference,
+            imt.distribution_account_id,
+            imt.costed_flag,
+            imt.currency_code,
+            imt.currency_conversion_rate,
+            imt.currency_conversion_type,
+            imt.currency_conversion_date,
+            imt.PICKING_LINE_ID,
+            imt.trx_source_line_id,
+            imt.trx_source_delivery_id,
+            imt.rma_line_id,
+            imt.transfer_transaction_id,
+            imt.transaction_set_id,
+            imt.rcv_transaction_id,
+            imt.source_code,
+            imt.source_line_id,
+            imt.transfer_organization_id,
+            imt.transfer_subinventory,
+            imt.last_update_date,
+            imt.last_updated_by,
+            list.ITEM_NUMBER,
+            list.ITEM_DESCRIPTION,
+            imt.Attribute10
+        FROM
+            sync_inv_material_txns imt,
+            sync_items_num_des_list list
+        <where>
+            and imt.organization_id = list.ORGANIZATION_ID
+            AND imt.inventory_item_id = list.INVENTORY_ITEM_ID
+            <if test="itemNumber != null  and itemNumber != ''"> and list.ITEM_NUMBER = #{itemNumber}</if>
+            <if test="subinventoryCode != null  and subinventoryCode != ''"> and imt.subinventory_code = #{subinventoryCode}</if>
+            <if test="transactionTypeId != null "> and imt.transaction_type_id = #{transactionTypeId}</if>
+            <if test="transactionSourceTypeId != null "> and imt.transaction_source_type_id = #{transactionSourceTypeId}</if>
+            <if test="transactionSourceName != null  and transactionSourceName != ''"> and imt.transaction_source_name = #{transactionSourceName}</if>
+            <if test="transferSubinventory != null  and transferSubinventory != ''"> and imt.transfer_subinventory = #{transferSubinventory}</if>
+            <if test="beginTime != null and beginTime != ''"> and CONVERT(varchar(100), imt.transaction_date, 23) &gt;= #{beginTime}</if>
+            <if test="endTime != null and endTime != ''"> and CONVERT(varchar(100), imt.transaction_date, 23) &lt;= #{endTime}</if>
+        </where>
+        order by imt.last_update_date desc
+    </select>
+
+</mapper>

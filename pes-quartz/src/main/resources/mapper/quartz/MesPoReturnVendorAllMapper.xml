@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.MesPoReturnVendorAllMapper">
+
+    <resultMap type="MesPoReturnVendorAllEO" id="MesPoReturnVendorAllEOResult">
+        <result property="parentTransactionId"    column="parent_transaction_id"    />
+        <result property="documentNumber"    column="document_number"    />
+        <result property="documentId"    column="document_id"    />
+        <result property="documentLineNumber"    column="document_line_number"    />
+        <result property="documentLineId"    column="document_line_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="unitOfMeasure"    column="unit_of_measure"    />
+        <result property="transactionDate"    column="transaction_date"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="erpFlag"    column="ERP_FLAG"    />
+        <result property="erpFlagDate"    column="ERP_FLAG_DATE"    />
+        <result property="remark"    column="REMARK"    />
+        <result property="returnVendorId"    column="return_vendor_id"    />
+        <result property="startUpdateDate"    column="START_UPDATE_DATE"    />
+        <result property="endUpdateDate"    column="END_UPDATE_DATE"    />
+        <result property="organizationCode"    column="ORGANIZATION_CODE"    />
+        <result property="erpFlagWork"    column="ERP_FLAG_WORK"    />
+        <result property="erpFlagDateWork"    column="ERP_FLAG_DATE_WORK"    />
+        <result property="woOperationSequenceNumber"    column="wo_operation_sequence_number"    />
+        <result property="WorkOrderNumber"    column="Work_Order_Number"    />
+        <result property="subinventoryCode"    column="subinventory_code"    />
+        <result property="lotControlCode"    column="lot_control_code"    />
+        <result property="errorInfor"    column="error_infor"    />
+    </resultMap>
+
+    <sql id="selectMesPoReturnVendorAllVo">
+        SELECT
+        prva.parent_transaction_id,
+        prva.document_number,
+        prva.document_id,
+        prva.document_line_number,
+        prva.document_line_id,
+        prva.organization_id,
+        prva.quantity,
+        prva.unit_of_measure,
+        getdate() as transaction_date,
+        prva.INVENTORY_ITEM_ID,
+        prva.ITEM_NUMBER,
+        prva.LAST_UPDATE_DATE,
+        prva.ERP_FLAG,
+        prva.ERP_FLAG_DATE,
+        prva.REMARK,
+        prva.return_vendor_id,
+        prva.subinventory_code,
+        prva.error_infor,
+        (SELECT
+                    esb.LOT_CONTROL_CODE
+                FROM
+                    sync_egp_system_items_b esb
+                WHERE
+                    esb.ORGANIZATION_ID = prva.organization_id
+                AND esb.INVENTORY_ITEM_ID = prva.INVENTORY_ITEM_ID) AS lot_control_code
+        FROM
+        mes_po_return_vendor_all prva
+    </sql>
+
+    <select id="getPoReturnVendorList" parameterType="MesPoReturnVendorAllEO" resultMap="MesPoReturnVendorAllEOResult">
+        <include refid="selectMesPoReturnVendorAllVo"/>
+        <where>
+            and (prva.ERP_FLAG = 0 or prva.ERP_FLAG = 2 or prva.ERP_FLAG_WORK = 0 or prva.ERP_FLAG_WORK = 2)
+            <!--<if test="startUpdateDate != null and startUpdateDate != ''"> and prva.LAST_UPDATE_DATE &gt;= #{startUpdateDate}</if>-->
+            <!--<if test="endUpdateDate != null and endUpdateDate != ''"> and prva.LAST_UPDATE_DATE &lt; #{endUpdateDate}</if>-->
+        </where>
+        order by prva.ERP_FLAG asc
+    </select>
+
+    <select id="getWieOrderList" parameterType="MesPoReturnVendorAllEO" resultType="Integer">
+        SELECT
+        COUNT (WORK_ORDER_ID)
+        FROM
+        sync_po_lines_all
+        WHERE
+        PO_HEADER_ID = #{documentId}
+        AND PO_LINE_ID = #{documentLineId}
+        and WORK_ORDER_ID > 0
+    </select>
+
+    <select id="selectOrgnazationCode" parameterType="Long" resultMap="MesPoReturnVendorAllEOResult">
+        select ORGANIZATION_CODE from sync_inv_org_parameters where ORGANIZATION_ID = #{organizationId}
+    </select>
+
+    <select id="selectOperSequenceNumber" parameterType="MesPoReturnVendorAllEO" resultMap="MesPoReturnVendorAllEOResult">
+        SELECT
+        wwob.work_order_number,
+        wwop.OPERATION_SEQ_NUMBER AS wo_operation_sequence_number,
+        (SELECT
+        esb.LOT_CONTROL_CODE
+        FROM
+        sync_egp_system_items_b esb
+        WHERE
+        esb.ORGANIZATION_ID = wwob.organization_id
+        AND esb.INVENTORY_ITEM_ID = wwob.INVENTORY_ITEM_ID) AS LOT_CONTROL_CODE
+        FROM
+        sync_wie_wo_operations_b wwop,
+        sync_wie_work_orders_b wwob,
+        sync_po_lines_all prv
+        WHERE
+        1 = 1
+        AND wwop.WORK_ORDER_ID = wwob.WORK_ORDER_ID
+        AND wwop.ORGANIZATION_ID = wwob.ORGANIZATION_ID
+        AND prv.organization_id = wwob.ORGANIZATION_ID
+        AND prv.WORK_ORDER_ID = wwob.WORK_ORDER_ID
+        AND wwop.AUTO_TRANSACT_FLAG = 'N'
+        AND prv.PO_HEADER_ID = #{documentId}
+        AND prv.PO_LINE_ID = #{documentLineId}
+        ORDER BY
+        wwop.OPERATION_SEQ_NUMBER desc
+    </select>
+
+    <update id="updateErpFlag" parameterType="MesPoReturnVendorAllEO">
+        update mes_po_return_vendor_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE = getdate(),
+            <if test="erpFlag != null">ERP_FLAG = #{erpFlag},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where return_vendor_id = #{returnVendorId}
+    </update>
+
+    <update id="updateErpFlagWork" parameterType="MesPoReturnVendorAllEO">
+        update mes_po_return_vendor_all
+        <trim prefix="SET" suffixOverrides=",">
+            ERP_FLAG_DATE_WORK = getdate(),
+            work_order_number = #{workOrderNumber},
+            <if test="erpFlagWork != null">ERP_FLAG_WORK = #{erpFlagWork},</if>
+            <if test="errorInfor != null and errorInfor != ''">error_infor = #{errorInfor},</if>
+        </trim>
+        where return_vendor_id = #{returnVendorId}
+    </update>
+
+    <select id="selectMesPoReturnVendorAllList" parameterType="MesPoReturnVendorAllEO" resultMap="MesPoReturnVendorAllEOResult">
+        <include refid="selectMesPoReturnVendorAllVo"/>
+        <where>
+            <if test="documentNumber != null  and documentNumber != ''"> and prva.document_number = #{documentNumber}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and prva.ITEM_NUMBER = #{itemNumber}</if>
+            <if test="erpFlagWork != null  and erpFlagWork != ''"> and prva.ERP_FLAG_WORK = #{erpFlagWork}</if>
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and prva.work_order_number = #{workOrderNumber}</if>
+            <if test="erpFlag != null  and erpFlag != ''"> and prva.erp_flag = #{erpFlag}</if>
+        </where>
+        order by prva.return_vendor_id desc
+    </select>
+
+    <select id="selectMesPoReturnVendorAllById" parameterType="Long" resultMap="MesPoReturnVendorAllEOResult">
+        <include refid="selectMesPoReturnVendorAllVo"/>
+        where prva.return_vendor_id = #{returnVendorId}
+    </select>
+
+</mapper>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncCstCostedVuCostsVMapper">
+
+    <resultMap type="SyncCstCostedVuCostsVEO" id="SyncCstCostedVuCostsVEOResult">
+        <result property="inventoryItemId"    column="inventory_item_id"    />
+        <result property="organizationId"    column="organization_id"    />
+        <result property="costElementId"    column="cost_element_id"    />
+        <result property="snapshotDate"    column="snapshot_date"    />
+        <result property="unitCost"    column="unit_cost"    />
+    </resultMap>
+
+
+    <delete id="deleteSyncCstCostedVuCostsVEO">
+        TRUNCATE TABLE sync_cst_costed_vu_costs_v
+    </delete>
+
+    <insert id="batchSyncCstCostedVuCostsVEO">
+        insert into sync_cst_costed_vu_costs_v( inventory_item_id, organization_id, cost_element_id, snapshot_date, unit_cost) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.inventoryItemId,jdbcType=BIGINT}, #{item.organizationId,jdbcType=BIGINT}, #{item.costElementId,jdbcType=BIGINT}, #{item.snapshotDate,jdbcType=TIMESTAMP},cast(#{item.unitCost,jdbcType=DECIMAL} as decimal(15,5)))
+        </foreach>
+    </insert>
+
+    <delete id="insertSyncCstCostedVuCostsVEO">
+        TRUNCATE TABLE sync_cst_costed_vu_costs_v_unit_price;
+        INSERT INTO sync_cst_costed_vu_costs_v_unit_price (
+        organization_id,
+        inventory_item_id,
+        snapshot_date,
+        sum_unit_cost
+        )
+        (SELECT
+            organization_id,
+            inventory_item_id,
+            snapshot_date,
+            SUM (isnull(unit_cost,0)) AS sum_unit_cost
+        FROM
+            sync_cst_costed_vu_costs_v
+        GROUP BY
+            organization_id,
+            inventory_item_id,
+            snapshot_date)
+    </delete>
+
+</mapper>

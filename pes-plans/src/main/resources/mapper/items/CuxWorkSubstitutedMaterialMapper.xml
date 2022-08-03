@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxWorkSubstitutedMaterialMapper">
+
+    <resultMap type="CuxWorkSubstitutedMaterial" id="CuxWorkSubstitutedMaterialResult">
+                    <result property="organizationId"    column="organization_id"    />
+                    <result property="pInventoryItemId"    column="p_inventory_item_id"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pItemDescription"    column="p_item_description"    />
+                    <result property="inventoryItemId"    column="inventory_item_id"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="itemDescription"    column="item_description"    />
+                    <result property="newInventoryItemId"    column="new_inventory_item_id"    />
+                    <result property="newItemNumber"    column="new_item_number"    />
+                    <result property="newItemDescription"    column="new_item_description"    />
+                    <result property="newPercentQuantity"    column="new_percent_quantity"    />
+                    <result property="uom"    column="uom"    />
+                    <result property="effectiveStartDate"    column="effective_start_date"    />
+                    <result property="effectiveEndDate"    column="effective_end_date"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="workSubId"    column="work_sub_id"    />
+                    <result property="onhandQuantity"    column="onhand_quantity"    />
+        <result property="priorityNum"    column="priority_num"    />
+        <result property="oaRequestId"    column="oa_request_id"    />
+            </resultMap>
+
+    <sql id="selectCuxWorkSubstitutedMaterialVo">
+        SELECT
+            wsm.organization_id,
+            wsm.p_inventory_item_id,
+            wsm.p_item_number,
+            wsm.p_item_description,
+            wsm.inventory_item_id,
+            wsm.item_number,
+            wsm.item_description,
+            wsm.new_inventory_item_id,
+            wsm.new_item_number,
+            wsm.new_item_description,
+            wsm.new_percent_quantity,
+            wsm.uom,
+            wsm.effective_start_date,
+            wsm.effective_end_date,
+            wsm.work_sub_id,
+            ISNULL(ioq.quantity,0) onhand_quantity,
+            wsm.priority_num,
+            wsm.oa_request_id
+        FROM
+            cux_work_substituted_material wsm
+            LEFT JOIN
+            sync_inv_onhand_quantity_new ioq
+            ON (wsm.new_inventory_item_id = ioq.inventory_item_id
+            AND wsm.organization_id = ioq.organization_id)
+    </sql>
+
+    <select id="selectCuxWorkSubstitutedMaterialList" parameterType="CuxWorkSubstitutedMaterial" resultMap="CuxWorkSubstitutedMaterialResult">
+        <include refid="selectCuxWorkSubstitutedMaterialVo"/>
+        <where>
+            and wsm.delete_flag = 'N'
+            <if test="organizationId != null "> and wsm.organization_id = #{organizationId}</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wsm.p_item_number like (#{pItemNumber} + '%')</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wsm.item_number like ( #{itemNumber} + '%')</if>
+            <if test="newItemNumber != null  and newItemNumber != ''"> and wsm.new_item_number like (#{newItemNumber} + '%')</if>
+            <if test="oaRequestId != null "> and wsm.oa_request_id = #{oaRequestId}</if>
+        </where>
+    </select>
+
+    <select id="checkAddAllowed" parameterType="CuxWorkSubstitutedMaterial" resultType="Integer">
+        SELECT
+          count(1)
+        FROM
+        cux_work_substituted_material
+       where 1=1
+      and delete_flag = 'N'
+      and getdate() between effective_start_date and effective_end_date
+      and organization_id = #{organizationId}
+      and p_item_number = #{pItemNumber}
+      and item_number = #{itemNumber}
+      and new_item_number = #{newItemNumber}
+    </select>
+
+    <select id="getCuxWorkSubstitutedMaterialIds" parameterType="CuxWorkSubstitutedMaterial" resultMap="CuxWorkSubstitutedMaterialResult">
+        SELECT
+        (select INVENTORY_ITEM_ID from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{pItemNumber}) as p_inventory_item_id,
+        (select ITEM_DESCRIPTION from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{pItemNumber}) as p_item_description,
+        (select INVENTORY_ITEM_ID from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{itemNumber}) as inventory_item_id,
+        (select ITEM_DESCRIPTION from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{itemNumber}) as item_description,
+        (select INVENTORY_ITEM_ID from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{newItemNumber}) as new_inventory_item_id,
+        (select ITEM_DESCRIPTION from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{newItemNumber}) as new_item_description,
+        (select PRIMARY_UOM_CODE from sync_items_num_des_list where ORGANIZATION_ID = #{organizationId} and ITEM_NUMBER = #{newItemNumber}) as uom
+    </select>
+
+    <select id="getOrgIds" parameterType="String" resultMap="CuxWorkSubstitutedMaterialResult">
+        select ORGANIZATION_ID from sync_inv_org_parameters where ORGANIZATION_CODE = #{organizationCode}
+    </select>
+
+    <insert id="insertCuxWorkSubstitutedMaterial" parameterType="CuxWorkSubstitutedMaterial">
+        insert into cux_work_substituted_material
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">organization_id,</if>
+            <if test="pInventoryItemId != null">p_inventory_item_id,</if>
+            <if test="pItemNumber != null">p_item_number,</if>
+            <if test="pItemDescription != null">p_item_description,</if>
+            <if test="inventoryItemId != null">inventory_item_id,</if>
+            <if test="itemNumber != null and itemNumber != ''">item_number,</if>
+            <if test="itemDescription != null">item_description,</if>
+            <if test="newInventoryItemId != null">new_inventory_item_id,</if>
+            <if test="newItemNumber != null and newItemNumber != ''">new_item_number,</if>
+            <if test="newItemDescription != null">new_item_description,</if>
+            <if test="newPercentQuantity != null">new_percent_quantity,</if>
+            <if test="priorityNum != null">priority_num,</if>
+            <if test="uom != null">uom,</if>
+            <if test="effectiveStartDate != null">effective_start_date,</if>
+            <if test="effectiveEndDate != null">effective_end_date,</if>
+            create_date,
+            <if test="createBy != null">create_by,</if>
+            last_update_date,
+            <if test="createBy != null">last_update_by,</if>
+            <if test="oaRequestId != null">oa_request_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="organizationId != null">#{organizationId},</if>
+            <if test="pInventoryItemId != null">#{pInventoryItemId},</if>
+            <if test="pItemNumber != null">#{pItemNumber},</if>
+            <if test="pItemDescription != null">#{pItemDescription},</if>
+            <if test="inventoryItemId != null">#{inventoryItemId},</if>
+            <if test="itemNumber != null and itemNumber != ''">#{itemNumber},</if>
+            <if test="itemDescription != null">#{itemDescription},</if>
+            <if test="newInventoryItemId != null">#{newInventoryItemId},</if>
+            <if test="newItemNumber != null and newItemNumber != ''">#{newItemNumber},</if>
+            <if test="newItemDescription != null">#{newItemDescription},</if>
+            <if test="newPercentQuantity != null">#{newPercentQuantity},</if>
+            <if test="priorityNum != null">#{priorityNum},</if>
+            <if test="uom != null">#{uom},</if>
+            <if test="effectiveStartDate != null">#{effectiveStartDate},</if>
+            <if test="effectiveEndDate != null">DATEADD(yyyy,10,#{effectiveEndDate}),</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            getdate(),
+            <if test="createBy != null">#{createBy},</if>
+            <if test="oaRequestId != null">#{oaRequestId},</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteCuxWorkSubstitutedMaterialByIds" parameterType="String">
+        update cux_work_substituted_material set delete_flag = 'Y',last_update_date = getdate() where work_sub_id in
+        <foreach item="workSubId" collection="array" open="(" separator="," close=")">
+            #{workSubId}
+        </foreach>
+    </delete>
+
+</mapper>

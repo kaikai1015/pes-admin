@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.items.mapper.CuxPlaItemBomListMapper">
+
+    <resultMap type="CuxPlaItemBomList" id="CuxPlaItemBomListResult">
+                    <result property="pInventoryItemId"    column="P_INVENTORY_ITEM_ID"    />
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="itemNumber"    column="ITEM_NUMBER"    />
+                    <result property="description"    column="DESCRIPTION"    />
+        <result property="pItemNumber"    column="P_ITEM_NUMBER"    />
+        <result property="pDescription"    column="P_DESCRIPTION"    />
+        <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+            </resultMap>
+
+    <select id="selectCuxPlaItemBomListList" parameterType="CuxPlaItemBomList" resultMap="CuxPlaItemBomListResult">
+        SELECT
+            esbs.ITEM_NUMBER AS P_ITEM_NUMBER,
+            esbs.DESCRIPTION as P_DESCRIPTION,
+            isnull(esbs.ATTRIBUTE5,esbs.ITEM_NUMBER) AS ITEM_NUMBER,
+            isnull((select DESCRIPTION from sync_egp_system_items_b esb where esb.ITEM_NUMBER = esbs.ATTRIBUTE5 and esb.ORGANIZATION_ID = esbs.ORGANIZATION_ID),esbs.DESCRIPTION) as DESCRIPTION,
+            esbs.INVENTORY_ITEM_ID as P_INVENTORY_ITEM_ID,
+            isnull((select esb.INVENTORY_ITEM_ID from sync_egp_system_items_b esb where esb.ITEM_NUMBER = esbs.ATTRIBUTE5 and esb.ORGANIZATION_ID = esbs.ORGANIZATION_ID),esbs.INVENTORY_ITEM_ID) as INVENTORY_ITEM_ID,
+            esbs.ORGANIZATION_ID
+        FROM
+            sync_egp_system_items_b esbs
+        WHERE
+            1 = 1
+        AND esbs.ITEM_TYPE IN ('FG', 'WWBCP', 'BCP')
+        AND esbs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        AND esbs.ITEM_NUMBER = #{itemNumber}
+    </select>
+
+    <select id="selectCuxPlaItemBomListListByIds" parameterType="CuxPlaItemBomList" resultMap="CuxPlaItemBomListResult">
+        SELECT
+        esbs.ITEM_NUMBER AS P_ITEM_NUMBER,
+        esbs.DESCRIPTION as P_DESCRIPTION,
+        isnull(esbs.ATTRIBUTE5,esbs.ITEM_NUMBER) AS ITEM_NUMBER,
+        isnull((select DESCRIPTION from sync_egp_system_items_b esb where esb.ITEM_NUMBER = esbs.ATTRIBUTE5 and esb.ORGANIZATION_ID = esbs.ORGANIZATION_ID),esbs.DESCRIPTION) as DESCRIPTION
+        FROM
+        sync_egp_system_items_b esbs
+        WHERE
+        1 = 1
+        AND esbs.ITEM_TYPE IN ('FG', 'WWBCP', 'BCP')
+        AND esbs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and esbs.ORGANIZATION_ID = #{organizationId}
+       and esbs.INVENTORY_ITEM_ID = #{inventoryItemId}
+    </select>
+
+    <select id="selectCuxPlaItemBomListListByPla" parameterType="CuxPlaItemBomList" resultMap="CuxPlaItemBomListResult">
+        SELECT
+        esbs.ITEM_NUMBER AS P_ITEM_NUMBER,
+        esbs.DESCRIPTION as P_DESCRIPTION,
+        esbs.ORGANIZATION_ID,
+        esbs.CREATED_BY as create_by,
+        esbs.CREATION_DATE as create_time,
+        esbs.ATTRIBUTE5 as ITEM_NUMBER,
+        (select DESCRIPTION from sync_items_num_des_list esb where esb.ITEM_NUMBER = esbs.ATTRIBUTE5 and esb.ORGANIZATION_ID = esbs.ORGANIZATION_ID) as DESCRIPTION
+        FROM
+        sync_egp_system_items_b esbs
+        WHERE
+        1 = 1
+        AND esbs.ITEM_TYPE IN ('FG', 'WWBCP', 'BCP')
+        AND esbs.INVENTORY_ITEM_STATUS_CODE = 'Active'
+        and esbs.ATTRIBUTE5 is not null
+        and esbs.ORGANIZATION_ID = #{organizationId}
+        <if test="pItemNumber != null  and pItemNumber != ''"> and esbs.ITEM_NUMBER like (#{pItemNumber} + '%')</if>
+        <if test="itemNumber != null  and itemNumber != ''"> and esbs.ATTRIBUTE5 like (#{itemNumber} + '%')</if>
+    </select>
+
+</mapper>

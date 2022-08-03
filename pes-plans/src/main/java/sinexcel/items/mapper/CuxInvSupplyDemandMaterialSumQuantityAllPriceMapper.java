@@ -1,0 +1,10 @@
+package sinexcel.items.mapper;
+
+import sinexcel.items.domain.CuxInvSupplyDemandMaterialSumQuantityAllPriceEO;
+
+import java.util.List;
+
+public interface CuxInvSupplyDemandMaterialSumQuantityAllPriceMapper {
+
+    List<CuxInvSupplyDemandMaterialSumQuantityAllPriceEO> selectCuxInvSupplyDemandMaterialSumQuantityAllPriceList(CuxInvSupplyDemandMaterialSumQuantityAllPriceEO cuxInvSupplyDemandMaterialSumQuantityAllPriceEO);
+}

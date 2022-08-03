@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.CuxMaterialTransactionsVendorMapper">
+
+    <resultMap type="CuxMaterialTransactionsVendorEO" id="CuxMaterialTransactionsVendorEOResult">
+        <result property="organizationCode"    column="ORGANIZATION_CODE"    />
+        <result property="workOrderNumber"    column="WORK_ORDER_NUMBER"    />
+        <result property="itemNumber"    column="ITEM_NUMBER"    />
+        <result property="quantity"    column="QUANTITY"    />
+        <result property="issuedQuantity"    column="ISSUED_QUANTITY"    />
+        <result property="tranctQty"    column="TRANCT_QTY"    />
+        <result property="onhandQuantity"    column="ONHAND_QUANTITY"    />
+        <result property="transactionUomCode"    column="TRANSACTION_UOM_CODE"    />
+        <result property="subinventoryCode"    column="SUBINVENTORY_CODE"    />
+        <result property="lotNumber"    column="LOT_NUMBER"    />
+        <result property="lastUpdateDate"    column="LAST_UPDATE_DATE"    />
+        <result property="countId"    column="COUNT_ID"    />
+        <result property="description"    column="DESCRIPTION"    />
+        <result property="workQuantity"    column="WORK_QUANTITY"    />
+        <result property="vendorName"    column="VENDOR_NAME"    />
+        <result property="id"    column="ID"    />
+    </resultMap>
+
+    <sql id="selectCuxMaterialTransactionsVendorVo">
+        select ORGANIZATION_CODE, WORK_ORDER_NUMBER, ITEM_NUMBER, QUANTITY, ISSUED_QUANTITY, TRANCT_QTY, isnull(ONHAND_QUANTITY,0) as ONHAND_QUANTITY, TRANSACTION_UOM_CODE, SUBINVENTORY_CODE, LOT_NUMBER, LAST_UPDATE_DATE, COUNT_ID, DESCRIPTION, WORK_QUANTITY,VENDOR_NAME, ID from cux_material_transactions_vendor
+    </sql>
+
+    <select id="selectCuxMaterialTransactionsList" parameterType="CuxMaterialTransactionsVendorEO" resultMap="CuxMaterialTransactionsVendorEOResult">
+        <include refid="selectCuxMaterialTransactionsVendorVo"/>
+        <where>
+            and (COUNT_ID = 0 or COUNT_ID = 2)
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and WORK_ORDER_NUMBER = #{workOrderNumber}</if>
+        </where>
+    </select>
+
+    <select id="selectCuxMaterialTransactionsById" parameterType="Integer" resultMap="CuxMaterialTransactionsVendorEOResult">
+        <include refid="selectCuxMaterialTransactionsVendorVo"/>
+        where ID = #{id}
+    </select>
+
+    <update id="updateCuxMaterialTransactions" parameterType="CuxMaterialTransactionsVendorEO">
+        update cux_material_transactions_vendor
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tranctQty != null">TRANCT_QTY = #{tranctQty},</if>
+            <if test="onhandQuantity != null">ONHAND_QUANTITY = #{onhandQuantity},</if>
+            <if test="transactionUomCode != null">TRANSACTION_UOM_CODE = #{transactionUomCode},</if>
+            <if test="subinventoryCode != null">SUBINVENTORY_CODE = #{subinventoryCode},</if>
+            LAST_UPDATE_DATE = getdate(),
+            <if test="lotNumber != null">LOT_NUMBER = #{lotNumber},</if>
+        </trim>
+        where ID = #{id}
+    </update>
+
+    <delete id="deleteCuxMaterialTransactionsVendorEO">
+        TRUNCATE TABLE cux_material_transactions_vendor
+    </delete>
+
+    <insert id="batchCuxMaterialTransactionsVendorEO">
+        insert into cux_material_transactions_vendor( ORGANIZATION_CODE,VENDOR_NAME, WORK_ORDER_NUMBER, ITEM_NUMBER, QUANTITY, ISSUED_QUANTITY, TRANCT_QTY, ONHAND_QUANTITY, TRANSACTION_UOM_CODE, SUBINVENTORY_CODE, LOT_NUMBER, DESCRIPTION, WORK_QUANTITY) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.organizationCode,jdbcType=VARCHAR}, #{item.vendorName,jdbcType=VARCHAR}, #{item.workOrderNumber,jdbcType=VARCHAR}, #{item.itemNumber,jdbcType=VARCHAR}, cast(#{item.quantity,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.issuedQuantity,jdbcType=DECIMAL} as decimal(15,5)),cast(#{item.tranctQty,jdbcType=DECIMAL} as decimal(15,5)), cast(#{item.onhandQuantity,jdbcType=DECIMAL} as decimal(15,5)), #{item.transactionUomCode,jdbcType=VARCHAR}, #{item.subinventoryCode,jdbcType=VARCHAR}, #{item.lotNumber,jdbcType=VARCHAR}, #{item.description,jdbcType=VARCHAR}, #{item.workQuantity,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+    <select id="selectCuxMaterialTransactionsByIds" parameterType="String" resultMap="CuxMaterialTransactionsVendorEOResult">
+        <include refid="selectCuxMaterialTransactionsVendorVo"/>
+        where ID in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <update id="updateCountId" parameterType="CuxMaterialTransactionsVendorEO">
+        update cux_material_transactions_vendor
+        <trim prefix="SET" suffixOverrides=",">
+            LAST_UPDATE_DATE = getdate(),
+            <if test="countId != null">count_id = #{countId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+</mapper>

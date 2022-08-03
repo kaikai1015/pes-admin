@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.lotNums.mapper.SyncOrdersDemandLotNumsListMapper">
+
+    <resultMap type="SyncOrdersDemandList" id="SyncOrdersDemandListResult">
+                    <result property="organizationCode"    column="ORGANIZATION_CODE"    />
+                    <result property="planItemNumber"    column="plan_item_number"    />
+                    <result property="planItemType"    column="plan_item_type"    />
+                    <result property="organizationId"    column="ORGANIZATION_ID"    />
+                    <result property="inventoryItemId"    column="INVENTORY_ITEM_ID"    />
+                    <result property="planItemQuantity"    column="plan_item_quantity"    />
+                    <result property="planDate"    column="plan_date"    />
+                    <result property="custPoNumber"    column="CUST_PO_NUMBER"    />
+                    <result property="documentNumber"    column="DOCUMENT_NUMBER"    />
+                    <result property="demandId"    column="demand_id"    />
+                    <result property="documentLineNum"    column="DOCUMENT_LINE_NUM"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+        <result property="itemDescription"    column="ITEM_DESCRIPTION"    />
+        <result property="planLotNum"    column="plan_lot_num"    />
+            </resultMap>
+
+    <sql id="selectSyncOrdersDemandListVo">
+        SELECT
+            list.plan_lot_num,
+            list.plan_item_number,
+            item.ITEM_DESCRIPTION,
+            list.plan_item_type,
+            list.ORGANIZATION_ID,
+            list.plan_item_quantity,
+            list.plan_date,
+            list.CUST_PO_NUMBER,
+            list.DOCUMENT_NUMBER,
+            list.demand_id,
+            list.DOCUMENT_LINE_NUM,
+            list.last_update_date
+        FROM
+            sync_orders_demand_list list,
+            sync_items_num_des_list item
+    </sql>
+
+    <select id="selectSyncOrdersDemandListList" parameterType="SyncOrdersDemandList" resultMap="SyncOrdersDemandListResult">
+        <include refid="selectSyncOrdersDemandListVo"/>
+        <where>
+            and list.ORGANIZATION_ID = item.ORGANIZATION_ID
+            AND list.INVENTORY_ITEM_ID = item.INVENTORY_ITEM_ID
+            <if test="planLotNum != null "> and list.plan_lot_num = #{planLotNum}</if>
+            <if test="planItemNumber != null  and planItemNumber != ''"> and list.plan_item_number like (#{planItemNumber} + '%')</if>
+            <if test="organizationId != null "> and list.ORGANIZATION_ID = #{organizationId}</if>
+            <if test="custPoNumber != null  and custPoNumber != ''"> and list.CUST_PO_NUMBER like (#{custPoNumber} + '%')</if>
+            <if test="documentNumber != null  and documentNumber != ''"> and list.DOCUMENT_NUMBER like (#{documentNumber} + '%')</if>
+        </where>
+    </select>
+
+
+    <delete id="deleteSyncOrdersDemandListByIds">
+        TRUNCATE TABLE pes_orders_bom_detail_list
+    </delete>
+
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.quartz.mapper.SyncSWieWoOperaMaterialIdAllMapper">
+
+    <resultMap type="SyncSWieWoOperaMaterialIdAllEO" id="SyncSWieWoOperaMaterialIdAllEOResult">
+        <result property="woOperationMaterialId"    column="WO_OPERATION_MATERIAL_ID"    />
+    </resultMap>
+
+    <delete id="deleteSyncSWieWoOperaMaterialIdAllTempEO">
+        TRUNCATE TABLE sync_wie_wo_operation_materials_id_all_temp
+    </delete>
+
+    <insert id="batchSyncSWieWoOperaMaterialIdAllTempEO">
+        insert into sync_wie_wo_operation_materials_id_all_temp( WO_OPERATION_MATERIAL_ID) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.woOperationMaterialId,jdbcType=BIGINT})
+        </foreach>
+    </insert>
+
+    <delete id="batchSyncSWieWoOperaMaterialIdAllEO">
+        TRUNCATE TABLE sync_wie_wo_operation_materials_id_all;
+        INSERT INTO sync_wie_wo_operation_materials_id_all (
+        WO_OPERATION_MATERIAL_ID
+        ) SELECT
+        WO_OPERATION_MATERIAL_ID
+        FROM
+        sync_wie_wo_operation_materials_id_all_temp
+    </delete>
+
+</mapper>

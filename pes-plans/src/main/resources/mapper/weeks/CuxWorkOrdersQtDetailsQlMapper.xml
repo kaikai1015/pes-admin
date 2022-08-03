@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.weeks.mapper.CuxWorkOrdersQtDetailsQlMapper">
+
+    <resultMap type="CuxWorkOrdersQtDetailsQl" id="CuxWorkOrdersQtDetailsQlResult">
+                    <result property="qtId"    column="qt_id"    />
+                    <result property="organizationCode"    column="organization_code"    />
+                    <result property="workOrderNumber"    column="work_order_number"    />
+                    <result property="plannedStartDate"    column="planned_start_date"    />
+                    <result property="pItemNumber"    column="p_item_number"    />
+                    <result property="pDescription"    column="p_description"    />
+                    <result property="plannedStartQuantity"    column="planned_start_quantity"    />
+                    <result property="completedQuantity"    column="completed_quantity"    />
+                    <result property="materialSeqNumber"    column="material_seq_number"    />
+                    <result property="itemNumber"    column="item_number"    />
+                    <result property="description"    column="description"    />
+                    <result property="requiredQuantity"    column="required_quantity"    />
+                    <result property="sumRequiredQuantity"    column="sum_required_quantity"    />
+                    <result property="quantity"    column="quantity"    />
+                    <result property="remainQuantity"    column="remain_quantity"    />
+                    <result property="receiveQuantity"    column="receive_quantity"    />
+                    <result property="inboundQuantity"    column="inbound_quantity"    />
+                    <result property="revRemainQuantity"    column="rev_remain_quantity"    />
+                    <result property="buyerName"    column="buyer_name"    />
+                    <result property="prodLine"    column="prod_line"    />
+                    <result property="customerName"    column="customer_name"    />
+                    <result property="orderNum"    column="order_num"    />
+                    <result property="lotNum"    column="lot_num"    />
+                    <result property="createBy"    column="create_by"    />
+                    <result property="createDate"    column="create_date"    />
+                    <result property="lastUpdateBy"    column="last_update_by"    />
+                    <result property="lastUpdateDate"    column="last_update_date"    />
+                    <result property="overRemainQuantity"    column="over_remain_quantity"    />
+            </resultMap>
+
+    <sql id="selectCuxWorkOrdersQtDetailsQlVo">
+            SELECT
+                wwob.qt_id,
+                wwob.organization_code,
+                wwob.work_order_number,
+                wwob.planned_start_date,
+                wwob.p_item_number,
+                wwob.p_description,
+                wwob.planned_start_quantity,
+                wwob.completed_quantity,
+                wwob.material_seq_number,
+                wwob.item_number,
+                wwob.description,
+                wwob.required_quantity,
+                wwob.sum_required_quantity,
+                wwob.quantity,
+                wwob.remain_quantity,
+        (case when (wwob.remain_quantity + wwob.required_quantity) &lt; 0 then (-1)*wwob.required_quantity else wwob.remain_quantity end) as over_remain_quantity,
+                wwob.receive_quantity,
+                wwob.inbound_quantity,
+                wwob.rev_remain_quantity,
+                wwob.buyer_name,
+                wwob.prod_line,
+                wwob.customer_name,
+                wwob.order_num,
+                wwob.lot_num
+            FROM
+                cux_work_orders_qt_details_ql wwob,
+                sys_user u
+    </sql>
+
+    <select id="selectCuxWorkOrdersQtDetailsQlList" parameterType="CuxWorkOrdersQtDetailsQl" resultMap="CuxWorkOrdersQtDetailsQlResult">
+        <include refid="selectCuxWorkOrdersQtDetailsQlVo"/>
+        where wwob.create_by = u.user_name
+            <if test="workOrderNumber != null  and workOrderNumber != ''"> and wwob.work_order_number = #{workOrderNumber}</if>
+            <if test="pItemNumber != null  and pItemNumber != ''"> and wwob.p_item_number = #{pItemNumber}</if>
+            <if test="itemNumber != null  and itemNumber != ''"> and wwob.item_number = #{itemNumber}</if>
+            <if test="lotNum != null  and lotNum != ''"> and wwob.lot_num = #{lotNum}</if>
+        ${params.dataScope}
+        order by wwob.qt_id
+    </select>
+
+    <delete id="deleteQtWorkImport" parameterType="CuxWorkOrdersQtDetailsQl">
+        DELETE FROM cux_work_orders_qt_details_ql WHERE lot_num = #{lotNum} and create_by = #{createBy};
+    </delete>
+
+    <insert id="qtWorkImport" parameterType="CuxWorkOrdersQtDetailsQl">
+        INSERT INTO cux_work_orders_qt_details_ql (
+            organization_code,
+            work_order_number,
+            planned_start_date,
+            p_item_number,
+            p_description,
+            planned_start_quantity,
+            completed_quantity,
+            material_seq_number,
+            item_number,
+            description,
+            required_quantity,
+            sum_required_quantity,
+            quantity,
+            remain_quantity,
+            receive_quantity,
+            inbound_quantity,
+            rev_remain_quantity,
+            buyer_name,
+            prod_line,
+            customer_name,
+            order_num,
+            lot_num,
+            create_by,
+            last_update_by
+        )
+      (SELECT
+            wki.ORGANIZATION_CODE,
+            wki.WORK_ORDER_NUMBER,
+            wki.PLANNED_START_DATE,
+            wki.P_ITEM_NUMBER,
+            wki.P_DESCRIPTION,
+            wki.PLANNED_START_QUANTITY,
+            isnull(wki.COMPLETED_QUANTITY,0) as COMPLETED_QUANTITY,
+            wki.MATERIAL_SEQ_NUMBER,
+            wki.ITEM_NUMBER,
+            wki.DESCRIPTION,
+            wki.REQUIRED_QUANTITY,
+            wki.SUM_REQUIRED_QUANTITY,
+            isnull(wki.QUANTITY,0) as QUANTITY,
+            (isnull(wki.QUANTITY,0) - wki.SUM_REQUIRED_QUANTITY) as REMAIN_QUANTITY,
+            isnull(wki.RECEIVE_QUANTITY,0) as RECEIVE_QUANTITY,
+            isnull(wki.inbound_quantity,0) as inbound_quantity,
+            (isnull(wki.RECEIVE_QUANTITY,0) + isnull(wki.inbound_quantity,0) + isnull(wki.QUANTITY,0) - wki.SUM_REQUIRED_QUANTITY) as REV_REMAIN_QUANTITY,
+            wki.BUYER_NAME,
+            wki.prod_line,
+            wki.customer_name,
+            wki.order_num,
+	        #{lotNum} as lot_num,
+            #{createBy} as create_by,
+	        #{createBy} as last_update_by
+        FROM
+            (SELECT
+                wob.ORGANIZATION_CODE,
+                wob.WORK_ORDER_NUMBER,
+                ck.PLANNED_START_DATE,
+                wob.ITEM_NUMBER AS P_ITEM_NUMBER,
+                wob.DESCRIPTION AS P_DESCRIPTION,
+                wob.PLANNED_START_QUANTITY,
+                wob.COMPLETED_QUANTITY,
+                wwdv.MATERIAL_SEQ_NUMBER,
+                wwdv.ITEM_NUMBER,
+                wwdv.DESCRIPTION,
+                wwdv.REQUIRED_QUANTITY,
+                SUM (wwdv.REQUIRED_QUANTITY) OVER (PARTITION BY wwdv.ORGANIZATION_ID,wwdv.INVENTORY_ITEM_ID ORDER BY ck.planned_start_date,wwdv.REQUIRED_QUANTITY,wwdv.WORK_ORDER_ID) AS SUM_REQUIRED_QUANTITY,
+                ioq.QUANTITY,
+                pir.RECEIVE_QUANTITY,
+                pir.inbound_quantity,
+                wwdv.BUYER_NAME,
+                ck.prod_line,
+                ck.customer_name,
+                ck.order_num
+            FROM
+                cux_wie_work_orders_b_check_w ck,
+                sync_wie_work_orders_b_w wob,
+                cux_wie_wo_demand_list_all_v wwdv
+                left join
+                (SELECT
+                ionc.inventory_item_id,
+                ionc.organization_id,
+                SUM (ionc.quantity) AS quantity
+                FROM
+                sync_inv_onhand_quantity_new_code ionc
+                WHERE
+                (ionc.subinventory_code like '1%' or ionc.subinventory_code like '2%')
+                and ionc.status_id = 1
+                GROUP BY
+                ionc.inventory_item_id,
+                ionc.organization_id) ioq
+                ON (wwdv.INVENTORY_ITEM_ID = ioq.inventory_item_id
+                AND wwdv.ORGANIZATION_ID = ioq.organization_id)
+                LEFT JOIN sync_po_inbound_rcv_qty pir
+                ON (wwdv.INVENTORY_ITEM_ID = pir.ITEM_ID
+                AND wwdv.ORGANIZATION_ID = pir.SHIP_TO_ORGANIZATION_ID)
+            WHERE
+                1 = 1
+                AND ck.organization_code = wob.ORGANIZATION_CODE
+                AND ck.work_order_number = wob.WORK_ORDER_NUMBER
+                AND wob.ORGANIZATION_ID = wwdv.ORGANIZATION_ID
+                AND wob.WORK_ORDER_ID = wwdv.WORK_ORDER_ID
+                AND ck.create_by = #{createBy}
+                AND ck.lot_num = #{lotNum}
+            ) wki
+	    )
+    </insert>
+
+</mapper>

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.daysPlan.mapper.MesTransferHeaderAllMapper">
+
+    <resultMap type="MesTransferHeaderAll" id="MesTransferHeaderAllResult">
+            <result property="organizationId"    column="organization_id"    />
+            <result property="diaoChuSubinventory"    column="diao_chu_subinventory"    />
+            <result property="diaoRuSubinventory"    column="diao_ru_subinventory"    />
+            <result property="createBy"    column="create_by"    />
+            <result property="createDate"    column="create_date"    />
+            <result property="lastUpdateBy"    column="last_update_by"    />
+            <result property="lastUpdateDate"    column="last_update_date"    />
+            <result property="id"    column="id"    />
+            <result property="wmsFlag"    column="wms_flag"    />
+            <result property="type"    column="type"    />
+            <result property="sourceCategory"    column="source_category"    />
+            <result property="sourceType"    column="source_type"    />
+            <result property="sourceCode"    column="source_code"    />
+            <result property="sourceName"    column="source_name"    />
+            <result property="sourceReferenceId"    column="source_reference_id"    />
+    </resultMap>
+
+    <sql id="selectMesTransferHeaderAllVo">
+        select organization_id, diao_chu_subinventory, diao_ru_subinventory, create_by, create_date, last_update_by, last_update_date, id, wms_flag, type, source_category, source_type, source_code, source_name, source_reference_id from mes_transfer_header_all
+    </sql>
+
+    <select id="selectMesTransferHeaderAllList" parameterType="MesTransferHeaderAll" resultMap="MesTransferHeaderAllResult">
+        <include refid="selectMesTransferHeaderAllVo"/>
+        <where>
+            <if test="organizationId != null "> and organization_id = #{organizationId}</if>
+                <if test="diaoChuSubinventory != null  and diaoChuSubinventory != ''"> and diao_chu_subinventory = #{diaoChuSubinventory}</if>
+                <if test="diaoRuSubinventory != null  and diaoRuSubinventory != ''"> and diao_ru_subinventory = #{diaoRuSubinventory}</if>
+                <if test="createDate != null "> and create_date = #{createDate}</if>
+                <if test="lastUpdateBy != null  and lastUpdateBy != ''"> and last_update_by = #{lastUpdateBy}</if>
+                <if test="lastUpdateDate != null "> and last_update_date = #{lastUpdateDate}</if>
+                <if test="wmsFlag != null  and wmsFlag != ''"> and wms_flag = #{wmsFlag}</if>
+                <if test="type != null  and type != ''"> and type = #{type}</if>
+                <if test="sourceCategory != null  and sourceCategory != ''"> and source_category = #{sourceCategory}</if>
+                <if test="sourceType != null  and sourceType != ''"> and source_type = #{sourceType}</if>
+                <if test="sourceCode != null  and sourceCode != ''"> and source_code = #{sourceCode}</if>
+                <if test="sourceName != null  and sourceName != ''"> and source_name like ('%' + #{sourceName} + '%')</if>
+                <if test="sourceReferenceId != null "> and source_reference_id = #{sourceReferenceId}</if>
+        </where>
+    </select>
+
+    <select id="selectMesTransferHeaderAllById" parameterType="Long" resultMap="MesTransferHeaderAllResult">
+        <include refid="selectMesTransferHeaderAllVo"/>
+        where id = #{id}
+    </select>
+
+    <insert id="insertMesTransferHeaderAll" parameterType="MesTransferHeaderAll" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        insert into mes_transfer_header_all
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="organizationId != null">organization_id,</if>
+                    <if test="diaoChuSubinventory != null">diao_chu_subinventory,</if>
+                    <if test="diaoRuSubinventory != null">diao_ru_subinventory,</if>
+                    <if test="createBy != null">create_by,</if>
+                    <if test="createDate != null">create_date,</if>
+                    <if test="lastUpdateBy != null">last_update_by,</if>
+                    <if test="lastUpdateDate != null">last_update_date,</if>
+                    <if test="wmsFlag != null">wms_flag,</if>
+                    <if test="type != null">type,</if>
+                    <if test="sourceCategory != null">source_category,</if>
+                    <if test="sourceType != null">source_type,</if>
+                    <if test="sourceCode != null">source_code,</if>
+                    <if test="sourceName != null">source_name,</if>
+                    <if test="sourceReferenceId != null">source_reference_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="organizationId != null">#{organizationId},</if>
+                    <if test="diaoChuSubinventory != null">#{diaoChuSubinventory},</if>
+                    <if test="diaoRuSubinventory != null">#{diaoRuSubinventory},</if>
+                    <if test="createBy != null">#{createBy},</if>
+                    <if test="createDate != null">#{createDate},</if>
+                    <if test="lastUpdateBy != null">#{lastUpdateBy},</if>
+                    <if test="lastUpdateDate != null">#{lastUpdateDate},</if>
+                    <if test="wmsFlag != null">#{wmsFlag},</if>
+                    <if test="type != null">#{type},</if>
+                    <if test="sourceCategory != null">#{sourceCategory},</if>
+                    <if test="sourceType != null">#{sourceType},</if>
+                    <if test="sourceCode != null">#{sourceCode},</if>
+                    <if test="sourceName != null">#{sourceName},</if>
+                    <if test="sourceReferenceId != null">#{sourceReferenceId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateMesTransferHeaderAll" parameterType="MesTransferHeaderAll">
+        update mes_transfer_header_all
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="organizationId != null">organization_id = #{organizationId},</if>
+            <if test="diaoChuSubinventory != null">diao_chu_subinventory = #{diaoChuSubinventory},</if>
+            <if test="diaoRuSubinventory != null">diao_ru_subinventory = #{diaoRuSubinventory},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
+            <if test="lastUpdateBy != null">last_update_by = #{lastUpdateBy},</if>
+            <if test="lastUpdateDate != null">last_update_date = #{lastUpdateDate},</if>
+            <if test="wmsFlag != null">wms_flag = #{wmsFlag},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="sourceCategory != null">source_category = #{sourceCategory},</if>
+            <if test="sourceType != null">source_type = #{sourceType},</if>
+            <if test="sourceCode != null">source_code = #{sourceCode},</if>
+            <if test="sourceName != null">source_name = #{sourceName},</if>
+            <if test="sourceReferenceId != null">source_reference_id = #{sourceReferenceId},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMesTransferHeaderAllById" parameterType="Long">
+        delete from mes_transfer_header_all where id = #{id}
+    </delete>
+
+    <delete id="deleteMesTransferHeaderAllByIds" parameterType="String">
+        delete from mes_transfer_header_all where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <update id="updateState">
+        update mes_transfer_header_all
+        set wms_flag = #{state}
+        where
+        id in
+        <foreach item="id"   collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+
+    </update>
+</mapper>

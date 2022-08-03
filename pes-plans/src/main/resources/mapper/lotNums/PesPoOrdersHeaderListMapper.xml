@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sinexcel.lotNums.mapper.PesPoOrdersHeaderListMapper">
+
+    <resultMap type="PesPoOrdersHeaderList" id="PesPoOrdersHeaderListResult">
+                    <result property="planLotNum"    column="plan_lot_num"    />
+                    <result property="planType"    column="plan_type"    />
+                    <result property="activeCode"    column="active_code"    />
+            </resultMap>
+
+    <sql id="selectPesPoOrdersHeaderListVo">
+        select plan_lot_num, plan_type, active_code from pes_po_orders_header_list
+    </sql>
+
+    <select id="selectPesPoOrdersHeaderListList" parameterType="PesPoOrdersHeaderList" resultMap="PesPoOrdersHeaderListResult">
+        <include refid="selectPesPoOrdersHeaderListVo"/>
+        <where>
+            <if test="planLotNum != null "> and plan_lot_num = #{planLotNum}</if>
+        </where>
+        order by plan_lot_num desc
+    </select>
+
+</mapper>
