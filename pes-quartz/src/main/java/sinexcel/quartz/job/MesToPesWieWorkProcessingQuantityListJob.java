@@ -40,10 +40,10 @@ public class MesToPesWieWorkProcessingQuantityListJob{
         sysJobLogMapper.updateLatUpdateDate(log);
 
         if(true){
-            List<MesToPesWieWorkProcessingQuantityListEO> lists = mesToPesWieWorkProcessingQuantityListService.selectMesWieWorkProcessingQuantityListList();
-            if(lists.size() > 0){
+                List<MesToPesWieWorkProcessingQuantityListEO> lists = mesToPesWieWorkProcessingQuantityListService.selectMesWieWorkProcessingQuantityListList();
+                if(lists.size() > 0){
                 mesToPesWieWorkProcessingQuantityListService.insertMesWieWorkProcessingQuantityList(lists);
-            }
+                }
         }
 
     }
