@@ -214,16 +214,16 @@ public class PesWieWoOperationMaterialsErpServiceImpl implements IPesWieWoOperat
         }
     }
 
-//    public int forEachPesWieWoOperationMaterialsErps(List<PesWieWoOperationMaterialsErp> pesWieWoOperationMaterialsErps,String endName){
-//        //先获取API地址
-////        String getUpdWorkOperationMaterialUrl = ConfigUtils.getWieWorksOperationMaterialUrl().replace("{WorkOrderId}",String.valueOf(pesWieWoOperationMaterialsErps.get(0).getWorkOrderId())).replace("{WorkOrderOperationId}",String.valueOf(pesWieWoOperationMaterialsErps.get(0).getWorkOrderOperationId()));
-////        for(PesWieWoOperationMaterialsErp pesWieWoOperationMaterialsErp:pesWieWoOperationMaterialsErps){
-////
-////            handleSubmitErpPesOperationMaterial(pesWieWoOperationMaterialsErp,getUpdWorkOperationMaterialUrl,endName);
-////        }
-//        handleSubmitErpPesOperationMaterial(pesWieWoOperationMaterialsErps,endName);
-//        return 1;
-//    }
+   public int forEachPesWieWoOperationMaterialsErps(List<PesWieWoOperationMaterialsErp> pesWieWoOperationMaterialsErps,String endName){
+       //先获取API地址
+//        String getUpdWorkOperationMaterialUrl = ConfigUtils.getWieWorksOperationMaterialUrl().replace("{WorkOrderId}",String.valueOf(pesWieWoOperationMaterialsErps.get(0).getWorkOrderId())).replace("{WorkOrderOperationId}",String.valueOf(pesWieWoOperationMaterialsErps.get(0).getWorkOrderOperationId()));
+//        for(PesWieWoOperationMaterialsErp pesWieWoOperationMaterialsErp:pesWieWoOperationMaterialsErps){
+//
+//            handleSubmitErpPesOperationMaterial(pesWieWoOperationMaterialsErp,getUpdWorkOperationMaterialUrl,endName);
+//        }
+       handleSubmitErpPesOperationMaterial(pesWieWoOperationMaterialsErps,endName);
+       return 1;
+   }
 
     /**
      * 单身批量回传
