@@ -48,7 +48,6 @@ spring:
     port: 5672
     username: admin
     password: admin123
-    prefetchCount: 1
   # 资源信息
   messages:
     # 国际化资源文件路径
