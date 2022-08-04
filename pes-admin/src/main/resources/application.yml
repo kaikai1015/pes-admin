@@ -42,10 +42,6 @@ logging:
 
 # Spring配置
 spring:
-  cloud:
-    sentinel:
-      transport:
-        dashboard: localhost:8090
   #配置rabbitMq 服务器
   rabbitmq:
     host: 172.16.6.42
