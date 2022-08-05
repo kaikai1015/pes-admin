@@ -31,6 +31,8 @@
         <result property="subinventoryCode"    column="subinventory_code"    />
         <result property="lotControlCode"    column="lot_control_code"    />
         <result property="errorInfor"    column="error_infor"    />
+        <result property="wmsReasonInfor"    column="wms_reason_infor"    />
+        <result property="wmsQualityName"    column="wms_quality_name"    />
     </resultMap>
 
     <sql id="selectMesPoReturnVendorAllVo">
@@ -53,6 +55,8 @@
         prva.return_vendor_id,
         prva.subinventory_code,
         prva.error_infor,
+        isnull(prva.wms_reason_infor,prva.REMARK) as wms_reason_infor,
+        isnull(prva.wms_quality_name,prva.REMARK) as wms_quality_name,
         (SELECT
                     esb.LOT_CONTROL_CODE
                 FROM

@@ -83,6 +83,25 @@ public class MesPoReturnVendorAllEO {
     @Excel(name = "异常信息", width = 20)
     private String errorInfor;
 
+    private String wmsReasonInfor;
+    private String wmsQualityName;
+
+    public String getWmsReasonInfor() {
+        return wmsReasonInfor;
+    }
+
+    public void setWmsReasonInfor(String wmsReasonInfor) {
+        this.wmsReasonInfor = wmsReasonInfor;
+    }
+
+    public String getWmsQualityName() {
+        return wmsQualityName;
+    }
+
+    public void setWmsQualityName(String wmsQualityName) {
+        this.wmsQualityName = wmsQualityName;
+    }
+
     public String getErrorInfor() {
         return errorInfor;
     }

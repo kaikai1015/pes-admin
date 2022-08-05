@@ -185,6 +185,8 @@ public class MesPoReturnVendorAllJob{
                 "                    <ns2:Quantity>"+poReturnVendorList.getQuantity()+"</ns2:Quantity>\n" +
                 "                    <ns2:UnitOfMeasure>"+poReturnVendorList.getUnitOfMeasure()+"</ns2:UnitOfMeasure>\n" +
                 "                    <ns2:TransactionDate>"+sdf1.format(cal.getTime())+"</ns2:TransactionDate>\n" +
+                "                    <ns2:Attribute1>"+poReturnVendorList.getWmsQualityName()+"</ns2:Attribute1>\n" +
+                "                    <ns2:Comments>"+poReturnVendorList.getWmsReasonInfor()+"</ns2:Comments>\n" +
                 lotNumbers+
                 "                </ns2:StagedReceivingTransaction>\n" +
                 "            </ns1:Receipt>\n" +
